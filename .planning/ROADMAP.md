@@ -31,7 +31,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Creative-level metadata fields exist in the schema and are ready to accept creative data without a migration in v2
 **Plans**: 2 plans
 Plans:
-- [ ] 01-01-PLAN.md — Schema foundation: packages/db scaffold, all schema tables with RLS, dual attribution, creative metadata
+- [x] 01-01-PLAN.md — Schema foundation: packages/db scaffold, all schema tables with RLS, dual attribution, creative metadata
 - [ ] 01-02-PLAN.md — Migrations: Drizzle migration generation, TimescaleDB hypertable conversion, migration runner
 
 ### Phase 2: Core Data Ingestion
@@ -98,7 +98,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Data Architecture | 0/2 | Planning complete | - |
+| 1. Data Architecture | 1/2 | In progress | - |
 | 2. Core Data Ingestion | 0/TBD | Not started | - |
 | 3. Statistical Engine | 0/TBD | Not started | - |
 | 4. Recommendations and Dashboard | 0/TBD | Not started | - |

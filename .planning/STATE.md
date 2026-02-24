@@ -10,27 +10,27 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 1 of 6 (Data Architecture)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-02-24 — Roadmap revised to 6 phases; Phase 1 narrowed to data architecture (ARCH-01/02/03); authentication split into new Phase 6 (AUTH-01/02/03)
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-02-24 — Completed Plan 01: packages/db schema package with RLS, dual attribution, creative metadata, ingestion coverage tracking
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [░░░░░░░░░░] 8%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: -
-- Total execution time: 0 hours
+- Total plans completed: 1
+- Average duration: 4 min
+- Total execution time: 0.1 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 01-data-architecture | 1 | 4 min | 4 min |
 
 **Recent Trend:**
-- Last 5 plans: -
+- Last 5 plans: 4 min
 - Trend: -
 
 *Updated after each plan completion*
@@ -49,19 +49,24 @@ Recent decisions affecting current work:
 - Dual attribution layers: direct + modeled shown side by side
 - 4 CRMs in v2 (HubSpot, Salesforce, GHL, Zoho deferred from v1)
 - Auth deferred to Phase 6 — schema-first approach means data architecture is built before auth is wired in
+- No UUID primary key on campaignMetrics — TimescaleDB hypertable uses uniqueIndex on (tenantId, campaignId, date, source)
+- tenants table has NO RLS — root of isolation hierarchy, access controlled by application auth
+- appRole declared as .existing() — created by infra/DBA, not managed by Drizzle migrations
 
 ### Pending Todos
 
-None yet.
+None.
 
 ### Blockers/Concerns
 
 - CausalPy production readiness is LOW confidence — verify before committing to this library. Fallback: causalimpact (Python port of Google's BSTS R library) or raw PyMC.
 - Ad platform API rate limits in research are from training data — verify current Meta, Google limits against live developer docs before designing ingestion queue.
 - Better Auth organization/role model needs verification that it supports all four required role levels before Phase 6 scaffold commits.
+- TimescaleDB availability on Railway — plan for custom Docker image. Verify before infrastructure provisioning.
+- app_user PostgreSQL role must be created by DBA/infra before migrations run — not managed by Drizzle.
 
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Roadmap revised from 5 to 6 phases. Phase 1 is now Data Architecture only. Phase 6 is Authentication. All 37 v1 requirements remain mapped. Ready to plan Phase 1.
+Stopped at: Completed 01-01-PLAN.md — packages/db schema package complete. Ready for Plan 02 (custom migrations for TimescaleDB hypertables).
 Resume file: None

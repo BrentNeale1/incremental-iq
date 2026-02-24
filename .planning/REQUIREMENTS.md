@@ -64,9 +64,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Data Architecture
 
-- [ ] **ARCH-01**: Data schema supports creative-level metadata for future v2 analysis
-- [ ] **ARCH-02**: Dual attribution layers: direct (trackable) and modeled (estimated) shown side by side
-- [ ] **ARCH-03**: System enforces minimum 1 year historical data before first analysis, recommends 3 years
+- [x] **ARCH-01**: Data schema supports creative-level metadata for future v2 analysis
+- [x] **ARCH-02**: Dual attribution layers: direct (trackable) and modeled (estimated) shown side by side
+- [x] **ARCH-03**: System enforces minimum 1 year historical data before first analysis, recommends 3 years
 
 ## v2 Requirements
 
@@ -127,9 +127,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ARCH-01 | Phase 1 | Pending |
-| ARCH-02 | Phase 1 | Pending |
-| ARCH-03 | Phase 1 | Pending |
+| ARCH-01 | Phase 1 | Complete |
+| ARCH-02 | Phase 1 | Complete |
+| ARCH-03 | Phase 1 | Complete |
 | INTG-01 | Phase 2 | Pending |
 | INTG-02 | Phase 2 | Pending |
 | INTG-03 | Phase 2 | Pending |
