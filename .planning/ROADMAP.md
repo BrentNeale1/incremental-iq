@@ -12,7 +12,7 @@ Six phases deliver campaign-level incremental lift analysis from a schema-first 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Data Architecture** - Multi-tenant schema with RLS, dual attribution layers, and creative metadata ready for campaign data
+- [x] **Phase 1: Data Architecture** - Multi-tenant schema with RLS, dual attribution layers, and creative metadata ready for campaign data
 - [ ] **Phase 2: Core Data Ingestion** - Meta Ads, Google Ads, and Shopify data flowing through the pipeline with historical backfill
 - [ ] **Phase 3: Statistical Engine** - Baseline forecasting, incrementality scoring, confidence intervals, and seasonality detection running
 - [ ] **Phase 4: Recommendations and Dashboard** - Scaling-first recommendations and dual-audience dashboard surfacing model outputs to users
@@ -32,7 +32,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 2 plans
 Plans:
 - [x] 01-01-PLAN.md — Schema foundation: packages/db scaffold, all schema tables with RLS, dual attribution, creative metadata
-- [ ] 01-02-PLAN.md — Migrations: Drizzle migration generation, TimescaleDB hypertable conversion, migration runner
+- [x] 01-02-PLAN.md — Migrations: Drizzle migration generation, TimescaleDB hypertable conversion, migration runner
 
 ### Phase 2: Core Data Ingestion
 **Goal**: Real campaign spend data from Meta Ads and Google Ads, and real revenue data from Shopify, are flowing through the pipeline with at least one year of historical backfill
@@ -98,7 +98,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Data Architecture | 1/2 | In progress | - |
+| 1. Data Architecture | 2/2 | Complete | 2026-02-24 |
 | 2. Core Data Ingestion | 0/TBD | Not started | - |
 | 3. Statistical Engine | 0/TBD | Not started | - |
 | 4. Recommendations and Dashboard | 0/TBD | Not started | - |
