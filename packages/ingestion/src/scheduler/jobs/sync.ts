@@ -6,12 +6,13 @@ import {
   withTenant,
   integrations,
   syncRuns,
+  tenants,
 } from '@incremental-iq/db';
 import { decryptToken } from '../../crypto';
 import { processMetaSync } from '../../normalizers/meta';
 import { processGoogleAdsSync } from '../../normalizers/google-ads';
 import { processShopifySync } from '../../normalizers/shopify';
-import { enqueueBackfill, registerNightlySync } from '../queues';
+import { enqueueBackfill, registerNightlySync, enqueueScoringAfterSync } from '../queues';
 import type { SyncJobData } from '../../types';
 
 /**
@@ -140,6 +141,35 @@ export async function processSyncJob(job: Job<SyncJobData>): Promise<void> {
         updatedAt: new Date(),
       })
       .where(eq(integrations.id, integrationId));
+
+    // Step 5b: Trigger scoring after successful sync (ARCH-03 gated)
+    //
+    // Only trigger if tenants.analysisUnlocked is true — the ARCH-03 gate
+    // ensures scoring doesn't run before >= 1 year of historical data exists.
+    // Fire-and-forget: HTTP response returns immediately; scoring errors are
+    // logged but not propagated (same pattern as backfill in OAuth callbacks).
+    try {
+      const [tenant] = await db
+        .select({ analysisUnlocked: tenants.analysisUnlocked })
+        .from(tenants)
+        .where(eq(tenants.id, tenantId))
+        .limit(1);
+
+      if (tenant?.analysisUnlocked) {
+        await enqueueScoringAfterSync(tenantId);
+        console.info(
+          `[sync] Scoring enqueued after successful sync for tenant ${tenantId}`,
+        );
+      } else {
+        console.info(
+          `[sync] Skipping scoring for tenant ${tenantId} — analysisUnlocked=false (ARCH-03 gate)`,
+        );
+      }
+    } catch (err) {
+      // Scoring trigger failure is non-fatal — sync succeeded, log and continue
+      const message = err instanceof Error ? err.message : String(err);
+      console.warn(`[sync] Failed to enqueue scoring after sync: ${message}`);
+    }
 
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);

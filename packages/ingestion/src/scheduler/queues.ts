@@ -1,26 +1,12 @@
 import { Queue } from 'bullmq';
 import type { Platform, SyncType } from '../types';
+import { redisConnection } from './redis';
 
 // ---------------------------------------------------------------------------
-// Redis connection
+// Redis connection — re-export for external consumers
 // ---------------------------------------------------------------------------
 
-/**
- * Redis connection config for BullMQ.
- *
- * Reads from environment variables. The connection object is shared across
- * all queues and workers within this process.
- *
- * Required env vars:
- *   REDIS_HOST     — Redis server hostname (default: localhost)
- *   REDIS_PORT     — Redis server port (default: 6379)
- *   REDIS_PASSWORD — Redis AUTH password (optional)
- */
-export const redisConnection = {
-  host: process.env.REDIS_HOST ?? 'localhost',
-  port: parseInt(process.env.REDIS_PORT ?? '6379', 10),
-  password: process.env.REDIS_PASSWORD ?? undefined,
-};
+export { redisConnection } from './redis';
 
 // ---------------------------------------------------------------------------
 // Queue definition
@@ -173,4 +159,55 @@ export async function enqueueManualSync(
     },
   );
   return job.id ?? '';
+}
+
+// ---------------------------------------------------------------------------
+// Scoring queue helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Re-export of scoringQueue from scoring/dispatch for convenience.
+ * The scoring queue is created in dispatch.ts; re-exported here for access
+ * alongside the ingestion queue.
+ */
+export { scoringQueue } from '../scoring/dispatch';
+
+/**
+ * Enqueue a full tenant scoring job after a nightly sync completes.
+ *
+ * Enqueues a single 'score-all-campaigns' job which triggers enqueueFullTenantScoring
+ * internally (scoring all active campaigns for the tenant). This decouples the
+ * ingestion completion event from the individual campaign scoring jobs.
+ *
+ * Called at the end of processSyncJob when tenants.analysisUnlocked is true.
+ * ARCH-03 gate enforced in sync.ts: only called when analysisUnlocked = true.
+ *
+ * @param tenantId - Tenant UUID to score all campaigns for.
+ */
+export async function enqueueScoringAfterSync(tenantId: string): Promise<void> {
+  const { scoringQueue: queue } = await import('../scoring/dispatch');
+  await queue.add(
+    'score-all-campaigns',
+    { tenantId, triggerType: 'nightly' },
+    {
+      attempts: 3,
+      backoff: { type: 'exponential', delay: 60_000 },
+      removeOnComplete: { count: 5 },
+      removeOnFail: { count: 20 },
+    },
+  );
+}
+
+/**
+ * Register the weekly model refit schedule for a tenant.
+ *
+ * Wraps dispatch.registerWeeklyRefit — idempotent, safe to call on every
+ * OAuth callback or tenant setup. Registers a cron job that re-fits all
+ * statistical models on Sundays at 4am UTC (STAT-07).
+ *
+ * @param tenantId - Tenant UUID to register the refit schedule for.
+ */
+export async function registerWeeklyRefitSchedule(tenantId: string): Promise<void> {
+  const { registerWeeklyRefit } = await import('../scoring/dispatch');
+  await registerWeeklyRefit(tenantId);
 }

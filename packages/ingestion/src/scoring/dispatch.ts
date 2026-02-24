@@ -10,8 +10,8 @@
  */
 
 import { Queue } from 'bullmq';
-import { redisConnection } from '../scheduler/queues';
-import { db, withTenant, campaignMetrics, campaigns } from '@incremental-iq/db';
+import { redisConnection } from '../scheduler/redis';
+import { db, withTenant } from '@incremental-iq/db';
 import { sql } from 'drizzle-orm';
 
 // ---------------------------------------------------------------------------
