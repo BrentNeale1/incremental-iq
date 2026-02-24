@@ -66,7 +66,7 @@ Plans:
 **Plans**: 6 plans
 Plans:
 - [ ] 03-01-PLAN.md — Schema additions: incrementality_scores, seasonal_events, budget_changes, saturation_estimates tables + funnelStage column + migration
-- [ ] 03-02-PLAN.md — Python FastAPI sidecar scaffold (packages/analysis) with Pydantic schemas, retail event calendar, Dockerfile
+- [x] 03-02-PLAN.md — Python FastAPI sidecar scaffold (packages/analysis) with Pydantic schemas, retail event calendar, Dockerfile
 - [ ] 03-03-PLAN.md — Prophet baseline forecasting with seasonal holiday injection and confidence intervals (TDD)
 - [ ] 03-04-PLAN.md — CausalPy incrementality scoring (ITS) and Hill function saturation curve modeling (TDD)
 - [ ] 03-05-PLAN.md — STL anomaly detection and TypeScript budget change detection
@@ -114,7 +114,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 1. Data Architecture | 2/2 | Complete | 2026-02-24 |
 | 2. Core Data Ingestion | 6/6 | Complete    | 2026-02-24 |
-| 3. Statistical Engine | 0/6 | Not started | - |
+| 3. Statistical Engine | 1/6 | In progress | - |
 | 4. Recommendations and Dashboard | 0/TBD | Not started | - |
 | 5. Expanded Connectors and Multi-Market | 0/TBD | Not started | - |
 | 6. Authentication | 0/TBD | Not started | - |

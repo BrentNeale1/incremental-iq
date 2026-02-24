@@ -36,7 +36,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Seasonality
 
-- [ ] **SEAS-01**: System includes pre-loaded retail event calendar (BFCM, Christmas, etc.)
+- [x] **SEAS-01**: System includes pre-loaded retail event calendar (BFCM, Christmas, etc.)
 - [ ] **SEAS-02**: System detects anomalies and seasonal patterns from historical data
 
 ### Multi-Market
@@ -141,7 +141,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | STAT-05 | Phase 3 | Pending |
 | STAT-06 | Phase 3 | Pending |
 | STAT-07 | Phase 3 | Pending |
-| SEAS-01 | Phase 3 | Pending |
+| SEAS-01 | Phase 3 | Complete |
 | SEAS-02 | Phase 3 | Pending |
 | RECC-01 | Phase 4 | Pending |
 | RECC-02 | Phase 4 | Pending |
@@ -172,4 +172,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-24*
-*Last updated: 2026-02-24 — AUTH-01/02/03 moved from Phase 1 to new Phase 6; Phase 1 narrowed to data architecture only (ARCH-01/02/03); roadmap expanded from 5 to 6 phases*
+*Last updated: 2026-02-24 — SEAS-01 complete (03-02-PLAN.md: retail event calendar with 12 US events in Prophet-compatible format)*
