@@ -1,11 +1,17 @@
 import type { Platform } from '../types';
 import type { PlatformConnector } from '../connector-base';
 import { GoogleAdsConnector } from './google-ads';
+import { MetaConnector } from './meta';
+import { ShopifyConnector } from './shopify';
 
 /**
  * Connector registry mapping platform identifiers to connector instances.
  *
- * Plans 03 (Meta) and 05 (Shopify) will register their connectors here.
+ * All three platform connectors are registered:
+ *   - meta:       Meta Ads API (facebook-nodejs-business-sdk) — Plan 03
+ *   - google_ads: Google Ads API (google-ads-api / Opteo) — Plan 04
+ *   - shopify:    Shopify GraphQL Admin API (@shopify/shopify-api) — Plan 05
+ *
  * The registry is lazy — connectors are instantiated on first request
  * and reused for subsequent calls (stateless by design).
  */
@@ -29,21 +35,19 @@ export function getConnector(platform: Platform): PlatformConnector {
 
 function createConnector(platform: Platform): PlatformConnector {
   switch (platform) {
+    case 'meta':
+      return new MetaConnector();
     case 'google_ads':
       return new GoogleAdsConnector();
-    case 'meta':
-      // Registered in Plan 03 (meta.ts)
-      throw new Error(
-        `Connector for platform 'meta' is not yet registered. Implement packages/ingestion/src/connectors/meta.ts (Plan 03).`,
-      );
     case 'shopify':
-      // Registered in Plan 05 (shopify.ts)
-      throw new Error(
-        `Connector for platform 'shopify' is not yet registered. Implement packages/ingestion/src/connectors/shopify.ts (Plan 05).`,
-      );
+      return new ShopifyConnector();
     default: {
       const _exhaustive: never = platform;
       throw new Error(`Unknown platform: ${_exhaustive}`);
     }
   }
 }
+
+export { MetaConnector } from './meta';
+export { GoogleAdsConnector } from './google-ads';
+export { ShopifyConnector } from './shopify';
