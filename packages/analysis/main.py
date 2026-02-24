@@ -9,7 +9,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import forecast, health
+from routers import anomalies, forecast, health, incrementality
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -42,9 +42,8 @@ app.include_router(health.router)
 
 # Statistical endpoint routers
 app.include_router(forecast.router, prefix="/forecast", tags=["forecast"])
+app.include_router(anomalies.router, prefix="/anomalies", tags=["anomalies"])
+app.include_router(incrementality.router, prefix="/incrementality", tags=["incrementality"])
 
-# Placeholder prefixes for statistical endpoint routers (implemented in Plans 04-05)
-# These will be registered once the routers are implemented:
-#   app.include_router(incrementality.router, prefix="/incrementality", tags=["incrementality"])
+# Placeholder prefix for saturation router (implemented in Plan 04 Task 2)
 #   app.include_router(saturation.router, prefix="/saturation", tags=["saturation"])
-#   app.include_router(anomalies.router, prefix="/anomalies", tags=["anomalies"])
