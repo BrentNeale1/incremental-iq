@@ -50,8 +50,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **RPRT-01**: Dashboard displays summary KPIs (spend, revenue, ROAS, incremental revenue, lift %)
 - [x] **RPRT-02**: User can select date ranges (7/14/30/90 days, custom range, comparison period)
-- [ ] **RPRT-03**: Multi-level view: campaign → cluster → channel → overall rollups
-- [ ] **RPRT-04**: Data freshness indicator per connected integration
+- [x] **RPRT-03**: Multi-level view: campaign → cluster → channel → overall rollups
+- [x] **RPRT-04**: Data freshness indicator per connected integration
 - [ ] **RPRT-05**: User can export data as CSV/Excel
 - [ ] **RPRT-06**: Web UI is mobile-responsive
 - [x] **RPRT-07**: Dual-audience views: simple summaries for business owners, detailed statistical output for analysts
@@ -151,8 +151,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RECC-06 | Phase 4 | Complete |
 | RPRT-01 | Phase 4 | Pending |
 | RPRT-02 | Phase 4 | Complete |
-| RPRT-03 | Phase 4 | Pending |
-| RPRT-04 | Phase 4 | Pending |
+| RPRT-03 | Phase 4 | Complete |
+| RPRT-04 | Phase 4 | Complete |
 | RPRT-05 | Phase 4 | Pending |
 | RPRT-06 | Phase 4 | Pending |
 | RPRT-07 | Phase 4 | Complete |
@@ -172,4 +172,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-24*
-*Last updated: 2026-02-24 — SEAS-01 complete (03-02-PLAN.md: retail event calendar with 12 US events in Prophet-compatible format)*
+*Last updated: 2026-02-25 — RPRT-03 and RPRT-04 complete (04-05-PLAN.md: DrillDownTable with campaign/cluster/channel/overall hierarchy + SyncStatusList with freshness indicators and stale data warnings)*
