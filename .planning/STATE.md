@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 2 of 6 (Core Data Ingestion) - IN PROGRESS
-Plan: 4 of 6 in current phase - COMPLETE
-Status: Phase 2 Plan 04 complete — Google Ads API connector (GAQL, MCC loginCustomerId, quarterly chunking, p-retry) and normalizer (cost_micros/1M USD, 4-col upsert, Zod validation, processGoogleAdsSync orchestrator)
-Last activity: 2026-02-24 — Completed Plan 04: GoogleAdsConnector (google-ads-api v23), connector registry, google-ads normalizer with two-stage pipeline
+Plan: 5 of 6 in current phase - COMPLETE
+Status: Phase 2 Plan 05 complete — Shopify GraphQL connector (fetchMetrics incremental + fetchMetricsBulk Bulk Operations JSONL streaming), Shopify normalizer (directRevenue/directConversions per date, synthetic shopify-revenue campaign, processShopifySync orchestrator), all three connectors registered
+Last activity: 2026-02-24 — Completed Plan 05: ShopifyConnector (@shopify/shopify-api), JSONL streaming, 1-hr token refresh, Shopify normalizer with direct attribution, synthetic campaign per tenant
 
-Progress: [██████░░░░] 58%
+Progress: [███████░░░] 67%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: 4.3 min
-- Total execution time: 0.3 hours
+- Total plans completed: 5
+- Average duration: 5.4 min
+- Total execution time: 0.45 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-data-architecture | 2 | 7 min | 3.5 min |
-| 02-core-data-ingestion | 4 | 31 min | 7.75 min |
+| 02-core-data-ingestion | 5 | 40 min | 8 min |
 
 **Recent Trend:**
-- Last 5 plans: 4 min, 3 min, 3 min, 8 min, 5 min
+- Last 5 plans: 4 min, 3 min, 3 min, 8 min, 5 min, 9 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -39,6 +39,7 @@ Progress: [██████░░░░] 58%
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
 | 02-core-data-ingestion | P03 | 7 min | 2 tasks | 3 files |
+| 02-core-data-ingestion | P05 | 9 min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -69,7 +70,7 @@ Recent decisions affecting current work:
 - FORCE ROW LEVEL SECURITY appended manually to 0002_legal_puma.sql — same atomic-with-table-creation pattern as 0000_aberrant_namora.sql
 - Meta OAuth uses long-lived token exchange (60-day expiry) — avoids refresh token requirement
 - Google OAuth stores both customerId and loginCustomerId in metadata — required for MCC accounts (RESEARCH.md Pitfall 5)
-- Shopify permanent tokens have null tokenExpiresAt — offline install tokens do not expire
+- Shopify offline tokens now expire in 1 hour (Dec 2025 change) — tokenExpiresAt stored as epoch ms in metadata; 5-minute refresh buffer; AbortError signals re-auth if refresh token >90 days old
 - No backfill in OAuth HTTP handlers — Plan 06 scheduler responsibility (RESEARCH.md anti-pattern)
 - HMAC-SHA256 state parameter with timing-safe comparison for OAuth CSRF protection
 - serverExternalPackages: ['postgres'] in next.config.ts — prevents Next.js bundling postgres.js native modules
@@ -79,6 +80,8 @@ Recent decisions affecting current work:
 - [Phase 02-core-data-ingestion]: facebook-nodejs-business-sdk imported via require() with manual type declarations — SDK has no bundled .d.ts types
 - [Phase 02-core-data-ingestion]: Meta attributionWindow hardcoded to '7d_click' — only supported default after Jan 2026 unification; stored in raw_api_pulls for re-normalization if windows change
 - [Phase 02-core-data-ingestion]: Meta ctr stored as decimal (percentage / 100) — Meta API returns '2.34' meaning 2.34%; normalized to 0.023400 matching campaign_metrics numeric(8,6)
+- [Phase 02-core-data-ingestion]: fetchMetricsBulk is Shopify-specific (not on PlatformConnector interface) — processShopifySync imports ShopifyConnector directly for bulk path when date range >30 days
+- [Phase 02-core-data-ingestion]: Synthetic 'shopify-revenue' campaign per tenant for Phase 2 revenue aggregation — per-campaign UTM attribution is Phase 3/4 concern
 
 ### Pending Todos
 
@@ -97,5 +100,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 02-04-PLAN.md — Google Ads connector (google-ads-api GAQL, MCC loginCustomerId, quarterly date chunking, p-retry), normalizer (cost_micros/1M USD, 4-col upsert, Zod validation, processGoogleAdsSync orchestrator), connector registry with getConnector(platform) factory.
+Stopped at: Completed 02-05-PLAN.md — Shopify GraphQL connector (fetchMetrics incremental + fetchMetricsBulk Bulk Operations JSONL streaming, expiring token refresh), Shopify normalizer (directRevenue/directConversions aggregated by date, synthetic shopify-revenue campaign per tenant, processShopifySync orchestrator), all three platform connectors registered in connectors/index.ts.
 Resume file: None
