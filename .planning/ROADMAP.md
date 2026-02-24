@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Data Architecture** - Multi-tenant schema with RLS, dual attribution layers, and creative metadata ready for campaign data
 - [x] **Phase 2: Core Data Ingestion** - Meta Ads, Google Ads, and Shopify data flowing through the pipeline with historical backfill
-- [ ] **Phase 3: Statistical Engine** - Baseline forecasting, incrementality scoring, confidence intervals, and seasonality detection running
+- [x] **Phase 3: Statistical Engine** - Baseline forecasting, incrementality scoring, confidence intervals, and seasonality detection running (completed 2026-02-24)
 - [ ] **Phase 4: Recommendations and Dashboard** - Scaling-first recommendations and dual-audience dashboard surfacing model outputs to users
 - [ ] **Phase 5: Expanded Connectors and Multi-Market** - GA4 integration, market auto-detection, and market-aware attribution
 - [ ] **Phase 6: Authentication** - User sign-up, login with session persistence, and logout across the platform
@@ -114,7 +114,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 1. Data Architecture | 2/2 | Complete | 2026-02-24 |
 | 2. Core Data Ingestion | 6/6 | Complete    | 2026-02-24 |
-| 3. Statistical Engine | 5/6 | In Progress|  |
+| 3. Statistical Engine | 6/6 | Complete   | 2026-02-24 |
 | 4. Recommendations and Dashboard | 0/TBD | Not started | - |
 | 5. Expanded Connectors and Multi-Market | 0/TBD | Not started | - |
 | 6. Authentication | 0/TBD | Not started | - |

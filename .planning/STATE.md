@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 
 ## Current Position
 
-Phase: 3 of 6 (Statistical Engine) - IN PROGRESS
-Plan: 6 of 6 in current phase - IN PROGRESS (Plans 01, 02, 03, 04, and 05 complete — Plan 06 pending)
-Status: Phase 3 Plans 01-05 complete — DB schema + FastAPI sidecar + Prophet baseline + CausalPy ITS incrementality + Hill saturation + hierarchical pooling + STL anomaly detection + TypeScript budget change detection.
-Last activity: 2026-02-24 — Completed Plan 04: CausalPy ITS (compute_incrementality, compute_raw_incrementality), Hill saturation (hill_saturation_percent, CV check), Bayesian hierarchical pooling (hierarchical_pooled_estimate), POST /incrementality + /incrementality/pooled + /saturation endpoints. 14 TDD tests pass.
+Phase: 3 of 6 (Statistical Engine) - COMPLETE
+Plan: 6 of 6 in current phase - COMPLETE (All 6 plans complete)
+Status: Phase 3 COMPLETE — DB schema + FastAPI sidecar + Prophet baseline + CausalPy ITS incrementality + Hill saturation + hierarchical pooling + STL anomaly detection + TypeScript budget change detection + TypeScript scoring orchestration layer (dispatch, worker, persist, rollup, BullMQ wiring).
+Last activity: 2026-02-24 — Completed Plan 06: TypeScript scoring orchestration layer. dispatch.ts (enqueueScoringJob, registerWeeklyRefit STAT-07), worker.ts (processScoringJob calling /forecast /incrementality /saturation /anomalies), persist.ts (dual adjusted/raw rows, ARCH-02 modeled_* update), rollup.ts (4-level hierarchy STAT-02), BullMQ scoring queue wired to scheduler with ARCH-03 gate.
 
-Progress: [████████░░] 78%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -47,6 +47,7 @@ Progress: [████████░░] 78%
 | 03-statistical-engine | P03 | 4 min | 2 tasks | 6 files |
 | 03-statistical-engine | P04 | 64 min | 3 tasks | 9 files |
 | 03-statistical-engine | P05 | 18 min | 2 tasks | 6 files |
+| Phase 03-statistical-engine PP06 | 10 min | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -115,6 +116,9 @@ Recent decisions affecting current work:
 - [Phase 03-statistical-engine]: CausalPy post-period extraction via get_plot_data_bayesian(hdi_prob): posterior['mu'] is (chains, draws, pre_obs, treated_units) covering only pre-period; use get_plot_data_bayesian() to get impact/HDI columns for post-period.
 - [Phase 03-statistical-engine]: Hierarchical pooling uses observed/latent split: data-rich campaigns observed=lift_mean (slight shrinkage toward cluster); sparse campaigns unobserved (posterior pulled toward cluster hyperprior with 2x sigma for honest uncertainty).
 - [Phase 03-statistical-engine]: Hill saturation CV threshold at 0.15: spend std/mean < 0.15 returns insufficient_variation status with saturation_percent=None, preventing nonsensical curve fits on flat-budget campaigns.
+- [Phase 03-statistical-engine]: Separate scoring BullMQ queue from ingestion queue: Python is CPU-heavy, separate queue allows independent concurrency tuning (concurrency=2 vs 3)
+- [Phase 03-statistical-engine]: redisConnection extracted to scheduler/redis.ts to break circular dependency between queues.ts and scoring/dispatch.ts
+- [Phase 03-statistical-engine]: Rollup sentinel convention: deterministic pseudo-UUID campaignId for rollup rows in incrementality_scores, groupKey encoded in rawModelOutput.groupKey
 
 ### Pending Todos
 
@@ -134,5 +138,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 03-04-PLAN.md — CausalPy ITS (compute_incrementality, compute_raw_incrementality with Bayesian credible intervals), Hill saturation (hill_saturation_percent with CV check), Bayesian hierarchical pooling for sparse campaigns (hierarchical_pooled_estimate), POST /incrementality + /incrementality/pooled + /saturation. 14 TDD tests pass.
+Stopped at: Completed 03-06-PLAN.md — TypeScript scoring orchestration layer: dispatch (enqueueScoringJob, registerWeeklyRefit STAT-07), worker (processScoringJob calling Python sidecar), persist (dual adjusted/raw rows ARCH-02), rollup (spendWeightedRollup, 4-level hierarchy STAT-02), BullMQ scoring queue (separate from ingestion), ARCH-03 gate, budget change trigger STAT-04. Phase 3 COMPLETE.
 Resume file: None
