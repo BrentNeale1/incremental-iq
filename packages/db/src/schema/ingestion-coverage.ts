@@ -1,6 +1,6 @@
 import { pgPolicy, pgTable, uuid, text, date, timestamp, numeric } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { appRole } from './roles.js';
+import { appRole } from './roles';
 
 /**
  * Data completeness tracking table (ARCH-03).

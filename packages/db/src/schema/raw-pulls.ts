@@ -1,6 +1,6 @@
 import { pgPolicy, pgTable, uuid, text, timestamp, boolean, jsonb } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { appRole } from './roles.js';
+import { appRole } from './roles';
 
 /**
  * Immutable raw API landing zone.

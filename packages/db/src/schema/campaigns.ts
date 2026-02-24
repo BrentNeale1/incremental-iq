@@ -1,7 +1,7 @@
 import { pgPolicy, pgTable, uuid, text, timestamp } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { appRole } from './roles.js';
-import { creatives } from './creatives.js';
+import { appRole } from './roles';
+import { creatives } from './creatives';
 
 /**
  * Campaign hierarchy: campaigns -> ad_sets -> ads

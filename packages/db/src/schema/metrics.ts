@@ -1,6 +1,6 @@
 import { pgPolicy, pgTable, uuid, date, text, numeric, timestamp, uniqueIndex } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { appRole } from './roles.js';
+import { appRole } from './roles';
 
 /**
  * Campaign metrics fact table with dual attribution columns (ARCH-02).

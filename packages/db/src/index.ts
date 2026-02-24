@@ -1,3 +1,3 @@
 // Main package entry point
-export * from './schema/index.js';
-export { db, withTenant } from './db.js';
+export * from './schema/index';
+export { db, withTenant } from './db';
