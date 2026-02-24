@@ -9,6 +9,8 @@ import { ComparisonToggle } from '@/components/dashboard/ComparisonToggle';
 import { ViewToggle } from '@/components/dashboard/ViewToggle';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { NotificationPanel } from '@/components/notifications/NotificationPanel';
+import { ExportButton } from '@/components/dashboard/ExportButton';
+import { useExportContext } from '@/lib/export/context';
 
 /** Maps pathnames to human-readable page titles. */
 const PAGE_TITLES: Record<string, string> = {
@@ -42,6 +44,7 @@ export function AppHeader() {
   const pathname = usePathname();
   const title = PAGE_TITLES[pathname] ?? 'Dashboard';
   const [notificationsOpen, setNotificationsOpen] = React.useState(false);
+  const { data: exportData, filename: exportFilename } = useExportContext();
 
   return (
     <>
@@ -58,6 +61,9 @@ export function AppHeader() {
           <DateRangePicker />
           <ComparisonToggle />
           <ViewToggle />
+
+          {/* Export — data provided by active page via ExportProvider context */}
+          <ExportButton data={exportData} filename={exportFilename} />
 
           {/* Notification bell — opens panel */}
           <NotificationBell

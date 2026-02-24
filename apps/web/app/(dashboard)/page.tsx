@@ -16,6 +16,7 @@ import { SeasonalAlertCard } from '@/components/recommendations/SeasonalAlertCar
 import { ChartSkeleton } from '@/components/dashboard/SkeletonLoaders';
 import { EmptyRecommendations } from '@/components/dashboard/EmptyStates';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useExportContext } from '@/lib/export/context';
 import type { Recommendation } from '@/lib/recommendations/types';
 
 /**
@@ -135,6 +136,17 @@ export default function ExecutiveOverviewPage() {
         .map((r: Recommendation) => r.seasonalAlert!),
     [recommendations],
   );
+
+  // Provide export data to AppHeader via context
+  const { setExportData } = useExportContext();
+  React.useEffect(() => {
+    if (campaignRows && campaignRows.length > 0) {
+      setExportData(
+        campaignRows as unknown as Record<string, unknown>[],
+        `executive-overview-${format(dateRange.from, 'yyyy-MM-dd')}`,
+      );
+    }
+  }, [campaignRows, dateRange.from, setExportData]);
 
   const campaignRecs = recommendations ?? [];
   const lowConfidenceRecs = campaignRecs.filter(

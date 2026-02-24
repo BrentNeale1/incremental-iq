@@ -7,6 +7,7 @@ import { DataGapsTimeline } from '@/components/health/DataGapsTimeline';
 import { IntegrationSettings } from '@/components/health/IntegrationSettings';
 import { EmptyHealth } from '@/components/dashboard/EmptyStates';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useExportContext } from '@/lib/export/context';
 
 /**
  * PLACEHOLDER tenant ID — Phase 6 (auth) will supply real tenant from session.
@@ -29,6 +30,12 @@ const PLACEHOLDER_TENANT_ID = undefined;
  */
 export default function DataHealthPage() {
   const { data: syncHistory, isLoading, isError, refetch } = useSyncHistory(PLACEHOLDER_TENANT_ID);
+  const { setExportData } = useExportContext();
+  React.useEffect(() => {
+    if (syncHistory && syncHistory.length > 0) {
+      setExportData(syncHistory as unknown as Record<string, unknown>[], 'data-health');
+    }
+  }, [syncHistory, setExportData]);
 
   async function handleManualSync(integrationId: string) {
     try {

@@ -1,7 +1,10 @@
 'use client';
 
 import * as React from 'react';
+import { format } from 'date-fns';
 import { useDashboardStore } from '@/lib/store/dashboard';
+import { useExportContext } from '@/lib/export/context';
+import { useCampaigns } from '@/lib/hooks/useCampaigns';
 import { PriorityQueue } from '@/components/performance/PriorityQueue';
 import { PlatformTabs } from '@/components/performance/PlatformTabs';
 
@@ -22,6 +25,16 @@ const PLACEHOLDER_TENANT_ID = undefined;
  */
 export default function MarketingPerformancePage() {
   const dateRange = useDashboardStore((s) => s.dateRange);
+  const { data: campaignRows } = useCampaigns(undefined, dateRange);
+  const { setExportData } = useExportContext();
+  React.useEffect(() => {
+    if (campaignRows && campaignRows.length > 0) {
+      setExportData(
+        campaignRows as unknown as Record<string, unknown>[],
+        `performance-${format(dateRange.from, 'yyyy-MM-dd')}`,
+      );
+    }
+  }, [campaignRows, dateRange.from, setExportData]);
 
   return (
     <div className="space-y-6 sm:space-y-8">

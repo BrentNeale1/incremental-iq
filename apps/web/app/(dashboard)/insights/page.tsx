@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/collapsible';
 import { ChevronDownIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useExportContext } from '@/lib/export/context';
 
 /**
  * PLACEHOLDER tenant ID — Phase 6 (auth) will supply real tenant from session.
@@ -40,6 +41,8 @@ const PLACEHOLDER_TENANT_ID = undefined;
 export default function StatisticalInsightsPage() {
   const dateRange = useDashboardStore((s) => s.dateRange);
 
+  const { setExportData } = useExportContext();
+
   // Incrementality scores for all campaigns
   const { data: scores, isLoading: scoresLoading } = useIncrementality(
     PLACEHOLDER_TENANT_ID,
@@ -48,6 +51,12 @@ export default function StatisticalInsightsPage() {
   );
 
   // Saturation for selected campaign
+  React.useEffect(() => {
+    if (scores && scores.length > 0) {
+      setExportData(scores as unknown as Record<string, unknown>[], 'statistical-insights');
+    }
+  }, [scores, setExportData]);
+
   const [selectedRow, setSelectedRow] = React.useState<DrillDownRow | null>(null);
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 

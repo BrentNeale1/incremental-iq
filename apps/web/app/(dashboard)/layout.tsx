@@ -5,6 +5,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/layout/AppSidebar';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { StaleDataBanner } from '@/components/dashboard/StaleDataBanner';
+import { ExportProvider } from '@/lib/export/context';
 import { useDashboardStore } from '@/lib/store/dashboard';
 
 /**
@@ -41,18 +42,20 @@ export default function DashboardLayout({
   }, []);
 
   return (
-    <SidebarProvider defaultOpen={true}>
-      <AppSidebar />
-      <div className="flex min-h-screen flex-1 flex-col overflow-hidden">
-        <AppHeader />
-        <main className="flex-1 overflow-auto p-4 sm:p-6">
-          <div className="mx-auto max-w-7xl space-y-4">
-            {/* Stale data banner — shown when any integration >24h stale */}
-            <StaleDataBanner tenantId={PLACEHOLDER_TENANT_ID} />
-            {children}
-          </div>
-        </main>
-      </div>
-    </SidebarProvider>
+    <ExportProvider>
+      <SidebarProvider defaultOpen={true}>
+        <AppSidebar />
+        <div className="flex min-h-screen flex-1 flex-col overflow-hidden">
+          <AppHeader />
+          <main className="flex-1 overflow-auto p-4 sm:p-6">
+            <div className="mx-auto max-w-7xl space-y-4">
+              {/* Stale data banner — shown when any integration >24h stale */}
+              <StaleDataBanner tenantId={PLACEHOLDER_TENANT_ID} />
+              {children}
+            </div>
+          </main>
+        </div>
+      </SidebarProvider>
+    </ExportProvider>
   );
 }

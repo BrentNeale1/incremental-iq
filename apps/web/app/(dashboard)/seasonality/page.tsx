@@ -8,6 +8,7 @@ import { HistoricalComparison } from '@/components/seasonality/HistoricalCompari
 import { TimelineSkeleton } from '@/components/dashboard/SkeletonLoaders';
 import { EmptySeasonality } from '@/components/dashboard/EmptyStates';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useExportContext } from '@/lib/export/context';
 
 /**
  * PLACEHOLDER tenant ID — Phase 6 (auth) will supply real tenant from session.
@@ -27,6 +28,12 @@ const PLACEHOLDER_TENANT_ID = undefined;
  */
 export default function SeasonalityPlanningPage() {
   const { data, isLoading, isError } = useSeasonality(PLACEHOLDER_TENANT_ID, 6);
+  const { setExportData } = useExportContext();
+  React.useEffect(() => {
+    if (data?.upcoming && data.upcoming.length > 0) {
+      setExportData(data.upcoming as unknown as Record<string, unknown>[], 'seasonality-planning');
+    }
+  }, [data, setExportData]);
 
   const upcomingEvents = data?.upcoming ?? [];
   const historicalData = data?.historical ?? [];
