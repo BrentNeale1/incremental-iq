@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 3 of 6 (Statistical Engine) - IN PROGRESS
-Plan: 3 of 6 in current phase - COMPLETE (Plans 01, 02, and 03 complete)
-Status: Phase 3 Plans 01-03 complete — DB schema (4 new tables, funnelStage on campaigns, migration 0003) + FastAPI analysis sidecar (Pydantic schemas, retail calendar, Dockerfile) + Prophet baseline forecasting model and /forecast endpoint.
-Last activity: 2026-02-24 — Completed Plan 03: Prophet baseline model (fit_baseline with zero-spend filtering, retail calendar holiday injection, multiplicative seasonality), POST /forecast FastAPI endpoint with ForecastResponse confidence intervals and seasonal decomposition, 6 TDD tests all passing.
+Plan: 5 of 6 in current phase - COMPLETE (Plans 01, 02, 03, and 05 complete)
+Status: Phase 3 Plans 01, 02, 03, 05 complete — DB schema + FastAPI sidecar + Prophet baseline + STL anomaly detection (/anomalies endpoint) + TypeScript budget change detection (3-day smoothing, 14-day rolling averages).
+Last activity: 2026-02-24 — Completed Plan 05: STL anomaly detection (detect_anomalies with seasonal_strength + trend_direction, 6 TDD tests pass), POST /anomalies FastAPI endpoint, TypeScript detectBudgetChanges/persistBudgetChange/scanAllCampaignsForBudgetChanges with 3-day smoothing (Pitfall 5 mitigation).
 
 Progress: [████████░░] 78%
 
@@ -45,6 +45,7 @@ Progress: [████████░░] 78%
 | 03-statistical-engine | P01 | 11 min | 2 tasks | 7 files |
 | 03-statistical-engine | P02 | 5 min | 2 tasks | 13 files |
 | 03-statistical-engine | P03 | 4 min | 2 tasks | 6 files |
+| 03-statistical-engine | P05 | 18 min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -105,6 +106,10 @@ Recent decisions affecting current work:
 - [Phase 03-statistical-engine]: Prophet lower_window stored as positive int in retail_calendar (human-readable), negated in to_prophet_holidays() — Prophet 1.3.0 requires lower_window <= 0
 - [Phase 03-statistical-engine]: FastAPI router handler path is "/" not "/forecast" — router mounted with prefix="/forecast" in main.py; handler "/forecast" would yield /forecast/forecast (404)
 - [Phase 03-statistical-engine]: Zero-spend filtering threshold is 20% — campaigns with ≤20% zero-spend rows keep them (legitimate weekend pause); above 20% filtered to avoid corrupting Prophet weekly seasonality
+- [Phase 03-statistical-engine]: STL period=7, seasonal=13, robust=True for anomaly detection — weekly campaign cycles with robust smoother downweights outlier influence during decomposition
+- [Phase 03-statistical-engine]: Seasonal strength formula: 1 - var(resid)/var(seasonal + resid) — measures weekly pattern strength, clamped to [0,1]
+- [Phase 03-statistical-engine]: Budget change detection uses raw SQL FILTER clause — pre/post windowed average comparison too complex for Drizzle ORM query builder; sql template literal keeps it type-safe
+- [Phase 03-statistical-engine]: 3-day spend smoothing via SQL ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING before threshold comparison — Pitfall 5 mitigation for billing cycle false positives
 
 ### Pending Todos
 
@@ -124,5 +129,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 03-03-PLAN.md — Prophet baseline model (fit_baseline with zero-spend filtering, retail calendar holiday injection, multiplicative seasonality), POST /forecast FastAPI endpoint with ForecastResponse confidence intervals and seasonal decomposition, 6 TDD tests all passing.
+Stopped at: Completed 03-05-PLAN.md — STL anomaly detection (detect_anomalies, 6 TDD tests), POST /anomalies endpoint, TypeScript budget change detection (detectBudgetChanges, persistBudgetChange, scanAllCampaignsForBudgetChanges) with 3-day smoothing.
 Resume file: None

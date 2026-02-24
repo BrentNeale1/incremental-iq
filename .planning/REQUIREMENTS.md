@@ -17,13 +17,13 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Statistical Engine
 
-- [ ] **STAT-01**: System builds baseline forecast model from historical data for each campaign
+- [x] **STAT-01**: System builds baseline forecast model from historical data for each campaign
 - [x] **STAT-02**: System produces campaign-level incrementality scores that roll up to clusters, channels, and overall
 - [x] **STAT-03**: All predictions and scores include confidence intervals
 - [x] **STAT-04**: System performs time-series pre/post analysis when budget changes are detected
 - [x] **STAT-05**: System supports geo-based testing with market-level control groups
 - [x] **STAT-06**: System models saturation curves to detect diminishing returns on spend
-- [ ] **STAT-07**: Model accuracy improves as more data accumulates over time
+- [x] **STAT-07**: Model accuracy improves as more data accumulates over time
 
 ### Recommendations
 
@@ -37,7 +37,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Seasonality
 
 - [x] **SEAS-01**: System includes pre-loaded retail event calendar (BFCM, Christmas, etc.)
-- [ ] **SEAS-02**: System detects anomalies and seasonal patterns from historical data
+- [x] **SEAS-02**: System detects anomalies and seasonal patterns from historical data
 
 ### Multi-Market
 
@@ -134,15 +134,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INTG-02 | Phase 2 | Complete |
 | INTG-03 | Phase 2 | Complete |
 | INTG-05 | Phase 2 | Complete |
-| STAT-01 | Phase 3 | Pending |
+| STAT-01 | Phase 3 | Complete |
 | STAT-02 | Phase 3 | Complete |
 | STAT-03 | Phase 3 | Complete |
 | STAT-04 | Phase 3 | Complete |
 | STAT-05 | Phase 3 | Complete |
 | STAT-06 | Phase 3 | Complete |
-| STAT-07 | Phase 3 | Pending |
+| STAT-07 | Phase 3 | Complete |
 | SEAS-01 | Phase 3 | Complete |
-| SEAS-02 | Phase 3 | Pending |
+| SEAS-02 | Phase 3 | Complete |
 | RECC-01 | Phase 4 | Pending |
 | RECC-02 | Phase 4 | Pending |
 | RECC-03 | Phase 4 | Pending |
