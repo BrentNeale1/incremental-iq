@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 2 of 6 (Core Data Ingestion) - IN PROGRESS
-Plan: 2 of 6 in current phase - COMPLETE
-Status: Phase 2 Plan 02 complete — Drizzle migration for integrations/sync_runs, Next.js App Router (apps/web), OAuth routes for Meta/Google/Shopify with AES-256-GCM token encryption and HMAC-SHA256 CSRF protection
-Last activity: 2026-02-24 — Completed Plan 02: apps/web Next.js scaffold, 6 OAuth routes, oauth-helpers.ts, Drizzle migration 0002_legal_puma.sql with FORCE RLS
+Plan: 4 of 6 in current phase - COMPLETE
+Status: Phase 2 Plan 04 complete — Google Ads API connector (GAQL, MCC loginCustomerId, quarterly chunking, p-retry) and normalizer (cost_micros/1M USD, 4-col upsert, Zod validation, processGoogleAdsSync orchestrator)
+Last activity: 2026-02-24 — Completed Plan 04: GoogleAdsConnector (google-ads-api v23), connector registry, google-ads normalizer with two-stage pipeline
 
-Progress: [████░░░░░░] 33%
+Progress: [██████░░░░] 58%
 
 ## Performance Metrics
 
@@ -28,10 +28,10 @@ Progress: [████░░░░░░] 33%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-data-architecture | 2 | 7 min | 3.5 min |
-| 02-core-data-ingestion | 2 | 11 min | 5.5 min |
+| 02-core-data-ingestion | 4 | 31 min | 7.75 min |
 
 **Recent Trend:**
-- Last 5 plans: 4 min, 3 min, 3 min, 8 min
+- Last 5 plans: 4 min, 3 min, 3 min, 8 min, 5 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -69,6 +69,9 @@ Recent decisions affecting current work:
 - No backfill in OAuth HTTP handlers — Plan 06 scheduler responsibility (RESEARCH.md anti-pattern)
 - HMAC-SHA256 state parameter with timing-safe comparison for OAuth CSRF protection
 - serverExternalPackages: ['postgres'] in next.config.ts — prevents Next.js bundling postgres.js native modules
+- [Phase 02-core-data-ingestion]: drizzle-orm added as direct dependency to packages/ingestion — normalizers need eq/and/sql helpers
+- [Phase 02-core-data-ingestion]: connector registry uses switch/exhaustive check — Plan 03 (meta) and 05 (shopify) update with their connectors
+- [Phase 02-core-data-ingestion]: cost_micros conversion in normalizer only — connector returns raw micros, normalizer handles USD conversion
 
 ### Pending Todos
 
@@ -87,5 +90,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 02-02-PLAN.md — Drizzle migration 0002_legal_puma.sql (integrations + sync_runs with FORCE RLS), apps/web Next.js scaffold, 6 OAuth routes (Meta/Google/Shopify initiation + callback), oauth-helpers.ts with saveIntegration/generateState/verifyState.
+Stopped at: Completed 02-04-PLAN.md — Google Ads connector (google-ads-api GAQL, MCC loginCustomerId, quarterly date chunking, p-retry), normalizer (cost_micros/1M USD, 4-col upsert, Zod validation, processGoogleAdsSync orchestrator), connector registry with getConnector(platform) factory.
 Resume file: None
