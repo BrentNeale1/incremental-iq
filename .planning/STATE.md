@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** Campaign-level incremental lift analysis that tells brands exactly which campaigns to scale, by how much, and for how long — with transparent confidence levels so no recommendation is made without measurable expected impact.
-**Current focus:** Phase 3 - Statistical Engine (IN PROGRESS)
+**Current focus:** Phase 4 - Recommendations and Dashboard (IN PROGRESS)
 
 ## Current Position
 
-Phase: 3 of 6 (Statistical Engine) - COMPLETE
-Plan: 6 of 6 in current phase - COMPLETE (All 6 plans complete)
-Status: Phase 3 COMPLETE — DB schema + FastAPI sidecar + Prophet baseline + CausalPy ITS incrementality + Hill saturation + hierarchical pooling + STL anomaly detection + TypeScript budget change detection + TypeScript scoring orchestration layer (dispatch, worker, persist, rollup, BullMQ wiring).
-Last activity: 2026-02-24 — Completed Plan 06: TypeScript scoring orchestration layer. dispatch.ts (enqueueScoringJob, registerWeeklyRefit STAT-07), worker.ts (processScoringJob calling /forecast /incrementality /saturation /anomalies), persist.ts (dual adjusted/raw rows, ARCH-02 modeled_* update), rollup.ts (4-level hierarchy STAT-02), BullMQ scoring queue wired to scheduler with ARCH-03 gate.
+Phase: 4 of 6 (Recommendations and Dashboard) - IN PROGRESS
+Plan: 2 of 6 in current phase - COMPLETE (Plans 01-02 done; Plans 03-06 remaining)
+Status: Phase 4 Plans 01+02 COMPLETE — UI foundation (shadcn/ui, Zustand stores, layout, providers) + recommendation engine (Hill curve math, scale/watch/investigate classification) + all 9 dashboard API routes (kpis, campaigns, incrementality, seasonality, saturation, recommendations, notifications).
+Last activity: 2026-02-24 — Completed Plan 02: TypeScript recommendation engine (computeBudgetRecommendation, classifyRecommendation, generateRecommendations) + 9 Next.js API routes consuming Phase 3 statistical outputs.
 
-Progress: [██████████] 100%
+Progress: [███░░░░░░░] 33%
 
 ## Performance Metrics
 
@@ -48,6 +48,8 @@ Progress: [██████████] 100%
 | 03-statistical-engine | P04 | 64 min | 3 tasks | 9 files |
 | 03-statistical-engine | P05 | 18 min | 2 tasks | 6 files |
 | Phase 03-statistical-engine PP06 | 10 min | 3 tasks | 11 files |
+| Phase 04-recommendations-and-dashboard PP01 | 10 min | 2 tasks | 37 files |
+| Phase 04-recommendations-and-dashboard PP02 | 11 min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -119,6 +121,14 @@ Recent decisions affecting current work:
 - [Phase 03-statistical-engine]: Separate scoring BullMQ queue from ingestion queue: Python is CPU-heavy, separate queue allows independent concurrency tuning (concurrency=2 vs 3)
 - [Phase 03-statistical-engine]: redisConnection extracted to scheduler/redis.ts to break circular dependency between queues.ts and scoring/dispatch.ts
 - [Phase 03-statistical-engine]: Rollup sentinel convention: deterministic pseudo-UUID campaignId for rollup rows in incrementality_scores, groupKey encoded in rawModelOutput.groupKey
+- [Phase 04-recommendations-and-dashboard]: shadcn/ui init on Windows requires Tailwind pre-installed + manual dep install when pnpm not on PATH in child process
+- [Phase 04-recommendations-and-dashboard]: Rollup sentinel rows filtered via INNER JOIN campaigns (not campaignId LIKE 'rollup:%') — INNER JOIN is more robust: rollup rows have pseudo-UUIDs not in campaigns table
+- [Phase 04-recommendations-and-dashboard]: holdoutTestDesign field strictly absent on scale_up action (RECC-06) — engine guarantees this; UI checks field existence to conditionally render holdout option
+- [Phase 04-recommendations-and-dashboard]: Explicit return type annotation on withTenant<T>() calls required — TypeScript strict mode collapses inferred type to '{}' without annotation; all API routes use 'const rows: MyType[] = await withTenant(...)'
+- [Phase 04-recommendations-and-dashboard]: Seasonal alerts wrapped in try/catch (non-critical) — recommendation list must succeed even if seasonal data query fails
+- [Phase 04-recommendations-and-dashboard]: Zustand persist requires skipHydration: true for Next.js App Router — client calls useDashboardStore.persist.rehydrate() after mount
+- [Phase 04-recommendations-and-dashboard]: TanStack Query SSR-safe pattern: typeof window === undefined guard creates per-request instance on server, reuses cached instance in browser
+- [Phase 04-recommendations-and-dashboard]: Tailwind v4 uses CSS-based config (postcss.config.mjs + @import tailwindcss in globals.css) — no tailwind.config.js needed
 
 ### Pending Todos
 
@@ -138,5 +148,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 03-06-PLAN.md — TypeScript scoring orchestration layer: dispatch (enqueueScoringJob, registerWeeklyRefit STAT-07), worker (processScoringJob calling Python sidecar), persist (dual adjusted/raw rows ARCH-02), rollup (spendWeightedRollup, 4-level hierarchy STAT-02), BullMQ scoring queue (separate from ingestion), ARCH-03 gate, budget change trigger STAT-04. Phase 3 COMPLETE.
+Stopped at: Completed 04-02-PLAN.md — TypeScript recommendation engine (computeBudgetRecommendation Hill curve, classifyRecommendation scale/watch/investigate, generateRecommendations with INNER JOIN rollup filter) + 9 Next.js API routes: /api/recommendations, /api/dashboard/kpis, /api/dashboard/campaigns (level= drill-down), /api/dashboard/incrementality, /api/dashboard/seasonality, /api/dashboard/saturation, /api/notifications, /api/notifications/preferences.
 Resume file: None

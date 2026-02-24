@@ -27,12 +27,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Recommendations
 
-- [ ] **RECC-01**: System defaults to scaling-first recommendations ("increase budget by X% for Y weeks")
-- [ ] **RECC-02**: Each recommendation includes expected outcome (simple estimate for owners, ranges with confidence for analysts)
-- [ ] **RECC-03**: System states uncertainty transparently and suggests specific tests to resolve data gaps
-- [ ] **RECC-04**: System can design holdout tests when statistical modeling lacks sufficient confidence
+- [x] **RECC-01**: System defaults to scaling-first recommendations ("increase budget by X% for Y weeks")
+- [x] **RECC-02**: Each recommendation includes expected outcome (simple estimate for owners, ranges with confidence for analysts)
+- [x] **RECC-03**: System states uncertainty transparently and suggests specific tests to resolve data gaps
+- [x] **RECC-04**: System can design holdout tests when statistical modeling lacks sufficient confidence
 - [ ] **RECC-05**: System proactively suggests budget adjustments ahead of known seasonal periods
-- [ ] **RECC-06**: Holdout tests are suggested only as a last resort, never as the first option
+- [x] **RECC-06**: Holdout tests are suggested only as a last resort, never as the first option
 
 ### Seasonality
 
@@ -49,12 +49,12 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Reporting & UI
 
 - [ ] **RPRT-01**: Dashboard displays summary KPIs (spend, revenue, ROAS, incremental revenue, lift %)
-- [ ] **RPRT-02**: User can select date ranges (7/14/30/90 days, custom range, comparison period)
+- [x] **RPRT-02**: User can select date ranges (7/14/30/90 days, custom range, comparison period)
 - [ ] **RPRT-03**: Multi-level view: campaign → cluster → channel → overall rollups
 - [ ] **RPRT-04**: Data freshness indicator per connected integration
 - [ ] **RPRT-05**: User can export data as CSV/Excel
 - [ ] **RPRT-06**: Web UI is mobile-responsive
-- [ ] **RPRT-07**: Dual-audience views: simple summaries for business owners, detailed statistical output for analysts
+- [x] **RPRT-07**: Dual-audience views: simple summaries for business owners, detailed statistical output for analysts
 
 ### Access
 
@@ -143,19 +143,19 @@ Which phases cover which requirements. Updated during roadmap creation.
 | STAT-07 | Phase 3 | Complete |
 | SEAS-01 | Phase 3 | Complete |
 | SEAS-02 | Phase 3 | Complete |
-| RECC-01 | Phase 4 | Pending |
-| RECC-02 | Phase 4 | Pending |
-| RECC-03 | Phase 4 | Pending |
-| RECC-04 | Phase 4 | Pending |
+| RECC-01 | Phase 4 | Complete |
+| RECC-02 | Phase 4 | Complete |
+| RECC-03 | Phase 4 | Complete |
+| RECC-04 | Phase 4 | Complete |
 | RECC-05 | Phase 4 | Pending |
-| RECC-06 | Phase 4 | Pending |
+| RECC-06 | Phase 4 | Complete |
 | RPRT-01 | Phase 4 | Pending |
-| RPRT-02 | Phase 4 | Pending |
+| RPRT-02 | Phase 4 | Complete |
 | RPRT-03 | Phase 4 | Pending |
 | RPRT-04 | Phase 4 | Pending |
 | RPRT-05 | Phase 4 | Pending |
 | RPRT-06 | Phase 4 | Pending |
-| RPRT-07 | Phase 4 | Pending |
+| RPRT-07 | Phase 4 | Complete |
 | INTG-04 | Phase 5 | Pending |
 | MRKT-01 | Phase 5 | Pending |
 | MRKT-02 | Phase 5 | Pending |

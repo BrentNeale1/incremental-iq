@@ -84,8 +84,8 @@ Plans:
   5. User can export all visible data as CSV or Excel, and the UI is fully usable on a mobile browser
 **Plans**: 6 plans
 Plans:
-- [ ] 04-01-PLAN.md — UI foundation: Tailwind v4 + shadcn/ui, fonts, ThemeProvider, QueryClient, Zustand stores, DB schema (notifications, user_preferences), migration
-- [ ] 04-02-PLAN.md — Recommendation engine + API routes: TypeScript Hill curve math, confidence gating, all dashboard API endpoints
+- [x] 04-01-PLAN.md — UI foundation: Tailwind v4 + shadcn/ui, fonts, ThemeProvider, QueryClient, Zustand stores, DB schema (notifications, user_preferences), migration
+- [x] 04-02-PLAN.md — Recommendation engine + API routes: TypeScript Hill curve math, confidence gating, all dashboard API endpoints
 - [ ] 04-03-PLAN.md — Dashboard layout + Executive Overview: collapsible sidebar, date range picker, KPI grid with dnd-kit, hero chart, recommendation cards
 - [ ] 04-04-PLAN.md — Marketing Performance + Seasonality Planning: priority queue, platform tabs, campaign drill-down, seasonal timeline, historical comparison
 - [ ] 04-05-PLAN.md — Statistical Insights + Data Health: model health charts, methodology sidebar, drill-down table, sync status, data gaps
@@ -122,6 +122,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Data Architecture | 2/2 | Complete | 2026-02-24 |
 | 2. Core Data Ingestion | 6/6 | Complete    | 2026-02-24 |
 | 3. Statistical Engine | 6/6 | Complete    | 2026-02-24 |
-| 4. Recommendations and Dashboard | 0/6 | Not started | - |
+| 4. Recommendations and Dashboard | 2/6 | In Progress|  |
 | 5. Expanded Connectors and Multi-Market | 0/TBD | Not started | - |
 | 6. Authentication | 0/TBD | Not started | - |
