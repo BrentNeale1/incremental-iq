@@ -14,5 +14,9 @@ export * from './seasonal-events';
 export * from './budget-changes';
 export * from './saturation-estimates';
 
+// Phase 4: Dashboard and recommendations schema
+export * from './notifications';
+export * from './user-preferences';
+
 // Re-export the app role for use in policy definitions
 export { appRole } from './roles';

@@ -29,6 +29,13 @@
       "when": 1771922593578,
       "tag": "0003_statistical_engine",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1771939198000,
+      "tag": "0004_phase4_dashboard",
+      "breakpoints": true
     }
   ]
 }
