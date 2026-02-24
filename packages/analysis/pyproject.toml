@@ -1,0 +1,35 @@
+[project]
+name = "incremental-iq-analysis"
+version = "1.0.0"
+description = "Statistical analysis engine for Incremental IQ — forecasting, incrementality, saturation, and anomaly detection"
+requires-python = ">=3.11"
+dependencies = [
+    "prophet>=1.1.0",
+    "causalpy>=0.7.0",
+    "pymc-marketing>=0.18.0",
+    "statsmodels>=0.14.0",
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "ruptures>=1.1.0",
+    "pandas>=2.0",
+    "numpy",
+    "arviz>=0.19.0",
+    "scipy",
+    "pydantic>=2.0",
+]
+
+[project.scripts]
+serve = "uvicorn main:app --host 0.0.0.0 --port 8000"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "httpx>=0.27.0",
+]
+
+[tool.uv]
+python-preference = "only-managed"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
