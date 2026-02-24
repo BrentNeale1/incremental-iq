@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 3 of 6 (Statistical Engine) - IN PROGRESS
-Plan: 5 of 6 in current phase - COMPLETE (Plans 01, 02, 03, and 05 complete)
-Status: Phase 3 Plans 01, 02, 03, 05 complete — DB schema + FastAPI sidecar + Prophet baseline + STL anomaly detection (/anomalies endpoint) + TypeScript budget change detection (3-day smoothing, 14-day rolling averages).
-Last activity: 2026-02-24 — Completed Plan 05: STL anomaly detection (detect_anomalies with seasonal_strength + trend_direction, 6 TDD tests pass), POST /anomalies FastAPI endpoint, TypeScript detectBudgetChanges/persistBudgetChange/scanAllCampaignsForBudgetChanges with 3-day smoothing (Pitfall 5 mitigation).
+Plan: 6 of 6 in current phase - IN PROGRESS (Plans 01, 02, 03, 04, and 05 complete — Plan 06 pending)
+Status: Phase 3 Plans 01-05 complete — DB schema + FastAPI sidecar + Prophet baseline + CausalPy ITS incrementality + Hill saturation + hierarchical pooling + STL anomaly detection + TypeScript budget change detection.
+Last activity: 2026-02-24 — Completed Plan 04: CausalPy ITS (compute_incrementality, compute_raw_incrementality), Hill saturation (hill_saturation_percent, CV check), Bayesian hierarchical pooling (hierarchical_pooled_estimate), POST /incrementality + /incrementality/pooled + /saturation endpoints. 14 TDD tests pass.
 
 Progress: [████████░░] 78%
 
@@ -45,6 +45,7 @@ Progress: [████████░░] 78%
 | 03-statistical-engine | P01 | 11 min | 2 tasks | 7 files |
 | 03-statistical-engine | P02 | 5 min | 2 tasks | 13 files |
 | 03-statistical-engine | P03 | 4 min | 2 tasks | 6 files |
+| 03-statistical-engine | P04 | 64 min | 3 tasks | 9 files |
 | 03-statistical-engine | P05 | 18 min | 2 tasks | 6 files |
 
 ## Accumulated Context
@@ -110,6 +111,10 @@ Recent decisions affecting current work:
 - [Phase 03-statistical-engine]: Seasonal strength formula: 1 - var(resid)/var(seasonal + resid) — measures weekly pattern strength, clamped to [0,1]
 - [Phase 03-statistical-engine]: Budget change detection uses raw SQL FILTER clause — pre/post windowed average comparison too complex for Drizzle ORM query builder; sql template literal keeps it type-safe
 - [Phase 03-statistical-engine]: 3-day spend smoothing via SQL ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING before threshold comparison — Pitfall 5 mitigation for billing cycle false positives
+- [Phase 03-statistical-engine]: cores=1 for PyMC on Windows: FastAPI uvicorn workers are not the __main__ module; PyMC spawn-based multiprocessing requires __main__ guard. Production Linux Docker can use cores=4.
+- [Phase 03-statistical-engine]: CausalPy post-period extraction via get_plot_data_bayesian(hdi_prob): posterior['mu'] is (chains, draws, pre_obs, treated_units) covering only pre-period; use get_plot_data_bayesian() to get impact/HDI columns for post-period.
+- [Phase 03-statistical-engine]: Hierarchical pooling uses observed/latent split: data-rich campaigns observed=lift_mean (slight shrinkage toward cluster); sparse campaigns unobserved (posterior pulled toward cluster hyperprior with 2x sigma for honest uncertainty).
+- [Phase 03-statistical-engine]: Hill saturation CV threshold at 0.15: spend std/mean < 0.15 returns insufficient_variation status with saturation_percent=None, preventing nonsensical curve fits on flat-budget campaigns.
 
 ### Pending Todos
 
@@ -120,7 +125,7 @@ Recent decisions affecting current work:
 
 ### Blockers/Concerns
 
-- CausalPy production readiness is LOW confidence — verify before committing to this library. Fallback: causalimpact (Python port of Google's BSTS R library) or raw PyMC.
+- CausalPy 0.7.0 verified working in Plan 04: ITS model fits correctly, get_plot_data_bayesian() extracts post-period impact with HDI. Windows requires cores=1; production Linux Docker should use cores=4. No fallback needed.
 - Better Auth organization/role model needs verification that it supports all four required role levels before Phase 6 scaffold commits.
 - TimescaleDB availability on Railway — plan for custom Docker image. Verify before infrastructure provisioning.
 - app_user PostgreSQL role must be created by DBA/infra before migrations run — not managed by Drizzle.
@@ -129,5 +134,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 03-05-PLAN.md — STL anomaly detection (detect_anomalies, 6 TDD tests), POST /anomalies endpoint, TypeScript budget change detection (detectBudgetChanges, persistBudgetChange, scanAllCampaignsForBudgetChanges) with 3-day smoothing.
+Stopped at: Completed 03-04-PLAN.md — CausalPy ITS (compute_incrementality, compute_raw_incrementality with Bayesian credible intervals), Hill saturation (hill_saturation_percent with CV check), Bayesian hierarchical pooling for sparse campaigns (hierarchical_pooled_estimate), POST /incrementality + /incrementality/pooled + /saturation. 14 TDD tests pass.
 Resume file: None
