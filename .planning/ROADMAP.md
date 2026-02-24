@@ -44,7 +44,14 @@ Plans:
   3. User can connect a Shopify store and see order and revenue data appear as the outcome variable (not ad platform conversion counts)
   4. System automatically backfills historical data up to 3 years for all connected sources, with a visible minimum of 1 year before analysis is unlocked
   5. Each connected integration shows a data freshness indicator so the user knows when data was last synced
-**Plans**: TBD
+**Plans**: 6 plans
+Plans:
+- [ ] 02-01-PLAN.md — Schema additions (integrations, sync_runs) + packages/ingestion scaffold with shared utilities
+- [ ] 02-02-PLAN.md — apps/web Next.js scaffold, Drizzle migration, OAuth routes for Meta/Google/Shopify
+- [ ] 02-03-PLAN.md — Meta Ads connector and normalizer (two-stage raw-to-normalized pipeline)
+- [ ] 02-04-PLAN.md — Google Ads connector and normalizer (GAQL queries, cost_micros conversion)
+- [ ] 02-05-PLAN.md — Shopify connector and normalizer (bulk operations for backfill, direct attribution)
+- [ ] 02-06-PLAN.md — BullMQ scheduler, backfill worker, manual sync, freshness API endpoints
 
 ### Phase 3: Statistical Engine
 **Goal**: The system produces campaign-level incrementality scores with confidence intervals, backed by a baseline forecast, seasonality decomposition, and saturation curve modeling
@@ -99,7 +106,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Data Architecture | 2/2 | Complete | 2026-02-24 |
-| 2. Core Data Ingestion | 0/TBD | Not started | - |
+| 2. Core Data Ingestion | 0/6 | Not started | - |
 | 3. Statistical Engine | 0/TBD | Not started | - |
 | 4. Recommendations and Dashboard | 0/TBD | Not started | - |
 | 5. Expanded Connectors and Multi-Market | 0/TBD | Not started | - |
