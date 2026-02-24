@@ -5,6 +5,7 @@ import { processBackfillJob } from './jobs/backfill';
 import { processScoringJob, enqueueFullTenantScoring } from '../scoring/worker';
 import { scanAllCampaignsForBudgetChanges, enqueueScoringJob } from '../scoring';
 import { recomputeRollups } from '../scoring/rollup';
+import { checkAndNotifyDataHealth, checkAndNotifyNewRecommendations } from '../notifications';
 import type { SyncJobData } from '../types';
 import type { ScoringJobData, TenantScoringJobData } from '../scoring/dispatch';
 
@@ -116,6 +117,17 @@ const scoringWorker = new Worker<ScoringJobData | TenantScoringJobData>(
         );
       }
 
+      // Post-scoring notification: alert on new scale_up recommendations
+      // Runs after rollups so recommendations are based on final aggregated scores.
+      try {
+        await checkAndNotifyNewRecommendations(tenantId, []);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        console.warn(
+          `[scoring-worker] Recommendation notification check failed for tenant ${tenantId}: ${message}`,
+        );
+      }
+
     } else {
       console.warn(`[scoring-worker] Unknown job name: ${job.name} — skipping`);
     }
@@ -142,6 +154,16 @@ worker.on('failed', (job, err) => {
   const jobId = job?.id ?? 'unknown';
   const jobName = job?.name ?? 'unknown';
   console.error(`[worker] Job failed: ${jobName} (id=${jobId}) — ${err.message}`);
+
+  // Data health check on ingestion failure — notify tenant if integration is stale
+  const tenantId = (job?.data as { tenantId?: string } | undefined)?.tenantId;
+  if (tenantId) {
+    checkAndNotifyDataHealth(tenantId).catch((notifyErr: Error) => {
+      console.warn(
+        `[worker] Data health notification check failed for tenant ${tenantId}: ${notifyErr.message}`,
+      );
+    });
+  }
 });
 
 worker.on('error', (err) => {
