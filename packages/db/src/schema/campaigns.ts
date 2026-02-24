@@ -17,6 +17,10 @@ export const campaigns = pgTable('campaigns', {
   source: text('source').notNull(),       // 'google_ads' | 'meta' | etc
   externalId: text('external_id').notNull(),
   status: text('status'),
+  // Funnel stage for 4-level score hierarchy: Campaign -> Cluster (Platform x Funnel Stage) -> Channel (Platform) -> Overall
+  // Auto-assigned from campaign objective; users can reassign between stages.
+  // Values: 'awareness' | 'consideration' | 'conversion'
+  funnelStage: text('funnel_stage').default('conversion'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 }, (t) => [
   pgPolicy('tenant_isolation', {

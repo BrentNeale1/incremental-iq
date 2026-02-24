@@ -8,5 +8,11 @@ export * from './ingestion-coverage';
 export * from './integrations';
 export * from './sync-runs';
 
+// Phase 3: Statistical engine schema
+export * from './incrementality-scores';
+export * from './seasonal-events';
+export * from './budget-changes';
+export * from './saturation-estimates';
+
 // Re-export the app role for use in policy definitions
 export { appRole } from './roles';
