@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 3 of 6 (Statistical Engine) - IN PROGRESS
-Plan: 2 of 6 in current phase - COMPLETE (Plans 01 and 02 both complete)
-Status: Phase 3 Plans 01 and 02 complete — DB schema (4 new tables, funnelStage on campaigns, migration 0003) + FastAPI analysis sidecar (Pydantic schemas, retail calendar, Dockerfile).
-Last activity: 2026-02-24 — Completed Plan 01: four Drizzle schema files (incrementality_scores with score_type discriminator, seasonal_events with system/brand event separation, budget_changes with full detection lifecycle, saturation_estimates with Hill function params), funnelStage on campaigns (default 'conversion'), 0003_statistical_engine.sql migration with ENABLE/FORCE RLS on all four tables, composite index on incrementality_scores.
+Plan: 3 of 6 in current phase - COMPLETE (Plans 01, 02, and 03 complete)
+Status: Phase 3 Plans 01-03 complete — DB schema (4 new tables, funnelStage on campaigns, migration 0003) + FastAPI analysis sidecar (Pydantic schemas, retail calendar, Dockerfile) + Prophet baseline forecasting model and /forecast endpoint.
+Last activity: 2026-02-24 — Completed Plan 03: Prophet baseline model (fit_baseline with zero-spend filtering, retail calendar holiday injection, multiplicative seasonality), POST /forecast FastAPI endpoint with ForecastResponse confidence intervals and seasonal decomposition, 6 TDD tests all passing.
 
 Progress: [████████░░] 78%
 
@@ -44,6 +44,7 @@ Progress: [████████░░] 78%
 | 02-core-data-ingestion | P06 | 9 min | 3 tasks | 11 files |
 | 03-statistical-engine | P01 | 11 min | 2 tasks | 7 files |
 | 03-statistical-engine | P02 | 5 min | 2 tasks | 13 files |
+| 03-statistical-engine | P03 | 4 min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -101,6 +102,9 @@ Recent decisions affecting current work:
 - [Phase 03-statistical-engine]: get_retail_events uses algorithmic date computation — Easter uses Gregorian algorithm, nth/last-weekday helpers for floating holidays; 12 events per year
 - [Phase 03-statistical-engine]: Prime Day anchored to Jul 12 as estimate — ForecastRequest.user_events allows override with actual announced date
 - [Phase 03-statistical-engine]: SaturationResponse.saturation_percent is Optional[float] with status field — None when fitting fails, distinguishes estimated/insufficient_variation/error
+- [Phase 03-statistical-engine]: Prophet lower_window stored as positive int in retail_calendar (human-readable), negated in to_prophet_holidays() — Prophet 1.3.0 requires lower_window <= 0
+- [Phase 03-statistical-engine]: FastAPI router handler path is "/" not "/forecast" — router mounted with prefix="/forecast" in main.py; handler "/forecast" would yield /forecast/forecast (404)
+- [Phase 03-statistical-engine]: Zero-spend filtering threshold is 20% — campaigns with ≤20% zero-spend rows keep them (legitimate weekend pause); above 20% filtered to avoid corrupting Prophet weekly seasonality
 
 ### Pending Todos
 
@@ -120,5 +124,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 03-01-PLAN.md — four Drizzle schema tables (incrementality_scores with score_type discriminator, seasonal_events, budget_changes, saturation_estimates), funnelStage column on campaigns, 0003_statistical_engine.sql migration with ENABLE/FORCE RLS on all four tables and composite index on incrementality_scores (tenant_id, campaign_id, score_type, scored_at).
+Stopped at: Completed 03-03-PLAN.md — Prophet baseline model (fit_baseline with zero-spend filtering, retail calendar holiday injection, multiplicative seasonality), POST /forecast FastAPI endpoint with ForecastResponse confidence intervals and seasonal decomposition, 6 TDD tests all passing.
 Resume file: None
