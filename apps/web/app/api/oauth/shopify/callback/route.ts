@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { subYears, format } from 'date-fns';
 import { verifyState, saveIntegration } from '@/lib/oauth-helpers';
+import { enqueueBackfill, registerNightlySync } from '@incremental-iq/ingestion';
 
 /**
  * GET /api/oauth/shopify/callback
@@ -130,6 +132,24 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         shop,
         scope: tokenData.scope,
       },
+    });
+
+    // Step 4: Auto-max backfill on first connection (user decision: INTG-05)
+    // Shopify: pull all available order history — the connector uses read_all_orders scope
+    const threeYearsAgo = format(subYears(new Date(), 3), 'yyyy-MM-dd');
+    const today = format(new Date(), 'yyyy-MM-dd');
+
+    enqueueBackfill(tenantId, 'shopify', integration.id, {
+      start: threeYearsAgo,
+      end: today,
+    }).catch((err: unknown) => {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error(`[shopify-callback] Failed to enqueue backfill for integration ${integration.id}: ${message}`);
+    });
+
+    registerNightlySync(tenantId, 'shopify', integration.id).catch((err: unknown) => {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error(`[shopify-callback] Failed to register nightly sync for integration ${integration.id}: ${message}`);
     });
 
     return NextResponse.json({

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { subYears, format } from 'date-fns';
 import { verifyState, saveIntegration } from '@/lib/oauth-helpers';
+import { enqueueBackfill, registerNightlySync } from '@incremental-iq/ingestion';
 
 /**
  * GET /api/oauth/meta/callback
@@ -143,6 +145,26 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         adAccountId,
         adAccounts: adAccountsMetadata,
       },
+    });
+
+    // Step 5: Auto-max backfill on first connection (user decision: INTG-05)
+    // Enqueue backfill and register nightly sync — do NOT await (fire and forget)
+    // Meta supports up to 37 months for aggregate totals (RESEARCH.md Pitfall 2)
+    // The backfill job itself will clamp to 37 months for Meta
+    const threeYearsAgo = format(subYears(new Date(), 3), 'yyyy-MM-dd');
+    const today = format(new Date(), 'yyyy-MM-dd');
+
+    enqueueBackfill(tenantId, 'meta', integration.id, {
+      start: threeYearsAgo,
+      end: today,
+    }).catch((err: unknown) => {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error(`[meta-callback] Failed to enqueue backfill for integration ${integration.id}: ${message}`);
+    });
+
+    registerNightlySync(tenantId, 'meta', integration.id).catch((err: unknown) => {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error(`[meta-callback] Failed to register nightly sync for integration ${integration.id}: ${message}`);
     });
 
     return NextResponse.json({

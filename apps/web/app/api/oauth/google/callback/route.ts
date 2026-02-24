@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { subYears, format } from 'date-fns';
 import { verifyState, saveIntegration } from '@/lib/oauth-helpers';
+import { enqueueBackfill, registerNightlySync } from '@incremental-iq/ingestion';
 
 /**
  * GET /api/oauth/google/callback
@@ -150,6 +152,24 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         loginCustomerId,
         customerIds,
       },
+    });
+
+    // Step 4: Auto-max backfill on first connection (user decision: INTG-05)
+    // Google Ads supports up to 3 years — no further clamp needed
+    const threeYearsAgo = format(subYears(new Date(), 3), 'yyyy-MM-dd');
+    const today = format(new Date(), 'yyyy-MM-dd');
+
+    enqueueBackfill(tenantId, 'google_ads', integration.id, {
+      start: threeYearsAgo,
+      end: today,
+    }).catch((err: unknown) => {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error(`[google-callback] Failed to enqueue backfill for integration ${integration.id}: ${message}`);
+    });
+
+    registerNightlySync(tenantId, 'google_ads', integration.id).catch((err: unknown) => {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error(`[google-callback] Failed to register nightly sync for integration ${integration.id}: ${message}`);
     });
 
     return NextResponse.json({
