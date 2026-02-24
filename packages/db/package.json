@@ -1,0 +1,22 @@
+{
+  "name": "@incremental-iq/db",
+  "version": "0.0.1",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "generate": "drizzle-kit generate",
+    "migrate": "drizzle-kit migrate",
+    "generate:custom": "drizzle-kit generate --custom"
+  },
+  "dependencies": {
+    "drizzle-orm": "0.45.1",
+    "postgres": "3.4.8"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.0",
+    "drizzle-kit": "0.31.9",
+    "typescript": "5.9.3"
+  }
+}
