@@ -10,6 +10,7 @@
     "@shopify/shopify-api": "^11.0.0",
     "bullmq": "^5.0.0",
     "date-fns": "^3.0.0",
+    "drizzle-orm": "0.45.1",
     "facebook-nodejs-business-sdk": "^23.0.0",
     "google-ads-api": "^23.0.0",
     "ioredis": "^5.0.0",
