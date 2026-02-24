@@ -127,49 +127,49 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INTG-01 | TBD | Pending |
-| INTG-02 | TBD | Pending |
-| INTG-03 | TBD | Pending |
-| INTG-04 | TBD | Pending |
-| INTG-05 | TBD | Pending |
-| STAT-01 | TBD | Pending |
-| STAT-02 | TBD | Pending |
-| STAT-03 | TBD | Pending |
-| STAT-04 | TBD | Pending |
-| STAT-05 | TBD | Pending |
-| STAT-06 | TBD | Pending |
-| STAT-07 | TBD | Pending |
-| RECC-01 | TBD | Pending |
-| RECC-02 | TBD | Pending |
-| RECC-03 | TBD | Pending |
-| RECC-04 | TBD | Pending |
-| RECC-05 | TBD | Pending |
-| RECC-06 | TBD | Pending |
-| SEAS-01 | TBD | Pending |
-| SEAS-02 | TBD | Pending |
-| MRKT-01 | TBD | Pending |
-| MRKT-02 | TBD | Pending |
-| MRKT-03 | TBD | Pending |
-| MRKT-04 | TBD | Pending |
-| RPRT-01 | TBD | Pending |
-| RPRT-02 | TBD | Pending |
-| RPRT-03 | TBD | Pending |
-| RPRT-04 | TBD | Pending |
-| RPRT-05 | TBD | Pending |
-| RPRT-06 | TBD | Pending |
-| RPRT-07 | TBD | Pending |
-| AUTH-01 | TBD | Pending |
-| AUTH-02 | TBD | Pending |
-| AUTH-03 | TBD | Pending |
-| ARCH-01 | TBD | Pending |
-| ARCH-02 | TBD | Pending |
-| ARCH-03 | TBD | Pending |
+| ARCH-01 | Phase 1 | Pending |
+| ARCH-02 | Phase 1 | Pending |
+| ARCH-03 | Phase 1 | Pending |
+| INTG-01 | Phase 2 | Pending |
+| INTG-02 | Phase 2 | Pending |
+| INTG-03 | Phase 2 | Pending |
+| INTG-05 | Phase 2 | Pending |
+| STAT-01 | Phase 3 | Pending |
+| STAT-02 | Phase 3 | Pending |
+| STAT-03 | Phase 3 | Pending |
+| STAT-04 | Phase 3 | Pending |
+| STAT-05 | Phase 3 | Pending |
+| STAT-06 | Phase 3 | Pending |
+| STAT-07 | Phase 3 | Pending |
+| SEAS-01 | Phase 3 | Pending |
+| SEAS-02 | Phase 3 | Pending |
+| RECC-01 | Phase 4 | Pending |
+| RECC-02 | Phase 4 | Pending |
+| RECC-03 | Phase 4 | Pending |
+| RECC-04 | Phase 4 | Pending |
+| RECC-05 | Phase 4 | Pending |
+| RECC-06 | Phase 4 | Pending |
+| RPRT-01 | Phase 4 | Pending |
+| RPRT-02 | Phase 4 | Pending |
+| RPRT-03 | Phase 4 | Pending |
+| RPRT-04 | Phase 4 | Pending |
+| RPRT-05 | Phase 4 | Pending |
+| RPRT-06 | Phase 4 | Pending |
+| RPRT-07 | Phase 4 | Pending |
+| INTG-04 | Phase 5 | Pending |
+| MRKT-01 | Phase 5 | Pending |
+| MRKT-02 | Phase 5 | Pending |
+| MRKT-03 | Phase 5 | Pending |
+| MRKT-04 | Phase 5 | Pending |
+| AUTH-01 | Phase 6 | Pending |
+| AUTH-02 | Phase 6 | Pending |
+| AUTH-03 | Phase 6 | Pending |
 
 **Coverage:**
 - v1 requirements: 37 total
-- Mapped to phases: 0
-- Unmapped: 37 ⚠️
+- Mapped to phases: 37
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-02-24*
-*Last updated: 2026-02-24 after initial definition*
+*Last updated: 2026-02-24 — AUTH-01/02/03 moved from Phase 1 to new Phase 6; Phase 1 narrowed to data architecture only (ARCH-01/02/03); roadmap expanded from 5 to 6 phases*
