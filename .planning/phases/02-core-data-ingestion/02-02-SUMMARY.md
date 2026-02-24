@@ -151,6 +151,20 @@ The following environment variables must be configured before OAuth flows will w
 - Plan 03 (connectors) can now read integration records and decrypt tokens for API calls
 - Plan 04-06 (API, scheduler) can query integrations table via withTenant() for sync jobs
 
+## Self-Check: PASSED
+
+| Item | Status |
+|------|--------|
+| packages/db/migrations/0002_legal_puma.sql | FOUND |
+| apps/web/lib/oauth-helpers.ts | FOUND |
+| apps/web/app/api/oauth/meta/callback/route.ts | FOUND |
+| apps/web/app/api/oauth/google/callback/route.ts | FOUND |
+| apps/web/app/api/oauth/shopify/callback/route.ts | FOUND |
+| .planning/phases/02-core-data-ingestion/02-02-SUMMARY.md | FOUND |
+| Commit bad87be (Task 1) | FOUND |
+| Commit 89220b6 (Task 2) | FOUND |
+| TypeScript: tsc --noEmit --skipLibCheck | PASS (zero errors) |
+
 ---
 *Phase: 02-core-data-ingestion*
 *Completed: 2026-02-24*
