@@ -29,7 +29,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. Database schema enforces tenant isolation at the row level — no application-level filter can expose one tenant's data to another
   2. Schema stores both direct (trackable) and modeled (estimated) attribution values side by side in the same record structure
   3. Creative-level metadata fields exist in the schema and are ready to accept creative data without a migration in v2
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 01-01-PLAN.md — Schema foundation: packages/db scaffold, all schema tables with RLS, dual attribution, creative metadata
+- [ ] 01-02-PLAN.md — Migrations: Drizzle migration generation, TimescaleDB hypertable conversion, migration runner
 
 ### Phase 2: Core Data Ingestion
 **Goal**: Real campaign spend data from Meta Ads and Google Ads, and real revenue data from Shopify, are flowing through the pipeline with at least one year of historical backfill
@@ -95,7 +98,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Data Architecture | 0/TBD | Not started | - |
+| 1. Data Architecture | 0/2 | Planning complete | - |
 | 2. Core Data Ingestion | 0/TBD | Not started | - |
 | 3. Statistical Engine | 0/TBD | Not started | - |
 | 4. Recommendations and Dashboard | 0/TBD | Not started | - |
