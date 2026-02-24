@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 2 of 6 (Core Data Ingestion) - IN PROGRESS
-Plan: 1 of 6 in current phase - COMPLETE
-Status: Phase 2 Plan 01 complete — integrations/sync_runs schema tables, packages/ingestion scaffold, AES-256-GCM crypto, PlatformConnector interface
-Last activity: 2026-02-24 — Completed Plan 01: integrations/sync_runs Drizzle schema with RLS, packages/ingestion with Meta/Google/Shopify SDKs, token encryption, connector contract
+Plan: 2 of 6 in current phase - COMPLETE
+Status: Phase 2 Plan 02 complete — Drizzle migration for integrations/sync_runs, Next.js App Router (apps/web), OAuth routes for Meta/Google/Shopify with AES-256-GCM token encryption and HMAC-SHA256 CSRF protection
+Last activity: 2026-02-24 — Completed Plan 02: apps/web Next.js scaffold, 6 OAuth routes, oauth-helpers.ts, Drizzle migration 0002_legal_puma.sql with FORCE RLS
 
-Progress: [███░░░░░░░] 25%
+Progress: [████░░░░░░] 33%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: 3.3 min
-- Total execution time: 0.2 hours
+- Total plans completed: 4
+- Average duration: 4.3 min
+- Total execution time: 0.3 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-data-architecture | 2 | 7 min | 3.5 min |
-| 02-core-data-ingestion | 1 | 3 min | 3 min |
+| 02-core-data-ingestion | 2 | 11 min | 5.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 4 min, 3 min, 3 min
+- Last 5 plans: 4 min, 3 min, 3 min, 8 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -61,10 +61,19 @@ Recent decisions affecting current work:
 - AES-256-GCM iv+authTag+ciphertext wire format — getKey() reads TOKEN_ENCRYPTION_KEY at call time so missing env var throws on use, not on import
 - PlatformConnector defined as interface (not abstract class) — duck typing allows simpler mock implementations in tests
 - NormalizedMetric numeric fields are string type — matches Drizzle numeric() column insert shape
+- Drizzle migration named 0002_legal_puma.sql — drizzle-kit generated name kept (renaming breaks _journal.json, same Phase 1 pattern)
+- FORCE ROW LEVEL SECURITY appended manually to 0002_legal_puma.sql — same atomic-with-table-creation pattern as 0000_aberrant_namora.sql
+- Meta OAuth uses long-lived token exchange (60-day expiry) — avoids refresh token requirement
+- Google OAuth stores both customerId and loginCustomerId in metadata — required for MCC accounts (RESEARCH.md Pitfall 5)
+- Shopify permanent tokens have null tokenExpiresAt — offline install tokens do not expire
+- No backfill in OAuth HTTP handlers — Plan 06 scheduler responsibility (RESEARCH.md anti-pattern)
+- HMAC-SHA256 state parameter with timing-safe comparison for OAuth CSRF protection
+- serverExternalPackages: ['postgres'] in next.config.ts — prevents Next.js bundling postgres.js native modules
 
 ### Pending Todos
 
-- Generate and run Drizzle migration for integrations and sync_runs tables before Plan 02 connectors can run against a real DB
+- Run Drizzle migration 0002_legal_puma.sql against production DB (after app_user role exists)
+- Configure OAuth env vars (FACEBOOK_APP_ID, GOOGLE_ADS_CLIENT_ID, SHOPIFY_API_KEY, etc.) before OAuth flows work
 
 ### Blockers/Concerns
 
@@ -78,5 +87,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 02-01-PLAN.md — integrations/sync_runs Drizzle schema with RLS, packages/ingestion scaffold with Meta/Google/Shopify SDKs, AES-256-GCM token encryption, PlatformConnector interface contract.
+Stopped at: Completed 02-02-PLAN.md — Drizzle migration 0002_legal_puma.sql (integrations + sync_runs with FORCE RLS), apps/web Next.js scaffold, 6 OAuth routes (Meta/Google/Shopify initiation + callback), oauth-helpers.ts with saveIntegration/generateState/verifyState.
 Resume file: None
