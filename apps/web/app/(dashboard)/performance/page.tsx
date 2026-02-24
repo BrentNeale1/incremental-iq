@@ -18,20 +18,13 @@ const PLACEHOLDER_TENANT_ID = undefined;
  *   Section 2 — Platform Tabs: All/Meta/Google views with overview metrics + campaign table
  *
  * Progressive loading: sections load independently with skeleton placeholders.
+ * Mobile-responsive: full-width sections, tables horizontally scroll on mobile.
  */
 export default function MarketingPerformancePage() {
   const dateRange = useDashboardStore((s) => s.dateRange);
 
   return (
-    <div className="space-y-8">
-      {/* Page header */}
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Marketing Performance</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Campaigns ranked by urgency — what to scale, watch, and investigate.
-        </p>
-      </div>
-
+    <div className="space-y-6 sm:space-y-8">
       {/* Section 1 — Priority Queue */}
       <section aria-label="Urgent campaign actions">
         <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -45,7 +38,10 @@ export default function MarketingPerformancePage() {
         <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Campaign Performance
         </h2>
-        <PlatformTabs tenantId={PLACEHOLDER_TENANT_ID} dateRange={dateRange} />
+        {/* Horizontal scroll wrapper ensures table is usable on mobile */}
+        <div className="overflow-x-auto">
+          <PlatformTabs tenantId={PLACEHOLDER_TENANT_ID} dateRange={dateRange} />
+        </div>
       </section>
     </div>
   );

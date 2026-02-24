@@ -13,6 +13,8 @@ import { RecommendationCard } from '@/components/recommendations/RecommendationC
 import { RecommendationAnalystCard } from '@/components/recommendations/RecommendationAnalystCard';
 import { LowConfidenceCard } from '@/components/recommendations/LowConfidenceCard';
 import { SeasonalAlertCard } from '@/components/recommendations/SeasonalAlertCard';
+import { ChartSkeleton } from '@/components/dashboard/SkeletonLoaders';
+import { EmptyRecommendations } from '@/components/dashboard/EmptyStates';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Recommendation } from '@/lib/recommendations/types';
 
@@ -85,6 +87,7 @@ function buildPlatformData(campaigns: {
  *   5. Recommendations — ranked by expected impact
  *
  * Progressive loading: each section has independent skeleton placeholders.
+ * Mobile-responsive: all grids use sm:/lg: breakpoints, charts scale to full width.
  *
  * NOTE: Zustand rehydration is handled in the dashboard layout (layout.tsx).
  */
@@ -142,7 +145,7 @@ export default function ExecutiveOverviewPage() {
   );
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Section 1 — Upcoming seasonal alerts */}
       {(seasonalAlerts.length > 0 || !recsLoading) && (
         <section aria-label="Upcoming seasonal events">
@@ -168,7 +171,7 @@ export default function ExecutiveOverviewPage() {
         </section>
       )}
 
-      {/* Section 2 — KPI grid */}
+      {/* Section 2 — KPI grid (KPIs first per progressive loading spec) */}
       <section aria-label="Key performance indicators">
         <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Key Metrics
@@ -181,14 +184,18 @@ export default function ExecutiveOverviewPage() {
         <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Incremental Revenue
         </h2>
-        <div className="rounded-lg border bg-card p-4">
-          <IncrementalRevenueChart
-            data={timeSeriesData}
-            comparisonEnabled={comparisonEnabled}
-            isLoading={kpisLoading}
-            height={280}
-          />
-        </div>
+        {kpisLoading ? (
+          <ChartSkeleton height={280} />
+        ) : (
+          <div className="rounded-lg border bg-card p-4">
+            <IncrementalRevenueChart
+              data={timeSeriesData}
+              comparisonEnabled={comparisonEnabled}
+              isLoading={kpisLoading}
+              height={280}
+            />
+          </div>
+        )}
       </section>
 
       {/* Section 4 — Supporting charts */}
@@ -196,13 +203,17 @@ export default function ExecutiveOverviewPage() {
         <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Platform Breakdown
         </h2>
-        <div className="rounded-lg border bg-card p-4">
-          <PlatformComparisonChart
-            data={platformData}
-            isLoading={campaignsLoading}
-            height={240}
-          />
-        </div>
+        {campaignsLoading ? (
+          <ChartSkeleton height={240} />
+        ) : (
+          <div className="rounded-lg border bg-card p-4">
+            <PlatformComparisonChart
+              data={platformData}
+              isLoading={campaignsLoading}
+              height={240}
+            />
+          </div>
+        )}
       </section>
 
       {/* Section 5 — Recommendations */}
@@ -218,9 +229,7 @@ export default function ExecutiveOverviewPage() {
             ))}
           </div>
         ) : campaignRecs.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            No recommendations yet — connect ad platforms to get started.
-          </p>
+          <EmptyRecommendations />
         ) : (
           <div className="space-y-6">
             {/* Actionable recommendations */}

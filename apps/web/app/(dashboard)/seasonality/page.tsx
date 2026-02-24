@@ -1,11 +1,12 @@
 'use client';
 
 import * as React from 'react';
-import { CalendarDaysIcon } from 'lucide-react';
 import { useSeasonality } from '@/lib/hooks/useSeasonality';
 import { SeasonalTimeline } from '@/components/seasonality/SeasonalTimeline';
 import { EventCard } from '@/components/seasonality/EventCard';
 import { HistoricalComparison } from '@/components/seasonality/HistoricalComparison';
+import { TimelineSkeleton } from '@/components/dashboard/SkeletonLoaders';
+import { EmptySeasonality } from '@/components/dashboard/EmptyStates';
 import { Skeleton } from '@/components/ui/skeleton';
 
 /**
@@ -22,7 +23,7 @@ const PLACEHOLDER_TENANT_ID = undefined;
  *   Section 3 — HistoricalComparison: last year vs this year for each event
  *
  * Progressive loading with skeleton placeholders.
- * Empty state: "Seasonal planning activates 6 weeks before your first retail event"
+ * Mobile-responsive: 1 col on mobile, 2 on sm, 3 on lg.
  */
 export default function SeasonalityPlanningPage() {
   const { data, isLoading, isError } = useSeasonality(PLACEHOLDER_TENANT_ID, 6);
@@ -48,10 +49,10 @@ export default function SeasonalityPlanningPage() {
   }, [historicalData]);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Page header */}
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Seasonality Planning</h1>
+        <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">Seasonality Planning</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Upcoming retail events with budget recommendations based on historical performance.
         </p>
@@ -62,7 +63,11 @@ export default function SeasonalityPlanningPage() {
         <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Event Calendar
         </h2>
-        <SeasonalTimeline events={upcomingEvents} isLoading={isLoading} />
+        {isLoading ? (
+          <TimelineSkeleton />
+        ) : (
+          <SeasonalTimeline events={upcomingEvents} isLoading={isLoading} />
+        )}
       </section>
 
       {/* Section 2 — EventCard grid */}
@@ -82,17 +87,7 @@ export default function SeasonalityPlanningPage() {
             Unable to load seasonal events. Retry in a moment.
           </p>
         ) : upcomingEvents.length === 0 ? (
-          <div className="flex flex-col items-center gap-3 rounded-lg border bg-card py-12 text-center">
-            <CalendarDaysIcon className="h-10 w-10 text-muted-foreground/40" aria-hidden="true" />
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                Seasonal planning activates 6 weeks before your first retail event
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Connect your ad platforms to see upcoming event recommendations.
-              </p>
-            </div>
-          </div>
+          <EmptySeasonality />
         ) : (
           <div className="space-y-6">
             {/* Urgent events (next 6 weeks) */}
