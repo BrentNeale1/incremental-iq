@@ -249,4 +249,10 @@ def to_prophet_holidays(events: list[dict[str, Any]]) -> pd.DataFrame:
 
     df = pd.DataFrame(events)
     df["ds"] = pd.to_datetime(df["ds"])
+
+    # Prophet requires lower_window <= 0 (negative = days before the event date).
+    # Event dicts store lower_window as a positive integer (human-readable "days before").
+    # Negate here so Prophet receives the expected signed convention.
+    df["lower_window"] = -df["lower_window"].abs()
+
     return df[["holiday", "ds", "lower_window", "upper_window"]].reset_index(drop=True)
