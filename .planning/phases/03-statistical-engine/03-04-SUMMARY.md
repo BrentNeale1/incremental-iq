@@ -165,6 +165,25 @@ None — no external service configuration required. The Python venv already has
 - All models handle edge cases: insufficient pre-period, flat spend, sparse campaigns
 - Remaining Phase 03 plans (03-05 anomaly detection, 03-06 budget change detection) can proceed independently
 
+## Self-Check: PASSED
+
+All created files verified:
+- FOUND: packages/analysis/models/its.py
+- FOUND: packages/analysis/models/saturation.py
+- FOUND: packages/analysis/models/hierarchical.py
+- FOUND: packages/analysis/routers/incrementality.py
+- FOUND: packages/analysis/routers/saturation.py
+- FOUND: packages/analysis/tests/test_incrementality.py
+- FOUND: packages/analysis/tests/test_saturation.py
+- FOUND: packages/analysis/tests/test_hierarchical.py
+- FOUND: .planning/phases/03-statistical-engine/03-04-SUMMARY.md
+
+All task commits verified:
+- FOUND: 968b935 (Task 1 - CausalPy ITS model and endpoint)
+- FOUND: e9dafca (Task 2 - Hill saturation model and endpoint)
+- FOUND: c005d37 (Task 3 - Bayesian hierarchical pooling)
+- FOUND: 03415d1 (Plan metadata - SUMMARY + STATE + ROADMAP)
+
 ---
 *Phase: 03-statistical-engine*
 *Completed: 2026-02-24*
