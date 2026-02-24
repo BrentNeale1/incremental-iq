@@ -5,6 +5,8 @@ export * from './creatives';
 export * from './metrics';
 export * from './raw-pulls';
 export * from './ingestion-coverage';
+export * from './integrations';
+export * from './sync-runs';
 
 // Re-export the app role for use in policy definitions
 export { appRole } from './roles';
