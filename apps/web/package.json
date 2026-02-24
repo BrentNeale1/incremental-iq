@@ -12,7 +12,9 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "@incremental-iq/db": "workspace:*",
-    "@incremental-iq/ingestion": "workspace:*"
+    "@incremental-iq/ingestion": "workspace:*",
+    "date-fns": "^3.0.0",
+    "drizzle-orm": "0.45.1"
   },
   "devDependencies": {
     "@types/node": "^25.3.0",
