@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git init:*)",
+      "Bash(node:*)",
+      "Bash(cd:*)",
+      "Skill(gsd:plan-phase)",
+      "WebSearch",
+      "WebFetch(domain:orm.drizzle.team)",
+      "WebFetch(domain:docs.timescale.com)",
+      "WebFetch(domain:www.tigerdata.com)",
+      "WebFetch(domain:www.permit.io)",
+      "WebFetch(domain:aws.amazon.com)",
+      "WebFetch(domain:oneuptime.com)"
+    ]
+  }
+}
