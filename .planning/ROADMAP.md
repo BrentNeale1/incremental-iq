@@ -13,7 +13,7 @@ Six phases deliver campaign-level incremental lift analysis from a schema-first 
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Data Architecture** - Multi-tenant schema with RLS, dual attribution layers, and creative metadata ready for campaign data
-- [ ] **Phase 2: Core Data Ingestion** - Meta Ads, Google Ads, and Shopify data flowing through the pipeline with historical backfill
+- [x] **Phase 2: Core Data Ingestion** - Meta Ads, Google Ads, and Shopify data flowing through the pipeline with historical backfill
 - [ ] **Phase 3: Statistical Engine** - Baseline forecasting, incrementality scoring, confidence intervals, and seasonality detection running
 - [ ] **Phase 4: Recommendations and Dashboard** - Scaling-first recommendations and dual-audience dashboard surfacing model outputs to users
 - [ ] **Phase 5: Expanded Connectors and Multi-Market** - GA4 integration, market auto-detection, and market-aware attribution
@@ -46,12 +46,12 @@ Plans:
   5. Each connected integration shows a data freshness indicator so the user knows when data was last synced
 **Plans**: 6 plans
 Plans:
-- [ ] 02-01-PLAN.md — Schema additions (integrations, sync_runs) + packages/ingestion scaffold with shared utilities
-- [ ] 02-02-PLAN.md — apps/web Next.js scaffold, Drizzle migration, OAuth routes for Meta/Google/Shopify
-- [ ] 02-03-PLAN.md — Meta Ads connector and normalizer (two-stage raw-to-normalized pipeline)
-- [ ] 02-04-PLAN.md — Google Ads connector and normalizer (GAQL queries, cost_micros conversion)
-- [ ] 02-05-PLAN.md — Shopify connector and normalizer (bulk operations for backfill, direct attribution)
-- [ ] 02-06-PLAN.md — BullMQ scheduler, backfill worker, manual sync, freshness API endpoints
+- [x] 02-01-PLAN.md — Schema additions (integrations, sync_runs) + packages/ingestion scaffold with shared utilities
+- [x] 02-02-PLAN.md — apps/web Next.js scaffold, Drizzle migration, OAuth routes for Meta/Google/Shopify
+- [x] 02-03-PLAN.md — Meta Ads connector and normalizer (two-stage raw-to-normalized pipeline)
+- [x] 02-04-PLAN.md — Google Ads connector and normalizer (GAQL queries, cost_micros conversion)
+- [x] 02-05-PLAN.md — Shopify connector and normalizer (bulk operations for backfill, direct attribution)
+- [x] 02-06-PLAN.md — BullMQ scheduler, backfill worker, manual sync, freshness API endpoints
 
 ### Phase 3: Statistical Engine
 **Goal**: The system produces campaign-level incrementality scores with confidence intervals, backed by a baseline forecast, seasonality decomposition, and saturation curve modeling
@@ -106,7 +106,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Data Architecture | 2/2 | Complete | 2026-02-24 |
-| 2. Core Data Ingestion | 5/6 | In Progress|  |
+| 2. Core Data Ingestion | 6/6 | Complete | 2026-02-24 |
 | 3. Statistical Engine | 0/TBD | Not started | - |
 | 4. Recommendations and Dashboard | 0/TBD | Not started | - |
 | 5. Expanded Connectors and Multi-Market | 0/TBD | Not started | - |
