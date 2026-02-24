@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 3 of 6 (Statistical Engine) - IN PROGRESS
-Plan: 2 of 6 in current phase - COMPLETE
-Status: Phase 3 Plan 02 complete — FastAPI analysis sidecar scaffolded with Pydantic schemas for all 4 endpoints, retail event calendar (12 events, Prophet-compatible), Dockerfile.
-Last activity: 2026-02-24 — Completed Plan 02: packages/analysis FastAPI scaffold (main.py, health router, Dockerfile), pyproject.toml with all statistical deps (prophet, causalpy, pymc-marketing, statsmodels, ruptures, arviz), Pydantic v2 schemas for forecast/incrementality/saturation/anomaly endpoints, retail calendar (12 US events, get_retail_events, to_prophet_holidays).
+Plan: 2 of 6 in current phase - COMPLETE (Plans 01 and 02 both complete)
+Status: Phase 3 Plans 01 and 02 complete — DB schema (4 new tables, funnelStage on campaigns, migration 0003) + FastAPI analysis sidecar (Pydantic schemas, retail calendar, Dockerfile).
+Last activity: 2026-02-24 — Completed Plan 01: four Drizzle schema files (incrementality_scores with score_type discriminator, seasonal_events with system/brand event separation, budget_changes with full detection lifecycle, saturation_estimates with Hill function params), funnelStage on campaigns (default 'conversion'), 0003_statistical_engine.sql migration with ENABLE/FORCE RLS on all four tables, composite index on incrementality_scores.
 
 Progress: [████████░░] 78%
 
@@ -29,7 +29,7 @@ Progress: [████████░░] 78%
 |-------|-------|-------|----------|
 | 01-data-architecture | 2 | 7 min | 3.5 min |
 | 02-core-data-ingestion | 6 | 49 min | 8.2 min |
-| 03-statistical-engine | 1 | 5 min | 5 min |
+| 03-statistical-engine | 2 | 16 min | 8 min |
 
 **Recent Trend:**
 - Last 6 plans: 4 min, 3 min, 3 min, 8 min, 5 min, 9 min, 9 min, 5 min
@@ -42,6 +42,7 @@ Progress: [████████░░] 78%
 | 02-core-data-ingestion | P03 | 7 min | 2 tasks | 3 files |
 | 02-core-data-ingestion | P05 | 9 min | 2 tasks | 3 files |
 | 02-core-data-ingestion | P06 | 9 min | 3 tasks | 11 files |
+| 03-statistical-engine | P01 | 11 min | 2 tasks | 7 files |
 | 03-statistical-engine | P02 | 5 min | 2 tasks | 13 files |
 
 ## Accumulated Context
@@ -91,6 +92,10 @@ Recent decisions affecting current work:
 - [Phase 02-core-data-ingestion]: apps/web added drizzle-orm and date-fns as direct dependencies — API routes use Drizzle helpers and date-fns freshness formatting directly
 - [Phase 02-core-data-ingestion]: Auto-backfill fire-and-forget from OAuth callbacks — HTTP response returns immediately, errors logged not propagated
 - [Phase 02-core-data-ingestion]: DB progressMetadata updated alongside job.updateProgress — BullMQ for real-time polling, DB for durability across worker restarts
+- [Phase 03-statistical-engine]: score_type discriminator on incrementality_scores stores adjusted and raw scores per campaign — enables dual seasonally-adjusted/raw output per user decision without separate tables
+- [Phase 03-statistical-engine]: nullable tenantId on seasonal_events distinguishes system events (readable by all tenants) from brand events (tenant-scoped) — RLS uses IS NULL OR matches tenant
+- [Phase 03-statistical-engine]: nullable marketId on incrementality_scores is STAT-05 scaffold for Phase 5 geo-based testing — NULL in Phase 3 (single-market scoring)
+- [Phase 03-statistical-engine]: 0003_statistical_engine.sql authored manually (drizzle-kit unavailable in shell) — follows exact drizzle-kit output pattern from prior migrations; functionally identical to generated output
 - [Phase 03-statistical-engine]: uv used as Python package manager for packages/analysis — uv.lock for reproducible installs, .python-version pins to 3.11 (PyMC ecosystem stability)
 - [Phase 03-statistical-engine]: IncrementalityResponse dual output (adjusted + raw) hardcoded at schema level per CONTEXT.md decision — schema enforces the product decision
 - [Phase 03-statistical-engine]: get_retail_events uses algorithmic date computation — Easter uses Gregorian algorithm, nth/last-weekday helpers for floating holidays; 12 events per year
@@ -99,7 +104,7 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-- Run Drizzle migration 0002_legal_puma.sql against production DB (after app_user role exists)
+- Run Drizzle migrations 0002_legal_puma.sql and 0003_statistical_engine.sql against production DB (after app_user role exists)
 - Configure OAuth env vars (FACEBOOK_APP_ID, GOOGLE_ADS_CLIENT_ID, SHOPIFY_API_KEY, etc.) before OAuth flows work
 - Configure Redis env vars (REDIS_HOST, REDIS_PORT, REDIS_PASSWORD) before worker process starts
 - Deploy worker process (packages/ingestion/src/scheduler/workers.ts) as separate Node.js process alongside Next.js app
@@ -115,5 +120,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 03-02-PLAN.md — packages/analysis FastAPI scaffold (main.py, health check, CORS), pyproject.toml with prophet/causalpy/pymc-marketing/statsmodels/ruptures/arviz, Pydantic v2 schemas for all 4 endpoints (ForecastRequest/Response, IncrementalityRequest/Response dual adjusted+raw, SaturationRequest/Response, AnomalyRequest/Response), retail event calendar (12 US events, algorithmic date computation, to_prophet_holidays), Dockerfile with C extension deps and healthcheck, uv.lock generated.
+Stopped at: Completed 03-01-PLAN.md — four Drizzle schema tables (incrementality_scores with score_type discriminator, seasonal_events, budget_changes, saturation_estimates), funnelStage column on campaigns, 0003_statistical_engine.sql migration with ENABLE/FORCE RLS on all four tables and composite index on incrementality_scores (tenant_id, campaign_id, score_type, scored_at).
 Resume file: None

@@ -18,11 +18,11 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Statistical Engine
 
 - [ ] **STAT-01**: System builds baseline forecast model from historical data for each campaign
-- [ ] **STAT-02**: System produces campaign-level incrementality scores that roll up to clusters, channels, and overall
-- [ ] **STAT-03**: All predictions and scores include confidence intervals
-- [ ] **STAT-04**: System performs time-series pre/post analysis when budget changes are detected
-- [ ] **STAT-05**: System supports geo-based testing with market-level control groups
-- [ ] **STAT-06**: System models saturation curves to detect diminishing returns on spend
+- [x] **STAT-02**: System produces campaign-level incrementality scores that roll up to clusters, channels, and overall
+- [x] **STAT-03**: All predictions and scores include confidence intervals
+- [x] **STAT-04**: System performs time-series pre/post analysis when budget changes are detected
+- [x] **STAT-05**: System supports geo-based testing with market-level control groups
+- [x] **STAT-06**: System models saturation curves to detect diminishing returns on spend
 - [ ] **STAT-07**: Model accuracy improves as more data accumulates over time
 
 ### Recommendations
@@ -135,11 +135,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INTG-03 | Phase 2 | Complete |
 | INTG-05 | Phase 2 | Complete |
 | STAT-01 | Phase 3 | Pending |
-| STAT-02 | Phase 3 | Pending |
-| STAT-03 | Phase 3 | Pending |
-| STAT-04 | Phase 3 | Pending |
-| STAT-05 | Phase 3 | Pending |
-| STAT-06 | Phase 3 | Pending |
+| STAT-02 | Phase 3 | Complete |
+| STAT-03 | Phase 3 | Complete |
+| STAT-04 | Phase 3 | Complete |
+| STAT-05 | Phase 3 | Complete |
+| STAT-06 | Phase 3 | Complete |
 | STAT-07 | Phase 3 | Pending |
 | SEAS-01 | Phase 3 | Complete |
 | SEAS-02 | Phase 3 | Pending |
