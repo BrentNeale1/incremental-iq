@@ -15,3 +15,6 @@ export {
   enqueueBackfill,
   enqueueManualSync,
 } from './scheduler/queues';
+
+// Scoring pipeline: dispatch, worker, persist, rollup, funnel-stage, budget-detection
+export * from './scoring';
