@@ -106,7 +106,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Data Architecture | 2/2 | Complete | 2026-02-24 |
-| 2. Core Data Ingestion | 0/6 | Not started | - |
+| 2. Core Data Ingestion | 1/6 | In Progress|  |
 | 3. Statistical Engine | 0/TBD | Not started | - |
 | 4. Recommendations and Dashboard | 0/TBD | Not started | - |
 | 5. Expanded Connectors and Multi-Market | 0/TBD | Not started | - |

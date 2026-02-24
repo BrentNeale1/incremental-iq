@@ -9,11 +9,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Data Integrations
 
-- [ ] **INTG-01**: User can connect Meta Ads account via OAuth and pull campaign/ad set/ad data
-- [ ] **INTG-02**: User can connect Google Ads account via OAuth and pull campaign data
-- [ ] **INTG-03**: User can connect Shopify store and pull order/revenue data
+- [x] **INTG-01**: User can connect Meta Ads account via OAuth and pull campaign/ad set/ad data
+- [x] **INTG-02**: User can connect Google Ads account via OAuth and pull campaign data
+- [x] **INTG-03**: User can connect Shopify store and pull order/revenue data
 - [ ] **INTG-04**: User can connect GA4 and select which conversion events represent leads
-- [ ] **INTG-05**: System backfills historical data from all connected sources (1yr min, 3yr ideal)
+- [x] **INTG-05**: System backfills historical data from all connected sources (1yr min, 3yr ideal)
 
 ### Statistical Engine
 
@@ -130,10 +130,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ARCH-01 | Phase 1 | Complete |
 | ARCH-02 | Phase 1 | Complete |
 | ARCH-03 | Phase 1 | Complete |
-| INTG-01 | Phase 2 | Pending |
-| INTG-02 | Phase 2 | Pending |
-| INTG-03 | Phase 2 | Pending |
-| INTG-05 | Phase 2 | Pending |
+| INTG-01 | Phase 2 | Complete |
+| INTG-02 | Phase 2 | Complete |
+| INTG-03 | Phase 2 | Complete |
+| INTG-05 | Phase 2 | Complete |
 | STAT-01 | Phase 3 | Pending |
 | STAT-02 | Phase 3 | Pending |
 | STAT-03 | Phase 3 | Pending |
