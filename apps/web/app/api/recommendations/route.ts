@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { auth } from '@/auth';
 import { generateRecommendations } from '@/lib/recommendations/engine';
+import { markets, withTenant } from '@incremental-iq/db';
+import { eq, and } from 'drizzle-orm';
 
 /**
  * GET /api/recommendations
@@ -37,6 +39,27 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const marketId = searchParams.get('marketId');
 
   const recommendations = await generateRecommendations(tenantId, marketId);
+
+  if (marketId) {
+    // Query market metadata for the filter label
+    const marketRow: Array<{ displayName: string; campaignCount: number }> =
+      await withTenant(tenantId, async (tx) => {
+        return tx
+          .select({
+            displayName: markets.displayName,
+            campaignCount: markets.campaignCount,
+          })
+          .from(markets)
+          .where(and(eq(markets.id, marketId), eq(markets.tenantId, tenantId)))
+          .limit(1);
+      });
+
+    const marketSummary = marketRow[0]
+      ? { marketName: marketRow[0].displayName, campaignCount: marketRow[0].campaignCount }
+      : null;
+
+    return NextResponse.json({ recommendations, marketSummary });
+  }
 
   return NextResponse.json(recommendations);
 }
