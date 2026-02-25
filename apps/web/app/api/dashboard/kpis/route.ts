@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { headers } from 'next/headers';
+import { auth } from '@/auth';
 import { withTenant, campaignMetrics, campaignMarkets } from '@incremental-iq/db';
 import { eq, and, sql, sum } from 'drizzle-orm';
 
@@ -8,8 +10,10 @@ import { eq, and, sql, sum } from 'drizzle-orm';
  * Returns aggregated KPIs for the requested date range from campaign_metrics.
  * Supports optional comparison period to compute period-over-period deltas.
  *
+ * tenantId is extracted from the authenticated session — not from query params.
+ * Returns 401 Unauthorized if no valid session exists.
+ *
  * Query params:
- *   tenantId    (required) — UUID of the requesting tenant
  *   from        (required) — ISO date string, e.g. "2025-01-01"
  *   to          (required) — ISO date string, e.g. "2025-01-31"
  *   compareFrom (optional) — ISO date string for comparison period start
@@ -18,6 +22,7 @@ import { eq, and, sql, sum } from 'drizzle-orm';
  * Returns:
  *   200: KpiResponse
  *   400: { error: string }
+ *   401: { error: 'Unauthorized' }
  */
 
 interface KpiAggregate {
@@ -105,17 +110,22 @@ async function aggregateKpis(
 }
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  const tenantId = session.user.tenantId;
+
   const { searchParams } = new URL(request.url);
-  const tenantId = searchParams.get('tenantId');
   const from = searchParams.get('from');
   const to = searchParams.get('to');
   const compareFrom = searchParams.get('compareFrom');
   const compareTo = searchParams.get('compareTo');
   const marketId = searchParams.get('marketId');
 
-  if (!tenantId || !from || !to) {
+  if (!from || !to) {
     return NextResponse.json(
-      { error: 'Missing required query parameters: tenantId, from, to' },
+      { error: 'Missing required query parameters: from, to' },
       { status: 400 },
     );
   }

@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { headers } from 'next/headers';
+import { auth } from '@/auth';
 import { withTenant, incrementalityScores, saturationEstimates, campaigns, campaignMarkets } from '@incremental-iq/db';
 import { eq, and, desc, sql } from 'drizzle-orm';
 
@@ -7,6 +9,9 @@ import { eq, and, desc, sql } from 'drizzle-orm';
  *
  * Returns incrementality score data for the Statistical Insights page.
  *
+ * tenantId is extracted from the authenticated session — not from query params.
+ * Returns 401 Unauthorized if no valid session exists.
+ *
  * Two modes:
  *   1. Campaign detail (campaignId provided): time series of scores for a specific campaign
  *   2. Overview (no campaignId): latest score per campaign across all campaigns
@@ -14,13 +19,13 @@ import { eq, and, desc, sql } from 'drizzle-orm';
  * Both modes include saturation data from saturation_estimates where available.
  *
  * Query params:
- *   tenantId   (required)  — UUID of the requesting tenant
  *   campaignId (optional)  — UUID of specific campaign; if omitted returns overview
  *   scoreType  (optional)  — 'adjusted' (default) | 'raw'
  *
  * Returns:
  *   200: IncrementalityDetail[]
  *   400: { error: string }
+ *   401: { error: 'Unauthorized' }
  */
 
 interface IncrementalityDetail {
@@ -66,18 +71,16 @@ interface RawSaturationRow {
 }
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  const tenantId = session.user.tenantId;
+
   const { searchParams } = new URL(request.url);
-  const tenantId = searchParams.get('tenantId');
   const campaignId = searchParams.get('campaignId');
   const scoreType = searchParams.get('scoreType') ?? 'adjusted';
   const marketId = searchParams.get('marketId');
-
-  if (!tenantId) {
-    return NextResponse.json(
-      { error: 'Missing required query parameter: tenantId' },
-      { status: 400 },
-    );
-  }
 
   if (!['adjusted', 'raw'].includes(scoreType)) {
     return NextResponse.json(

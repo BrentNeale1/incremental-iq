@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { headers } from 'next/headers';
+import { auth } from '@/auth';
 import { withTenant, campaigns, campaignMetrics, incrementalityScores, campaignMarkets } from '@incremental-iq/db';
 import { eq, and, desc, sql, sum } from 'drizzle-orm';
 
@@ -8,8 +10,10 @@ import { eq, and, desc, sql, sum } from 'drizzle-orm';
  * Returns campaign-level or rollup-level data with incrementality scores
  * for the requested date range.
  *
+ * tenantId is extracted from the authenticated session — not from query params.
+ * Returns 401 Unauthorized if no valid session exists.
+ *
  * Query params:
- *   tenantId (required)  — UUID of the requesting tenant
  *   from     (required)  — ISO date string, e.g. "2025-01-01"
  *   to       (required)  — ISO date string, e.g. "2025-01-31"
  *   platform (optional)  — filter by platform/source (e.g., 'google_ads', 'meta')
@@ -26,6 +30,7 @@ import { eq, and, desc, sql, sum } from 'drizzle-orm';
  * Returns:
  *   200: CampaignRow[]
  *   400: { error: string }
+ *   401: { error: 'Unauthorized' }
  */
 
 interface CampaignRow {
@@ -77,17 +82,22 @@ interface RollupScoreRow {
 }
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  const tenantId = session.user.tenantId;
+
   const { searchParams } = new URL(request.url);
-  const tenantId = searchParams.get('tenantId');
   const from = searchParams.get('from');
   const to = searchParams.get('to');
   const platform = searchParams.get('platform');
   const level = searchParams.get('level') ?? 'campaign';
   const marketId = searchParams.get('marketId');
 
-  if (!tenantId || !from || !to) {
+  if (!from || !to) {
     return NextResponse.json(
-      { error: 'Missing required query parameters: tenantId, from, to' },
+      { error: 'Missing required query parameters: from, to' },
       { status: 400 },
     );
   }
