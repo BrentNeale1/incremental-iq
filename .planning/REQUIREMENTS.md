@@ -12,7 +12,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **INTG-01**: User can connect Meta Ads account via OAuth and pull campaign/ad set/ad data
 - [x] **INTG-02**: User can connect Google Ads account via OAuth and pull campaign data
 - [x] **INTG-03**: User can connect Shopify store and pull order/revenue data
-- [x] **INTG-04**: User can connect GA4 and select which conversion events represent leads
+- [ ] **INTG-04**: User can connect GA4 and select which conversion events represent leads
 - [x] **INTG-05**: System backfills historical data from all connected sources (1yr min, 3yr ideal)
 
 ### Statistical Engine
@@ -31,7 +31,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **RECC-02**: Each recommendation includes expected outcome (simple estimate for owners, ranges with confidence for analysts)
 - [x] **RECC-03**: System states uncertainty transparently and suggests specific tests to resolve data gaps
 - [x] **RECC-04**: System can design holdout tests when statistical modeling lacks sufficient confidence
-- [ ] **RECC-05**: System proactively suggests budget adjustments ahead of known seasonal periods
+- [x] **RECC-05**: System proactively suggests budget adjustments ahead of known seasonal periods
 - [x] **RECC-06**: Holdout tests are suggested only as a last resort, never as the first option
 
 ### Seasonality
@@ -43,17 +43,17 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **MRKT-01**: System auto-detects markets from campaign geo targeting metadata
 - [ ] **MRKT-02**: User confirms or corrects detected markets during onboarding
-- [ ] **MRKT-03**: Attribution model isolates markets to prevent cross-market false signals
+- [x] **MRKT-03**: Attribution model isolates markets to prevent cross-market false signals
 - [ ] **MRKT-04**: All reports and analysis can be segmented by market
 
 ### Reporting & UI
 
-- [ ] **RPRT-01**: Dashboard displays summary KPIs (spend, revenue, ROAS, incremental revenue, lift %)
+- [x] **RPRT-01**: Dashboard displays summary KPIs (spend, revenue, ROAS, incremental revenue, lift %)
 - [x] **RPRT-02**: User can select date ranges (7/14/30/90 days, custom range, comparison period)
 - [x] **RPRT-03**: Multi-level view: campaign → cluster → channel → overall rollups
 - [x] **RPRT-04**: Data freshness indicator per connected integration
-- [ ] **RPRT-05**: User can export data as CSV/Excel
-- [ ] **RPRT-06**: Web UI is mobile-responsive
+- [x] **RPRT-05**: User can export data as CSV/Excel
+- [x] **RPRT-06**: Web UI is mobile-responsive
 - [x] **RPRT-07**: Dual-audience views: simple summaries for business owners, detailed statistical output for analysts
 
 ### Access
@@ -147,20 +147,20 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RECC-02 | Phase 4 | Complete |
 | RECC-03 | Phase 4 | Complete |
 | RECC-04 | Phase 4 | Complete |
-| RECC-05 | Phase 4 | Pending |
+| RECC-05 | Phase 4 | Complete |
 | RECC-06 | Phase 4 | Complete |
-| RPRT-01 | Phase 4 | Pending |
+| RPRT-01 | Phase 4 | Complete |
 | RPRT-02 | Phase 4 | Complete |
 | RPRT-03 | Phase 4 | Complete |
 | RPRT-04 | Phase 4 | Complete |
-| RPRT-05 | Phase 4 | Pending |
-| RPRT-06 | Phase 4 | Pending |
+| RPRT-05 | Phase 4 | Complete |
+| RPRT-06 | Phase 4 | Complete |
 | RPRT-07 | Phase 4 | Complete |
-| INTG-04 | Phase 5 | Complete |
+| INTG-04 | Phase 7 | Pending |
 | MRKT-01 | Phase 5 | Complete |
-| MRKT-02 | Phase 5 | Pending |
-| MRKT-03 | Phase 5 | Pending |
-| MRKT-04 | Phase 5 | Pending |
+| MRKT-02 | Phase 7 | Pending |
+| MRKT-03 | Phase 5 | Complete |
+| MRKT-04 | Phase 8 | Pending |
 | AUTH-01 | Phase 6 | Complete |
 | AUTH-02 | Phase 6 | Complete |
 | AUTH-03 | Phase 6 | Complete |
@@ -172,4 +172,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-24*
-*Last updated: 2026-02-25 — RPRT-03 and RPRT-04 complete (04-05-PLAN.md: DrillDownTable with campaign/cluster/channel/overall hierarchy + SyncStatusList with freshness indicators and stale data warnings)*
+*Last updated: 2026-02-25 — Gap closure phases 7-8 created; INTG-04 reset to Pending (partial); RECC-05, RPRT-01, RPRT-05, RPRT-06, MRKT-03 updated to Complete per audit; INTG-04/MRKT-02 → Phase 7, MRKT-04 → Phase 8*

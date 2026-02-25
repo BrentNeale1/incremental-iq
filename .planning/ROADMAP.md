@@ -18,6 +18,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 4: Recommendations and Dashboard** - Scaling-first recommendations and dual-audience dashboard surfacing model outputs to users
 - [x] **Phase 5: Expanded Connectors and Multi-Market** - GA4 integration, market auto-detection, and market-aware attribution
 - [x] **Phase 6: Authentication** - User sign-up, login with session persistence, and logout across the platform (completed 2026-02-25)
+- [ ] **Phase 7: Onboarding & Integration Connect** - Onboarding wizard mounting GA4EventSelector, MarketConfirmationStep, OutcomeModeSelector, and integration connect flow (Gap Closure)
+- [ ] **Phase 8: Market-Aware Recommendations** - Add marketId filtering to recommendations API and engine (Gap Closure)
 
 ## Phase Details
 
@@ -122,6 +124,29 @@ Plans:
 - [x] 06-03-PLAN.md — API retrofit: session-based tenantId on all API routes, remove PLACEHOLDER_TENANT_ID from dashboard
 - [ ] 06-04-PLAN.md — UAT gap closure: fix CSS cold-reload, sign-up redirect, login env/callbackURL, forgot-password autofill
 
+### Phase 7: Onboarding & Integration Connect
+**Goal**: New users can connect integrations, select GA4 events, confirm markets, and set outcome mode through a guided onboarding flow — all 4 orphaned components are reachable
+**Depends on**: Phase 6
+**Requirements**: INTG-04, MRKT-02
+**Gap Closure**: Closes gaps from audit — INTG-04 (GA4EventSelector bugs + not mounted), MRKT-02 (MarketConfirmationStep not mounted), integration orphans, 3 broken E2E flows
+**Success Criteria** (what must be TRUE):
+  1. New user lands on an onboarding wizard after first sign-up with steps to connect integrations (Meta, Google, Shopify), select GA4 events, confirm markets, and set outcome mode
+  2. GA4EventSelector correctly fetches events from GET /api/ga4/events and saves selections via POST with body params
+  3. MarketConfirmationStep is rendered and functional — user can confirm, rename, merge, add, or delete auto-detected markets
+  4. OutcomeModeSelector allows switching between ecommerce and lead_gen outcome modes
+**Plans**: TBD
+
+### Phase 8: Market-Aware Recommendations
+**Goal**: Recommendations respect market selection — when a user filters by market, recommendations only include campaigns from that market
+**Depends on**: Phase 7
+**Requirements**: MRKT-04
+**Gap Closure**: Closes gap from audit — MRKT-04 (/api/recommendations missing marketId filtering)
+**Success Criteria** (what must be TRUE):
+  1. /api/recommendations accepts optional marketId query parameter
+  2. When marketId is provided, only campaigns belonging to that market are included in recommendation generation
+  3. MarketSelector in AppHeader filters recommendations the same way it filters other dashboard views
+**Plans**: TBD
+
 ## Progress
 
 **Execution Order:**
@@ -135,3 +160,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 4. Recommendations and Dashboard | 5/6 | In Progress|  |
 | 5. Expanded Connectors and Multi-Market | 4/4 | Complete | 2026-02-25 |
 | 6. Authentication | 4/4 | Complete   | 2026-02-25 |
+| 7. Onboarding & Integration Connect | 0/? | Pending | |
+| 8. Market-Aware Recommendations | 0/? | Pending | |
