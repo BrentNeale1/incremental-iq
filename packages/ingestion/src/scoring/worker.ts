@@ -29,6 +29,8 @@ import {
   campaignMetrics,
   incrementalityScores,
   seasonalEvents,
+  campaignMarkets,
+  tenants,
 } from '@incremental-iq/db';
 import { assignFunnelStage } from './funnel-stage';
 import { persistScores } from './persist';
@@ -180,6 +182,37 @@ export async function processScoringJob(job: Job<ScoringJobData>): Promise<void>
     `);
     return result.rows as MetricRow[];
   });
+
+  await job.updateProgress(10);
+
+  // -------------------------------------------------------------------------
+  // Step 1b: Query campaign market assignment and tenant outcome mode
+  // -------------------------------------------------------------------------
+  const campaignMarket = await withTenant(tenantId, async () => {
+    const result = await db.execute(sql`
+      SELECT market_id::text AS market_id
+      FROM campaign_markets
+      WHERE
+        tenant_id = ${tenantId}::uuid
+        AND campaign_id = ${campaignId}::uuid
+      LIMIT 1
+    `);
+    return (result.rows[0] as { market_id: string | null } | undefined)?.market_id ?? null;
+  });
+
+  const tenantOutcomeMode = await withTenant(tenantId, async () => {
+    const result = await db.execute(sql`
+      SELECT outcome_mode FROM tenants WHERE id = ${tenantId}::uuid LIMIT 1
+    `);
+    return (result.rows[0] as { outcome_mode: string } | undefined)?.outcome_mode ?? 'ecommerce';
+  });
+
+  // For lead-gen tenants, use directConversions as the revenue field in MetricRow
+  if (tenantOutcomeMode === 'lead_gen') {
+    for (const row of rawMetrics) {
+      row.direct_revenue = row.direct_conversions;
+    }
+  }
 
   await job.updateProgress(15);
 
@@ -398,12 +431,12 @@ export async function processScoringJob(job: Job<ScoringJobData>): Promise<void>
     },
   };
 
-  await persistScores(tenantId, campaignId, scoringResults);
+  await persistScores(tenantId, campaignId, scoringResults, campaignMarket);
 
   await job.updateProgress(100);
 
   console.info(
-    `[scoring-worker] Completed score: tenant=${tenantId} campaign=${campaignId} status=${incrementalityResult.adjusted.status}`,
+    `[scoring-worker] Completed score: tenant=${tenantId} campaign=${campaignId} market=${campaignMarket ?? 'global'} status=${incrementalityResult.adjusted.status}`,
   );
 }
 

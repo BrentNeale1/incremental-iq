@@ -99,6 +99,7 @@ export async function persistScores(
   tenantId: string,
   campaignId: string,
   results: ScoringResults,
+  marketId: string | null = null,
 ): Promise<void> {
   await withTenant(tenantId, async () => {
     const scoredAt = new Date();
@@ -120,7 +121,7 @@ export async function persistScores(
       dataPoints: String(adjusted.data_points),
       status: adjusted.status,
       rawModelOutput: raw_model_output ?? null,
-      marketId: null, // STAT-05 scaffold — Phase 5 populates this
+      marketId,
     });
 
     // -----------------------------------------------------------------------
@@ -137,8 +138,8 @@ export async function persistScores(
       confidence: raw.confidence.toFixed(4),
       dataPoints: String(raw.data_points),
       status: raw.status,
-      rawModelOutput: null, // Raw scores share raw_model_output with adjusted; avoid duplication
-      marketId: null, // STAT-05 scaffold
+      rawModelOutput: null,
+      marketId,
     });
 
     // -----------------------------------------------------------------------

@@ -222,7 +222,26 @@ export function computeHierarchyRollups(scores: CampaignScore[]): RollupScore[] 
   }
 
   // -------------------------------------------------------------------------
-  // Level 4: Overall rollup
+  // Level 3.5: Market rollups (all campaigns in same market)
+  //
+  // Aggregates across platforms within a single market. Only produced when
+  // at least one campaign has a non-null marketId.
+  // -------------------------------------------------------------------------
+  const marketGroups = new Map<string, CampaignScore[]>();
+  for (const score of scoreable) {
+    if (!score.marketId) continue;
+    if (!marketGroups.has(score.marketId)) {
+      marketGroups.set(score.marketId, []);
+    }
+    marketGroups.get(score.marketId)!.push(score);
+  }
+
+  for (const [marketId, marketScores] of marketGroups) {
+    rollups.push(spendWeightedRollup(marketScores, 'channel', `market_${marketId}`));
+  }
+
+  // -------------------------------------------------------------------------
+  // Level 4: Overall rollup (all markets combined — "All Markets" view)
   // -------------------------------------------------------------------------
   rollups.push(spendWeightedRollup(scoreable, 'overall', 'overall'));
 

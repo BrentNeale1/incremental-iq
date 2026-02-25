@@ -12,6 +12,7 @@ import { decryptToken } from '../../crypto';
 import { processMetaSync } from '../../normalizers/meta';
 import { processGoogleAdsSync } from '../../normalizers/google-ads';
 import { processShopifySync } from '../../normalizers/shopify';
+import { detectMarketsForTenant } from '../../market-detection';
 import { enqueueBackfill, registerNightlySync, enqueueScoringAfterSync } from '../queues';
 import type { SyncJobData } from '../../types';
 
@@ -142,7 +143,23 @@ export async function processSyncJob(job: Job<SyncJobData>): Promise<void> {
       })
       .where(eq(integrations.id, integrationId));
 
-    // Step 5b: Trigger scoring after successful sync (ARCH-03 gated)
+    // Step 5b: Re-detect markets if new campaigns were synced
+    //
+    // Market detection runs before scoring so that new campaigns get market
+    // assignments (via campaign_markets) before scoring partitions by market.
+    if (recordsIngested > 0 && (platform === 'meta' || platform === 'google_ads')) {
+      try {
+        await detectMarketsForTenant(tenantId);
+        console.info(
+          `[sync] Market detection re-run after ${recordsIngested} records synced for tenant ${tenantId}`,
+        );
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.warn(`[sync] Market detection failed (non-fatal): ${msg}`);
+      }
+    }
+
+    // Step 5c: Trigger scoring after successful sync (ARCH-03 gated)
     //
     // Only trigger if tenants.analysisUnlocked is true — the ARCH-03 gate
     // ensures scoring doesn't run before >= 1 year of historical data exists.
