@@ -163,5 +163,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 4. Recommendations and Dashboard | 5/6 | In Progress|  |
 | 5. Expanded Connectors and Multi-Market | 4/4 | Complete | 2026-02-25 |
 | 6. Authentication | 4/4 | Complete   | 2026-02-25 |
-| 7. Onboarding & Integration Connect | 0/2 | Planned | |
+| 7. Onboarding & Integration Connect | 1/2 | In Progress|  |
 | 8. Market-Aware Recommendations | 0/? | Pending | |

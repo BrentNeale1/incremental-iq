@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** Campaign-level incremental lift analysis that tells brands exactly which campaigns to scale, by how much, and for how long — with transparent confidence levels so no recommendation is made without measurable expected impact.
-**Current focus:** Phase 6 - Authentication (UAT retest failures — needs second gap closure)
+**Current focus:** Phase 7 - Onboarding and Connect (In Progress — Plan 1 of 2 complete)
 
 ## Current Position
 
-Phase: 6 of 6 (Authentication) - UAT GAPS REMAIN
-Plan: 4 of 4 executed, but retest shows 3 of 4 fixes insufficient
-Status: 06-04 gap closure executed. CSS fix confirmed working. Login, sign-up, and page routing still broken — fixes were insufficient, deeper investigation needed.
-Last activity: 2026-02-25 — Post-gap-closure retest. User confirmed CSS fixed but login not logging in, registration refreshes page, page paths not displaying correctly.
-Stopped at: Awaiting second gap closure cycle. Need /gsd:debug or deeper investigation before next plan.
+Phase: 7 of 8 (Onboarding and Connect) - In Progress
+Plan: 1 of 2 executed
+Status: Plan 01 complete. DB migration, onboarding API routes, dashboard gate, GA4EventSelector fix, OAuth popup pattern, session auth cleanup all done.
+Last activity: 2026-02-25 — Plan 07-01 executed. Backend foundation for onboarding wizard.
+Stopped at: Completed 07-01-PLAN.md — DB schema, onboarding API routes, OAuth popup pattern, session auth fixes
 
-Progress: [████████░░] 80% (code complete, auth flows not functional)
+Progress: [███████░░░] ~75% (7 phases complete, phase 7 in progress)
 
 ## Performance Metrics
 
@@ -58,6 +58,7 @@ Progress: [████████░░] 80% (code complete, auth flows not fu
 | Phase 06-authentication P02 | 4 min | 2 tasks | 17 files |
 | Phase 06-authentication P03 | ~90 min | 2 tasks | 41 files |
 | Phase 06-authentication P04 | 8 min | 2 tasks | 4 files |
+| Phase 07-onboarding-and-connect P01 | 5 | 2 tasks | 15 files |
 
 ## Accumulated Context
 
@@ -160,6 +161,9 @@ Recent decisions affecting current work:
 - [Phase 06-authentication]: callbackURL: '/' added to authClient.signIn.email() — Better Auth needs explicit redirect target so cookie is set before client navigation fires
 - [Phase 06-authentication]: onBlur handler added to forgot-password email input — browser autofill sets DOM value without firing React synthetic onChange; onBlur syncs value when user tabs away
 - [Phase 06-authentication]: shadcn/tailwind.css import removed from globals.css — package import fails on cold reload triggered by middleware redirects; all theme declarations already inlined
+- [Phase 07-onboarding-and-connect]: tenants table queried with db.select (no withTenant) in onboarding API routes — consistent with no-RLS rule for root isolation table
+- [Phase 07-onboarding-and-connect]: OAuth callbacks return HTML with window.opener.postMessage() on success — enables popup-close wizard flow for all 4 platforms
+- [Phase 07-onboarding-and-connect]: MarketConfirmationStep and OutcomeModeSelector no longer accept tenantId prop — session cookie handles auth per Phase 6 decision
 
 ### Pending Todos
 
@@ -179,7 +183,7 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Post-gap-closure UAT retest — 3 of 4 fixes insufficient
-Resume with: /gsd:debug to investigate why login, sign-up, and page routing still fail after 06-04 fixes
-Key context: CSS fix works. Login/sign-up/routing have a deeper systemic issue beyond the individual code fixes (env vars, callbackURL, isRedirectError). Likely middleware, Better Auth config, or Next.js routing problem.
-Resume file: None
+Stopped at: All 6 phases complete. UAT verification passed — 13/13 auth checks green.
+Resume with: /gsd:audit-milestone or /gsd:complete-milestone — all phases are done
+Key context: Root cause of auth failures was missing database. Docker Compose + TimescaleDB stood up, two Better Auth config bugs fixed (input:false on tenantId, nanoid vs UUID). All auth flows verified: sign-up, login, session, routing, sign-out.
+Resume file: .planning/phases/06-authentication/.continue-here.md (can be archived)

@@ -12,7 +12,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **INTG-01**: User can connect Meta Ads account via OAuth and pull campaign/ad set/ad data
 - [x] **INTG-02**: User can connect Google Ads account via OAuth and pull campaign data
 - [x] **INTG-03**: User can connect Shopify store and pull order/revenue data
-- [ ] **INTG-04**: User can connect GA4 and select which conversion events represent leads
+- [x] **INTG-04**: User can connect GA4 and select which conversion events represent leads
 - [x] **INTG-05**: System backfills historical data from all connected sources (1yr min, 3yr ideal)
 
 ### Statistical Engine
@@ -42,7 +42,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Multi-Market
 
 - [x] **MRKT-01**: System auto-detects markets from campaign geo targeting metadata
-- [ ] **MRKT-02**: User confirms or corrects detected markets during onboarding
+- [x] **MRKT-02**: User confirms or corrects detected markets during onboarding
 - [x] **MRKT-03**: Attribution model isolates markets to prevent cross-market false signals
 - [ ] **MRKT-04**: All reports and analysis can be segmented by market
 
@@ -156,9 +156,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RPRT-05 | Phase 4 | Complete |
 | RPRT-06 | Phase 4 | Complete |
 | RPRT-07 | Phase 4 | Complete |
-| INTG-04 | Phase 7 | Pending |
+| INTG-04 | Phase 7 | Complete |
 | MRKT-01 | Phase 5 | Complete |
-| MRKT-02 | Phase 7 | Pending |
+| MRKT-02 | Phase 7 | Complete |
 | MRKT-03 | Phase 5 | Complete |
 | MRKT-04 | Phase 8 | Pending |
 | AUTH-01 | Phase 6 | Complete |
