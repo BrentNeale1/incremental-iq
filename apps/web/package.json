@@ -34,6 +34,7 @@
     "react-email": "^5.2.8",
     "recharts": "2.15.4",
     "resend": "^6.9.2",
+    "shadcn": "^3.8.5",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0",
     "tailwindcss": "^4.2.1",
