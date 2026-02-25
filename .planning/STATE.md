@@ -61,6 +61,7 @@ Progress: [█████████░] ~90% (7 phases complete, phase 8 in p
 | Phase 07-onboarding-and-connect P01 | 5 | 2 tasks | 15 files |
 | Phase 07-onboarding-and-connect P02 | 6 min | 2 tasks | 8 files |
 | Phase 08-market-aware-recommendations P01 | 8 min | 2 tasks | 3 files |
+| Phase 08-market-aware-recommendations P02 | 4 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -171,6 +172,8 @@ Recent decisions affecting current work:
 - [Phase 07-onboarding-and-connect]: Post-onboarding settings covered by existing dashboard pages for v1 — no new settings page needed (IntegrationSettings in Health, MarketSelector in AppHeader, outcomeMode in preferences)
 - [Phase 08-market-aware-recommendations]: Drizzle innerJoin bug fixed via immutable builder pattern: filteredQuery = marketId ? baseQuery.innerJoin(...) : baseQuery — query.innerJoin() discards return value
 - [Phase 08-market-aware-recommendations]: API route returns plain Recommendation[] when no marketId (backwards compatible with useRecommendations hook); wrapped { recommendations, marketSummary } only when marketId present
+- [Phase 08-market-aware-recommendations]: queryKey stays ['recommendations'] (no market in key) — client-side filtering via TanStack Query select avoids per-market network requests
+- [Phase 08-market-aware-recommendations]: CrossMarketSuggestions reads from queryClient.getQueryData(['recommendations']) — no extra fetch for empty-market cross-market suggestions
 
 ### Pending Todos
 

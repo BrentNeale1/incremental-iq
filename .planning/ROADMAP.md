@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: Expanded Connectors and Multi-Market** - GA4 integration, market auto-detection, and market-aware attribution
 - [x] **Phase 6: Authentication** - User sign-up, login with session persistence, and logout across the platform (completed 2026-02-25)
 - [x] **Phase 7: Onboarding & Integration Connect** - Onboarding wizard mounting GA4EventSelector, MarketConfirmationStep, OutcomeModeSelector, and integration connect flow (Gap Closure) (completed 2026-02-25)
-- [ ] **Phase 8: Market-Aware Recommendations** - Add marketId filtering to recommendations API and engine (Gap Closure)
+- [x] **Phase 8: Market-Aware Recommendations** - Add marketId filtering to recommendations API and engine (Gap Closure) (completed 2026-02-25)
 
 ## Phase Details
 
@@ -167,4 +167,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 5. Expanded Connectors and Multi-Market | 4/4 | Complete | 2026-02-25 |
 | 6. Authentication | 4/4 | Complete   | 2026-02-25 |
 | 7. Onboarding & Integration Connect | 2/2 | Complete   | 2026-02-25 |
-| 8. Market-Aware Recommendations | 1/2 | In Progress|  |
+| 8. Market-Aware Recommendations | 2/2 | Complete   | 2026-02-25 |
