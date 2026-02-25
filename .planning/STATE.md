@@ -5,16 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** Campaign-level incremental lift analysis that tells brands exactly which campaigns to scale, by how much, and for how long — with transparent confidence levels so no recommendation is made without measurable expected impact.
-**Current focus:** Phase 6 - Authentication (NEXT)
+**Current focus:** Phase 6 - Authentication (IN PROGRESS)
 
 ## Current Position
 
-Phase: 5 of 6 (Expanded Connectors and Multi-Market) - COMPLETE
-Plan: 4 of 4 in current phase - COMPLETE (all plans done, verified)
-Status: Phase 5 COMPLETE — All 4 success criteria verified. GA4 connector + OAuth, market auto-detection, market-isolated scoring, market-segmented UI + recommendations.
-Last activity: 2026-02-25 — Phase 5 verified and completed. Verification gaps fixed (GA4EventSelector POST body, recommendations marketId filter).
+Phase: 6 of 6 (Authentication) - IN PROGRESS
+Plan: 1 of 3 in current phase - COMPLETE
+Status: Phase 6 Plan 01 COMPLETE — Better Auth installed, auth schema + migration (0006_auth.sql), server/client instances configured, middleware route protection, dashboard layout auth guard, tenantId wired from session.
+Last activity: 2026-02-25 — Phase 6 Plan 01 executed. Better Auth foundation laid.
+Stopped at: Completed 06-01-PLAN.md
 
-Progress: [██████████] 90%
+Progress: [██████████] 93%
 
 ## Performance Metrics
 
@@ -53,6 +54,7 @@ Progress: [██████████] 90%
 | Phase 04-recommendations-and-dashboard PP05 | 25 min | 2 tasks | 14 files |
 | Phase 05-expanded-connectors-and-multi-market P01 | 7 | 2 tasks | 9 files |
 | Phase 05-expanded-connectors-and-multi-market PP02 | 12 min | 2 tasks | 9 files |
+| Phase 06-authentication P01 | 7 | 2 tasks | 20 files |
 
 ## Accumulated Context
 
@@ -143,6 +145,8 @@ Recent decisions affecting current work:
 - [Phase 05-expanded-connectors-and-multi-market]: GA4Connector does NOT implement PlatformConnector — outcome source with separate getGA4Connector() factory; Platform type extended to include 'ga4'
 - [Phase 05-expanded-connectors-and-multi-market]: GA4 lead counts stored in directConversions column (not directRevenue) — same column used by Shopify orders; outcomeMode gates which column is the primary outcome signal
 - [Phase 05-expanded-connectors-and-multi-market]: No GA4 backfill from OAuth callback — requires property + event selection first; POST /api/ga4/events triggers backfill eligibility (Plan 06 scheduler responsibility)
+- [Phase 06-authentication]: Better Auth v1.4.19 with drizzleAdapter — no RLS on auth tables, no cookieCache, 30-day sliding sessions, tenantId additionalField on user
+- [Phase 06-authentication]: TenantProvider React context distributes tenantId to dashboard client components — useTenantId() replaces PLACEHOLDER_TENANT_ID in all 5 dashboard pages
 
 ### Pending Todos
 

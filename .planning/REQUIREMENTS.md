@@ -59,7 +59,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Access
 
 - [ ] **AUTH-01**: User can sign up with email and password
-- [ ] **AUTH-02**: User can log in with session persistence across browser refresh
+- [x] **AUTH-02**: User can log in with session persistence across browser refresh
 - [ ] **AUTH-03**: User can log out from any page
 
 ### Data Architecture
@@ -162,7 +162,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MRKT-03 | Phase 5 | Pending |
 | MRKT-04 | Phase 5 | Pending |
 | AUTH-01 | Phase 6 | Pending |
-| AUTH-02 | Phase 6 | Pending |
+| AUTH-02 | Phase 6 | Complete |
 | AUTH-03 | Phase 6 | Pending |
 
 **Coverage:**
