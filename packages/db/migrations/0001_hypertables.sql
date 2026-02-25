@@ -13,18 +13,15 @@ SELECT create_hypertable(
   if_not_exists => TRUE
 );
 
--- Compression: compress chunks older than 90 days
--- Segment by tenant and campaign for efficient range queries
--- Order by date DESC for time-range scan performance
-ALTER TABLE campaign_metrics SET (
-  timescaledb.compress,
-  timescaledb.compress_segmentby = 'tenant_id, campaign_id',
-  timescaledb.compress_orderby = 'date DESC'
-);
-SELECT add_compression_policy('campaign_metrics', INTERVAL '90 days');
+-- NOTE: Compression deferred — TimescaleDB compression is incompatible with RLS.
+-- Production deployment should disable RLS on hypertables before enabling compression,
+-- relying on application-layer tenant isolation (withTenant SET LOCAL) instead.
 
 -- Convert raw_api_pulls to hypertable (append-only, benefits from time partitioning)
 -- Use 1-week chunks (raw data has higher volume and shorter retention)
+-- TimescaleDB requires partition column in all unique indexes/primary keys
+ALTER TABLE raw_api_pulls DROP CONSTRAINT raw_api_pulls_pkey;
+ALTER TABLE raw_api_pulls ADD PRIMARY KEY (id, pulled_at);
 SELECT create_hypertable(
   'raw_api_pulls',
   'pulled_at',

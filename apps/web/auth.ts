@@ -66,12 +66,20 @@ export const auth = betterAuth({
     // Do NOT enable cookieCache — prevents immediate logout invalidation (AUTH-03)
   },
 
+  advanced: {
+    database: {
+      // Let PostgreSQL generate UUIDs via gen_random_uuid() instead of Better Auth's nanoid
+      // Required because auth tables use uuid column type, not text
+      generateId: false,
+    },
+  },
+
   user: {
     additionalFields: {
       tenantId: {
         type: "string",
         required: true,
-        input: false, // Set programmatically at sign-up, not user-provided
+        input: true, // Must be true for auth.api.signUpEmail() to accept it; server action controls the value
       },
     },
   },
