@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { headers } from 'next/headers';
+import { auth } from '@/auth';
 import { withTenant, userPreferences } from '@incremental-iq/db';
 import { eq } from 'drizzle-orm';
 
@@ -8,21 +10,18 @@ import { eq } from 'drizzle-orm';
  * Returns the user's notification preferences.
  * Creates default preferences if none exist.
  *
- * Query params:
- *   tenantId (required) — UUID of the requesting tenant
+ * tenantId is extracted from the authenticated session — not from query params.
+ * Returns 401 Unauthorized if no valid session exists.
  *
  * Returns:
  *   200: UserPreferences
- *   400: { error: string }
+ *   401: { error: 'Unauthorized' }
  *
  * ---
  *
  * PUT /api/notifications/preferences
  *
  * Updates (upserts) the user's notification preferences.
- *
- * Query params:
- *   tenantId (required) — UUID of the requesting tenant
  *
  * Body: Partial<NotificationPreferences>
  *   {
@@ -35,6 +34,7 @@ import { eq } from 'drizzle-orm';
  * Returns:
  *   200: UserPreferences (updated)
  *   400: { error: string }
+ *   401: { error: 'Unauthorized' }
  */
 
 const DEFAULT_NOTIFICATION_PREFERENCES: Record<string, { in_app: boolean; email: boolean }> = {
@@ -44,16 +44,12 @@ const DEFAULT_NOTIFICATION_PREFERENCES: Record<string, { in_app: boolean; email:
   data_health:          { in_app: true,  email: true  },
 };
 
-export async function GET(request: NextRequest): Promise<NextResponse> {
-  const { searchParams } = new URL(request.url);
-  const tenantId = searchParams.get('tenantId');
-
-  if (!tenantId) {
-    return NextResponse.json(
-      { error: 'Missing required query parameter: tenantId' },
-      { status: 400 },
-    );
+export async function GET(_request: NextRequest): Promise<NextResponse> {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+  const tenantId = session.user.tenantId;
 
   const rows = await withTenant(tenantId, async (tx) => {
     return tx
@@ -79,15 +75,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 }
 
 export async function PUT(request: NextRequest): Promise<NextResponse> {
-  const { searchParams } = new URL(request.url);
-  const tenantId = searchParams.get('tenantId');
-
-  if (!tenantId) {
-    return NextResponse.json(
-      { error: 'Missing required query parameter: tenantId' },
-      { status: 400 },
-    );
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+  const tenantId = session.user.tenantId;
 
   let body: unknown;
   try {

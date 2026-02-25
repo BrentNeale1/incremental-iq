@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { headers } from 'next/headers';
+import { auth } from '@/auth';
 import { withTenant, saturationEstimates, campaigns, campaignMarkets } from '@incremental-iq/db';
 import { eq, and, desc, sql } from 'drizzle-orm';
 
@@ -8,18 +10,21 @@ import { eq, and, desc, sql } from 'drizzle-orm';
  * Returns Hill curve saturation data for the Statistical Insights page.
  * Used to render saturation curve charts showing diminishing returns.
  *
+ * tenantId is extracted from the authenticated session — not from query params.
+ * Returns 401 Unauthorized if no valid session exists.
+ *
  * Two modes:
  *   1. Single campaign (campaignId provided): detailed curve data points for chart
  *      Returns Hill curve parameters + 100 data points for smooth rendering
  *   2. Overview (no campaignId): latest saturation estimate per campaign
  *
  * Query params:
- *   tenantId   (required) — UUID of the requesting tenant
  *   campaignId (optional) — UUID of specific campaign for detailed curve
  *
  * Returns:
  *   200: SaturationResponse
  *   400: { error: string }
+ *   401: { error: 'Unauthorized' }
  */
 
 interface SaturationRow {
@@ -78,17 +83,15 @@ function generateCurvePoints(
 }
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  const tenantId = session.user.tenantId;
+
   const { searchParams } = new URL(request.url);
-  const tenantId = searchParams.get('tenantId');
   const campaignId = searchParams.get('campaignId');
   const marketId = searchParams.get('marketId');
-
-  if (!tenantId) {
-    return NextResponse.json(
-      { error: 'Missing required query parameter: tenantId' },
-      { status: 400 },
-    );
-  }
 
   if (campaignId) {
     // Campaign detail mode

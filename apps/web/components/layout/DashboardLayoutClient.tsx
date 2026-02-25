@@ -11,6 +11,10 @@ import { TenantProvider } from '@/lib/auth/tenant-context';
 
 interface DashboardLayoutClientProps {
   tenantId: string;
+  user: {
+    name: string;
+    email: string;
+  };
   children: React.ReactNode;
 }
 
@@ -38,6 +42,7 @@ interface DashboardLayoutClientProps {
  */
 export function DashboardLayoutClient({
   tenantId,
+  user,
   children,
 }: DashboardLayoutClientProps) {
   React.useEffect(() => {
@@ -49,7 +54,7 @@ export function DashboardLayoutClient({
     <TenantProvider tenantId={tenantId}>
       <ExportProvider>
         <SidebarProvider defaultOpen={true}>
-          <AppSidebar />
+          <AppSidebar user={user} />
           <div className="flex min-h-screen flex-1 flex-col overflow-hidden">
             <AppHeader tenantId={tenantId} />
             <main className="flex-1 overflow-auto p-4 sm:p-6">

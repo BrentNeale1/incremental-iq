@@ -34,9 +34,13 @@ export default async function DashboardLayout({
   }
 
   const tenantId = session.user.tenantId;
+  const user = {
+    name: session.user.name ?? '',
+    email: session.user.email,
+  };
 
   return (
-    <DashboardLayoutClient tenantId={tenantId}>
+    <DashboardLayoutClient tenantId={tenantId} user={user}>
       {children}
     </DashboardLayoutClient>
   );

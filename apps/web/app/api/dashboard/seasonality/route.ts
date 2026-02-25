@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { headers } from 'next/headers';
+import { auth } from '@/auth';
 import { withTenant, seasonalEvents, campaignMetrics, campaignMarkets } from '@incremental-iq/db';
 import { eq, and, sql, sum } from 'drizzle-orm';
 
@@ -8,13 +10,16 @@ import { eq, and, sql, sum } from 'drizzle-orm';
  * Returns upcoming seasonal events and historical performance data for the
  * Seasonality Planning page.
  *
+ * tenantId is extracted from the authenticated session — not from query params.
+ * Returns 401 Unauthorized if no valid session exists.
+ *
  * Query params:
- *   tenantId (required) — UUID of the requesting tenant
  *   months   (optional) — number of months to look forward (default: 6)
  *
  * Returns:
  *   200: SeasonalityResponse
  *   400: { error: string }
+ *   401: { error: 'Unauthorized' }
  */
 
 interface SeasonalEventRow {
@@ -55,17 +60,15 @@ interface RawSeasonalEvent {
 }
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  const tenantId = session.user.tenantId;
+
   const { searchParams } = new URL(request.url);
-  const tenantId = searchParams.get('tenantId');
   const monthsParam = searchParams.get('months');
   const marketId = searchParams.get('marketId');
-
-  if (!tenantId) {
-    return NextResponse.json(
-      { error: 'Missing required query parameter: tenantId' },
-      { status: 400 },
-    );
-  }
 
   const months = monthsParam ? parseInt(monthsParam, 10) : 6;
   if (isNaN(months) || months < 1 || months > 24) {

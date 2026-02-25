@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { headers } from 'next/headers';
+import { auth } from '@/auth';
 import { generateRecommendations } from '@/lib/recommendations/engine';
 
 /**
@@ -6,6 +8,9 @@ import { generateRecommendations } from '@/lib/recommendations/engine';
  *
  * Returns scaling-first recommendations for all campaigns belonging to a tenant,
  * ranked by expected incremental revenue (highest first).
+ *
+ * tenantId is extracted from the authenticated session — not from query params.
+ * Returns 401 Unauthorized if no valid session exists.
  *
  * Recommendation types:
  *   scale_up   — high/medium confidence + headroom available; includes specific budget numbers
@@ -15,23 +20,21 @@ import { generateRecommendations } from '@/lib/recommendations/engine';
  * RECC-06: holdoutTestDesign is only present on watch/low-confidence recommendations.
  *
  * Query params:
- *   tenantId (required) — UUID of the requesting tenant
+ *   marketId (optional) — filter recommendations by market UUID
  *
  * Returns:
  *   200: Recommendation[] sorted by expectedImpact DESC
- *   400: { error: 'Missing tenantId query parameter' }
+ *   401: { error: 'Unauthorized' }
  */
 export async function GET(request: NextRequest): Promise<NextResponse> {
-  const { searchParams } = new URL(request.url);
-  const tenantId = searchParams.get('tenantId');
-  const marketId = searchParams.get('marketId');
-
-  if (!tenantId) {
-    return NextResponse.json(
-      { error: 'Missing tenantId query parameter' },
-      { status: 400 },
-    );
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+  const tenantId = session.user.tenantId;
+
+  const { searchParams } = new URL(request.url);
+  const marketId = searchParams.get('marketId');
 
   const recommendations = await generateRecommendations(tenantId, marketId);
 
