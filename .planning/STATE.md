@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 5 of 6 (Expanded Connectors and Multi-Market) - IN PROGRESS
-Plan: 1 of 4 in current phase - COMPLETE (Plan 01 done; Plans 02-04 remaining)
-Status: Phase 5 Plan 01 COMPLETE — markets + campaign_markets schema with RLS, migration 0005, outcomeMode on tenants, market detection from Google Ads (GAQL two-query) and Meta (ad set geo aggregation).
-Last activity: 2026-02-25 — Completed Plan 01: markets and campaign_markets Drizzle tables with RLS, SQL migration 0005_markets_and_ga4, outcomeMode column on tenants, detectMarketsForTenant orchestrator, detectGoogleAdsMarkets (two-query GAQL), detectMetaMarkets (ad set targeting aggregation).
+Plan: 2 of 4 in current phase - COMPLETE (Plans 01-02 done; Plans 03-04 remaining)
+Status: Phase 5 Plan 02 COMPLETE — GA4 connector (listProperties, listKeyEvents, fetchLeadCounts with YYYYMMDD normalization, refreshTokenIfNeeded), processGA4Sync normalizer (directConversions, ga4-leads synthetic campaign), GA4 OAuth routes, properties/events API endpoints.
+Last activity: 2026-02-25 — Completed Plan 02: GA4Connector with Admin API + Data API, processGA4Sync normalizer, OAuth flow (analytics.readonly), properties/events endpoints.
 
 Progress: [█████████░] 85%
 
@@ -52,6 +52,7 @@ Progress: [█████████░] 85%
 | Phase 04-recommendations-and-dashboard PP02 | 11 min | 2 tasks | 11 files |
 | Phase 04-recommendations-and-dashboard PP05 | 25 min | 2 tasks | 14 files |
 | Phase 05-expanded-connectors-and-multi-market P01 | 7 | 2 tasks | 9 files |
+| Phase 05-expanded-connectors-and-multi-market PP02 | 12 min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -139,6 +140,9 @@ Recent decisions affecting current work:
 - [Phase 05-expanded-connectors-and-multi-market]: markets.campaignCount uses integer (not numeric) — integer matches Drizzle type for a count field
 - [Phase 05-expanded-connectors-and-multi-market]: detectMarketsForTenant uses raw SQL upsert for campaign_markets ON CONFLICT (tenant_id, campaign_id) DO UPDATE — cleaner than select-then-insert for unique index
 - [Phase 05-expanded-connectors-and-multi-market]: NULL marketId in campaign_markets = Global/Unassigned bucket (not a sentinel UUID) — matches user decision from CONTEXT.md
+- [Phase 05-expanded-connectors-and-multi-market]: GA4Connector does NOT implement PlatformConnector — outcome source with separate getGA4Connector() factory; Platform type extended to include 'ga4'
+- [Phase 05-expanded-connectors-and-multi-market]: GA4 lead counts stored in directConversions column (not directRevenue) — same column used by Shopify orders; outcomeMode gates which column is the primary outcome signal
+- [Phase 05-expanded-connectors-and-multi-market]: No GA4 backfill from OAuth callback — requires property + event selection first; POST /api/ga4/events triggers backfill eligibility (Plan 06 scheduler responsibility)
 
 ### Pending Todos
 

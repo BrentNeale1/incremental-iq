@@ -128,5 +128,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Core Data Ingestion | 6/6 | Complete    | 2026-02-24 |
 | 3. Statistical Engine | 6/6 | Complete    | 2026-02-24 |
 | 4. Recommendations and Dashboard | 5/6 | In Progress|  |
-| 5. Expanded Connectors and Multi-Market | 1/4 | In Progress|  |
+| 5. Expanded Connectors and Multi-Market | 2/4 | In Progress|  |
 | 6. Authentication | 0/TBD | Not started | - |
