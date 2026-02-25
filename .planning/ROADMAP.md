@@ -134,7 +134,10 @@ Plans:
   2. GA4EventSelector correctly fetches events from GET /api/ga4/events and saves selections via POST with body params
   3. MarketConfirmationStep is rendered and functional — user can confirm, rename, merge, add, or delete auto-detected markets
   4. OutcomeModeSelector allows switching between ecommerce and lead_gen outcome modes
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 07-01-PLAN.md — Backend foundation: DB schema (onboarding_completed), onboarding API routes, GA4EventSelector bug fixes, OAuth callback popup pattern, MarketConfirmationStep session auth, dashboard onboarding gate
+- [ ] 07-02-PLAN.md — Wizard UI: onboarding route group, 4-step wizard (connect integrations, GA4 events, market confirmation, outcome mode), OAuth popup, transition screen
 
 ### Phase 8: Market-Aware Recommendations
 **Goal**: Recommendations respect market selection — when a user filters by market, recommendations only include campaigns from that market
@@ -160,5 +163,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 4. Recommendations and Dashboard | 5/6 | In Progress|  |
 | 5. Expanded Connectors and Multi-Market | 4/4 | Complete | 2026-02-25 |
 | 6. Authentication | 4/4 | Complete   | 2026-02-25 |
-| 7. Onboarding & Integration Connect | 0/? | Pending | |
+| 7. Onboarding & Integration Connect | 0/2 | Planned | |
 | 8. Market-Aware Recommendations | 0/? | Pending | |
