@@ -5,15 +5,15 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** Campaign-level incremental lift analysis that tells brands exactly which campaigns to scale, by how much, and for how long — with transparent confidence levels so no recommendation is made without measurable expected impact.
-**Current focus:** Phase 6 - Authentication (IN PROGRESS)
+**Current focus:** Phase 6 - Authentication (COMPLETE)
 
 ## Current Position
 
 Phase: 6 of 6 (Authentication) - COMPLETE
-Plan: 3 of 3 in current phase - COMPLETE
-Status: Phase 6 Plan 03 COMPLETE — Eliminated IDOR vulnerability: all 16 non-OAuth API routes use session-based tenantId (auth.api.getSession), all 8 hooks and 11 UI components stripped of tenantId prop. Full tenant isolation enforced by auth session, not client query params.
-Last activity: 2026-02-25 — Phase 6 Plan 03 executed. Session-based tenant isolation complete across all routes.
-Stopped at: Completed 06-03-PLAN.md
+Plan: 4 of 4 in current phase - COMPLETE
+Status: Phase 6 Plan 04 COMPLETE — Closed all 4 UAT gaps: sign-up redirect propagates via isRedirectError re-throw, login works with callbackURL, forgot-password autofill-aware via onBlur, CSS stable on middleware redirects via removal of unreliable shadcn/tailwind.css import.
+Last activity: 2026-02-25 — Phase 6 Plan 04 executed. All UAT gaps closed, authentication flows fully functional.
+Stopped at: Completed 06-04-PLAN.md
 
 Progress: [██████████] 100%
 
@@ -57,6 +57,7 @@ Progress: [██████████] 100%
 | Phase 06-authentication P01 | 7 | 2 tasks | 20 files |
 | Phase 06-authentication P02 | 4 min | 2 tasks | 17 files |
 | Phase 06-authentication P03 | ~90 min | 2 tasks | 41 files |
+| Phase 06-authentication P04 | 8 min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -155,6 +156,10 @@ Recent decisions affecting current work:
 - [Phase 06-authentication]: OAuth routes (/api/oauth/*) excluded from session retrofit — run during pre-auth OAuth flow, use own tenant resolution
 - [Phase 06-authentication]: DashboardLayoutClient passes tenantId to TenantProvider only — AppHeader, StaleDataBanner, SidebarNav use hooks directly; no tenantId prop chain
 - [Phase 06-authentication]: PUT body types for markets and tenant/preferences no longer accept tenantId field — eliminates all client-supplied tenantId vectors (not just query params)
+- [Phase 06-authentication]: isRedirectError from next/dist/client/components/redirect-error re-thrown in signup catch block — NEXT_REDIRECT must propagate, not be swallowed as a generic error
+- [Phase 06-authentication]: callbackURL: '/' added to authClient.signIn.email() — Better Auth needs explicit redirect target so cookie is set before client navigation fires
+- [Phase 06-authentication]: onBlur handler added to forgot-password email input — browser autofill sets DOM value without firing React synthetic onChange; onBlur syncs value when user tabs away
+- [Phase 06-authentication]: shadcn/tailwind.css import removed from globals.css — package import fails on cold reload triggered by middleware redirects; all theme declarations already inlined
 
 ### Pending Todos
 
@@ -174,5 +179,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 06-03-PLAN.md
+Stopped at: Completed 06-04-PLAN.md
 Resume file: None
