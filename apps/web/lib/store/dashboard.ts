@@ -2,10 +2,18 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 export type ViewMode = 'executive' | 'analyst';
+export type OutcomeMode = 'ecommerce' | 'lead_gen';
 
 export interface DateRange {
   from: Date;
   to: Date;
+}
+
+export interface MarketInfo {
+  id: string;
+  countryCode: string;
+  displayName: string;
+  campaignCount: number;
 }
 
 interface DashboardState {
@@ -19,6 +27,12 @@ interface DashboardState {
   viewMode: ViewMode;
   /** Ordered array of KPI metric keys. Persisted. */
   kpiOrder: string[];
+  /** Selected market filter — null means "All Markets". Persisted. */
+  selectedMarket: string | null;
+  /** Available markets for this tenant — loaded from API. Not persisted. */
+  markets: MarketInfo[];
+  /** Tenant outcome mode — gates terminology (revenue vs leads). Not persisted. */
+  outcomeMode: OutcomeMode;
 
   // Setters
   setDateRange: (range: DateRange) => void;
@@ -26,6 +40,9 @@ interface DashboardState {
   setComparisonEnabled: (enabled: boolean) => void;
   setViewMode: (mode: ViewMode) => void;
   setKpiOrder: (order: string[]) => void;
+  setSelectedMarket: (marketId: string | null) => void;
+  setMarkets: (markets: MarketInfo[]) => void;
+  setOutcomeMode: (mode: OutcomeMode) => void;
 }
 
 /** Last 30 days helper — called at store initialization */
@@ -55,19 +72,26 @@ export const useDashboardStore = create<DashboardState>()(
       comparisonEnabled: false,
       viewMode: 'executive',
       kpiOrder: ['spend', 'revenue', 'roas', 'incremental_revenue'],
+      selectedMarket: null,
+      markets: [],
+      outcomeMode: 'ecommerce' as OutcomeMode,
 
       setDateRange: (range) => set({ dateRange: range }),
       setComparisonRange: (range) => set({ comparisonRange: range }),
       setComparisonEnabled: (enabled) => set({ comparisonEnabled: enabled }),
       setViewMode: (mode) => set({ viewMode: mode }),
       setKpiOrder: (order) => set({ kpiOrder: order }),
+      setSelectedMarket: (marketId) => set({ selectedMarket: marketId }),
+      setMarkets: (markets) => set({ markets }),
+      setOutcomeMode: (mode) => set({ outcomeMode: mode }),
     }),
     {
       name: 'dashboard-store',
-      // Persist only viewMode and kpiOrder — date ranges are transient
+      // Persist viewMode, kpiOrder, and selectedMarket — date ranges are transient
       partialize: (state) => ({
         viewMode: state.viewMode,
         kpiOrder: state.kpiOrder,
+        selectedMarket: state.selectedMarket,
       }),
       // CRITICAL: skipHydration prevents SSR hydration mismatch in Next.js App Router
       // The client must call useDashboardStore.persist.rehydrate() after mounting

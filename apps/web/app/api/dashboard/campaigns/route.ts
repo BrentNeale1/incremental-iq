@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withTenant, campaigns, campaignMetrics, incrementalityScores } from '@incremental-iq/db';
+import { withTenant, campaigns, campaignMetrics, incrementalityScores, campaignMarkets } from '@incremental-iq/db';
 import { eq, and, desc, sql, sum } from 'drizzle-orm';
 
 /**
@@ -83,6 +83,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const to = searchParams.get('to');
   const platform = searchParams.get('platform');
   const level = searchParams.get('level') ?? 'campaign';
+  const marketId = searchParams.get('marketId');
 
   if (!tenantId || !from || !to) {
     return NextResponse.json(
@@ -161,15 +162,27 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   }
 
   const campaignList: CampaignListRow[] = await withTenant(tenantId, async (tx) => {
-    return tx
+    const query = tx
       .select({
         id: campaigns.id,
         name: campaigns.name,
         source: campaigns.source,
         funnelStage: campaigns.funnelStage,
       })
-      .from(campaigns)
-      .where(and(...campaignConditions));
+      .from(campaigns);
+
+    // Market filter: only include campaigns assigned to the selected market
+    if (marketId) {
+      query.innerJoin(
+        campaignMarkets,
+        and(
+          eq(campaignMarkets.campaignId, campaigns.id),
+          eq(campaignMarkets.marketId, marketId),
+        ),
+      );
+    }
+
+    return query.where(and(...campaignConditions));
   });
 
   if (campaignList.length === 0) {

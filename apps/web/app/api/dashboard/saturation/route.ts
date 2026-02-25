@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withTenant, saturationEstimates, campaigns } from '@incremental-iq/db';
+import { withTenant, saturationEstimates, campaigns, campaignMarkets } from '@incremental-iq/db';
 import { eq, and, desc, sql } from 'drizzle-orm';
 
 /**
@@ -81,6 +81,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const { searchParams } = new URL(request.url);
   const tenantId = searchParams.get('tenantId');
   const campaignId = searchParams.get('campaignId');
+  const marketId = searchParams.get('marketId');
 
   if (!tenantId) {
     return NextResponse.json(
@@ -175,7 +176,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
   // Overview mode: latest saturation estimate per campaign
   const allRows = await withTenant(tenantId, async (tx) => {
-    return tx
+    const query = tx
       .select({
         campaignId: saturationEstimates.campaignId,
         saturationPct: saturationEstimates.saturationPct,
@@ -194,7 +195,20 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           eq(saturationEstimates.campaignId, campaigns.id),
           eq(campaigns.tenantId, tenantId),
         ),
-      )
+      );
+
+    // Market filter via campaign_markets JOIN
+    if (marketId) {
+      query.innerJoin(
+        campaignMarkets,
+        and(
+          eq(campaignMarkets.campaignId, saturationEstimates.campaignId),
+          eq(campaignMarkets.marketId, marketId),
+        ),
+      );
+    }
+
+    return query
       .where(eq(saturationEstimates.tenantId, tenantId))
       .orderBy(desc(saturationEstimates.estimatedAt));
   });

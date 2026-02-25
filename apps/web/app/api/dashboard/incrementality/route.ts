@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withTenant, incrementalityScores, saturationEstimates, campaigns } from '@incremental-iq/db';
+import { withTenant, incrementalityScores, saturationEstimates, campaigns, campaignMarkets } from '@incremental-iq/db';
 import { eq, and, desc, sql } from 'drizzle-orm';
 
 /**
@@ -70,6 +70,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const tenantId = searchParams.get('tenantId');
   const campaignId = searchParams.get('campaignId');
   const scoreType = searchParams.get('scoreType') ?? 'adjusted';
+  const marketId = searchParams.get('marketId');
 
   if (!tenantId) {
     return NextResponse.json(
@@ -176,6 +177,16 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
   // Overview mode: latest score per campaign
   const allScores: RawScoreWithCampaign[] = await withTenant(tenantId, async (tx) => {
+    const conditions = [
+      eq(incrementalityScores.tenantId, tenantId),
+      eq(incrementalityScores.scoreType, scoreType),
+    ];
+
+    // Filter by marketId on the score rows directly
+    if (marketId) {
+      conditions.push(eq(incrementalityScores.marketId, marketId));
+    }
+
     return tx
       .select({
         campaignId: incrementalityScores.campaignId,
@@ -197,12 +208,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           eq(campaigns.tenantId, tenantId),
         ),
       )
-      .where(
-        and(
-          eq(incrementalityScores.tenantId, tenantId),
-          eq(incrementalityScores.scoreType, scoreType),
-        ),
-      )
+      .where(and(...conditions))
       .orderBy(desc(incrementalityScores.scoredAt));
   });
 

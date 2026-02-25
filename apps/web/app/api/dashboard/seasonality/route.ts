@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withTenant, seasonalEvents, campaignMetrics } from '@incremental-iq/db';
+import { withTenant, seasonalEvents, campaignMetrics, campaignMarkets } from '@incremental-iq/db';
 import { eq, and, sql, sum } from 'drizzle-orm';
 
 /**
@@ -58,6 +58,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const { searchParams } = new URL(request.url);
   const tenantId = searchParams.get('tenantId');
   const monthsParam = searchParams.get('months');
+  const marketId = searchParams.get('marketId');
 
   if (!tenantId) {
     return NextResponse.json(
@@ -145,19 +146,30 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
       try {
         const metricsRows = await withTenant(tenantId, async (tx) => {
-          return tx
+          const query = tx
             .select({
               totalSpend: sum(campaignMetrics.spendUsd),
               totalRevenue: sum(campaignMetrics.directRevenue),
             })
-            .from(campaignMetrics)
-            .where(
+            .from(campaignMetrics);
+
+          if (marketId) {
+            query.innerJoin(
+              campaignMarkets,
               and(
-                eq(campaignMetrics.tenantId, tenantId),
-                sql`${campaignMetrics.date} >= ${periodFromStr}`,
-                sql`${campaignMetrics.date} <= ${periodToStr}`,
+                eq(campaignMarkets.campaignId, campaignMetrics.campaignId),
+                eq(campaignMarkets.marketId, marketId),
               ),
             );
+          }
+
+          return query.where(
+            and(
+              eq(campaignMetrics.tenantId, tenantId),
+              sql`${campaignMetrics.date} >= ${periodFromStr}`,
+              sql`${campaignMetrics.date} <= ${periodToStr}`,
+            ),
+          );
         });
 
         const row = metricsRows[0];

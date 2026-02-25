@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withTenant, campaignMetrics } from '@incremental-iq/db';
+import { withTenant, campaignMetrics, campaignMarkets } from '@incremental-iq/db';
 import { eq, and, sql, sum } from 'drizzle-orm';
 
 /**
@@ -48,9 +48,10 @@ async function aggregateKpis(
   tenantId: string,
   from: string,
   to: string,
+  marketId?: string | null,
 ): Promise<KpiAggregate> {
   const rows = await withTenant(tenantId, async (tx) => {
-    return tx
+    const query = tx
       .select({
         totalSpend: sum(campaignMetrics.spendUsd),
         totalDirectRevenue: sum(campaignMetrics.directRevenue),
@@ -61,14 +62,26 @@ async function aggregateKpis(
               ELSE NULL END`,
         ),
       })
-      .from(campaignMetrics)
-      .where(
+      .from(campaignMetrics);
+
+    // Market filter: INNER JOIN on campaign_markets when marketId specified
+    if (marketId) {
+      query.innerJoin(
+        campaignMarkets,
         and(
-          eq(campaignMetrics.tenantId, tenantId),
-          sql`${campaignMetrics.date} >= ${from}`,
-          sql`${campaignMetrics.date} <= ${to}`,
+          eq(campaignMarkets.campaignId, campaignMetrics.campaignId),
+          eq(campaignMarkets.marketId, marketId),
         ),
       );
+    }
+
+    return query.where(
+      and(
+        eq(campaignMetrics.tenantId, tenantId),
+        sql`${campaignMetrics.date} >= ${from}`,
+        sql`${campaignMetrics.date} <= ${to}`,
+      ),
+    );
   });
 
   const row = rows[0];
@@ -98,6 +111,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const to = searchParams.get('to');
   const compareFrom = searchParams.get('compareFrom');
   const compareTo = searchParams.get('compareTo');
+  const marketId = searchParams.get('marketId');
 
   if (!tenantId || !from || !to) {
     return NextResponse.json(
@@ -106,12 +120,12 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     );
   }
 
-  const period = await aggregateKpis(tenantId, from, to);
+  const period = await aggregateKpis(tenantId, from, to, marketId);
   const response: KpiResponse = { period };
 
   // Optional comparison period
   if (compareFrom && compareTo) {
-    const comparisonPeriod = await aggregateKpis(tenantId, compareFrom, compareTo);
+    const comparisonPeriod = await aggregateKpis(tenantId, compareFrom, compareTo, marketId);
 
     const delta = (current: number, previous: number) => ({
       delta: Math.round((current - previous) * 100) / 100,
