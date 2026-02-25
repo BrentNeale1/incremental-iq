@@ -14,10 +14,10 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Data Architecture** - Multi-tenant schema with RLS, dual attribution layers, and creative metadata ready for campaign data
 - [x] **Phase 2: Core Data Ingestion** - Meta Ads, Google Ads, and Shopify data flowing through the pipeline with historical backfill
-- [x] **Phase 3: Statistical Engine** - Baseline forecasting, incrementality scoring, confidence intervals, and seasonality detection running (completed 2026-02-24)
+- [x] **Phase 3: Statistical Engine** - Baseline forecasting, incrementality scoring, confidence intervals, and seasonality detection running (completed 2026-02-24)
 - [ ] **Phase 4: Recommendations and Dashboard** - Scaling-first recommendations and dual-audience dashboard surfacing model outputs to users
 - [x] **Phase 5: Expanded Connectors and Multi-Market** - GA4 integration, market auto-detection, and market-aware attribution
-- [x] **Phase 6: Authentication** - User sign-up, login with session persistence, and logout across the platform (completed 2026-02-25)
+- [x] **Phase 6: Authentication** - User sign-up, login with session persistence, and logout across the platform (completed 2026-02-25)
 
 ## Phase Details
 
@@ -115,11 +115,12 @@ Plans:
   1. User can create an account with email and password and access the platform
   2. User can log in and remain logged in across browser refreshes without re-authenticating
   3. User can log out from any page and their session is immediately invalidated
-**Plans**: 3 plans
+**Plans**: 4 plans
 Plans:
 - [x] 06-01-PLAN.md — Auth foundation: Better Auth + Drizzle adapter, auth schema + migration, middleware, dashboard auth guard
 - [x] 06-02-PLAN.md — Auth UI: login, signup, forgot-password, reset-password pages + sidebar logout dropdown
 - [x] 06-03-PLAN.md — API retrofit: session-based tenantId on all API routes, remove PLACEHOLDER_TENANT_ID from dashboard
+- [ ] 06-04-PLAN.md — UAT gap closure: fix CSS cold-reload, sign-up redirect, login env/callbackURL, forgot-password autofill
 
 ## Progress
 
@@ -133,4 +134,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 3. Statistical Engine | 6/6 | Complete    | 2026-02-24 |
 | 4. Recommendations and Dashboard | 5/6 | In Progress|  |
 | 5. Expanded Connectors and Multi-Market | 4/4 | Complete | 2026-02-25 |
-| 6. Authentication | 3/3 | Complete   | 2026-02-25 |
+| 6. Authentication | 3/4 | In Progress | |
