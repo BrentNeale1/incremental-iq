@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** Campaign-level incremental lift analysis that tells brands exactly which campaigns to scale, by how much, and for how long — with transparent confidence levels so no recommendation is made without measurable expected impact.
-**Current focus:** Phase 7 - Onboarding and Connect (Complete — Both plans done)
+**Current focus:** Phase 8 - Market-Aware Recommendations (In Progress — Plan 1 of 1+ done)
 
 ## Current Position
 
-Phase: 7 of 8 (Onboarding and Connect) - Complete
-Plan: 2 of 2 executed
-Status: Phase 7 complete. Full onboarding wizard UI built — route group, 4-step wizard, OAuth popup cards, GA4 event selection, BatchMarketConfirmation batch-save, OnboardingTransition screen.
-Last activity: 2026-02-25 — Plan 07-02 executed. Full onboarding wizard UI complete.
-Stopped at: Completed 07-02-PLAN.md — onboarding route group, wizard, integration cards, batch market save, transition screen
+Phase: 8 of 8 (Market-Aware Recommendations) - In Progress
+Plan: 1 of 1 executed
+Status: Phase 8 Plan 1 complete. Drizzle innerJoin bug fixed; market fields added to Recommendation type and engine; API route returns conditional marketSummary.
+Last activity: 2026-02-26 — Plan 08-01 executed. Server-side market filtering foundation complete.
+Stopped at: Completed 08-01-PLAN.md — Drizzle bug fix, market type fields, market enrichment query, API marketSummary response
 
-Progress: [████████░░] ~85% (7 phases complete, phase 8 pending)
+Progress: [█████████░] ~90% (7 phases complete, phase 8 in progress — plan 1 done)
 
 ## Performance Metrics
 
@@ -60,6 +60,7 @@ Progress: [████████░░] ~85% (7 phases complete, phase 8 pend
 | Phase 06-authentication P04 | 8 min | 2 tasks | 4 files |
 | Phase 07-onboarding-and-connect P01 | 5 | 2 tasks | 15 files |
 | Phase 07-onboarding-and-connect P02 | 6 min | 2 tasks | 8 files |
+| Phase 08-market-aware-recommendations P01 | 8 min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -168,6 +169,8 @@ Recent decisions affecting current work:
 - [Phase 07-onboarding-and-connect]: BatchMarketConfirmation uses forwardRef + useImperativeHandle for save()/canProceed — wizard calls save() on Next click, true undo-before-commit (all edits local until flush)
 - [Phase 07-onboarding-and-connect]: GA4EventSelectorWithRef wrapper in OnboardingWizard exposes handleSave() via ref — wizard controls GA4 event save timing without modifying existing GA4EventSelector
 - [Phase 07-onboarding-and-connect]: Post-onboarding settings covered by existing dashboard pages for v1 — no new settings page needed (IntegrationSettings in Health, MarketSelector in AppHeader, outcomeMode in preferences)
+- [Phase 08-market-aware-recommendations]: Drizzle innerJoin bug fixed via immutable builder pattern: filteredQuery = marketId ? baseQuery.innerJoin(...) : baseQuery — query.innerJoin() discards return value
+- [Phase 08-market-aware-recommendations]: API route returns plain Recommendation[] when no marketId (backwards compatible with useRecommendations hook); wrapped { recommendations, marketSummary } only when marketId present
 
 ### Pending Todos
 
@@ -186,8 +189,8 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-02-25
-Stopped at: Completed 07-02-PLAN.md — full onboarding wizard UI. Phase 7 complete (both plans done).
-Resume with: /gsd:execute-phase phase 08 (final phase — deployment/infrastructure)
-Key context: Phase 7 complete. Onboarding wizard fully wired: (onboarding) route group, 4-step wizard, OAuth popup cards, GA4 event selection sub-flow, BatchMarketConfirmation batch-save wrapper, OutcomeModeSelector, OnboardingTransition screen. INTG-04 and MRKT-02 satisfied. New users routed through /onboarding before reaching dashboard. Returning onboarded users redirected from /onboarding to /.
+Last session: 2026-02-26
+Stopped at: Completed 08-01-PLAN.md — Drizzle bug fix, market type fields, market enrichment query, API marketSummary response.
+Resume with: Next plan in phase 08 (market-aware recommendations client UI)
+Key context: Phase 8 Plan 1 complete. Server-side foundation for MRKT-04 done: Drizzle innerJoin bug fixed (filteredQuery pattern), Recommendation type has marketId/marketName/marketCountryCode fields, engine enriches recommendations via Step-4b LEFT JOIN campaign_markets+markets, API route conditionally returns { recommendations, marketSummary } when marketId present.
 Resume file: .planning/phases/06-authentication/.continue-here.md (can be archived)

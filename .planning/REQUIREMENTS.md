@@ -44,7 +44,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **MRKT-01**: System auto-detects markets from campaign geo targeting metadata
 - [x] **MRKT-02**: User confirms or corrects detected markets during onboarding
 - [x] **MRKT-03**: Attribution model isolates markets to prevent cross-market false signals
-- [ ] **MRKT-04**: All reports and analysis can be segmented by market
+- [x] **MRKT-04**: All reports and analysis can be segmented by market
 
 ### Reporting & UI
 
@@ -160,7 +160,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MRKT-01 | Phase 5 | Complete |
 | MRKT-02 | Phase 7 | Complete |
 | MRKT-03 | Phase 5 | Complete |
-| MRKT-04 | Phase 8 | Pending |
+| MRKT-04 | Phase 8 | Complete |
 | AUTH-01 | Phase 6 | Complete |
 | AUTH-02 | Phase 6 | Complete |
 | AUTH-03 | Phase 6 | Complete |
