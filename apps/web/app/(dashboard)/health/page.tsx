@@ -8,11 +8,7 @@ import { IntegrationSettings } from '@/components/health/IntegrationSettings';
 import { EmptyHealth } from '@/components/dashboard/EmptyStates';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useExportContext } from '@/lib/export/context';
-
-/**
- * PLACEHOLDER tenant ID — Phase 6 (auth) will supply real tenant from session.
- */
-const PLACEHOLDER_TENANT_ID = undefined;
+import { useTenantId } from '@/lib/auth/tenant-context';
 
 /**
  * Data Health page — integration sync status, missing data gaps, and integration management.
@@ -29,7 +25,8 @@ const PLACEHOLDER_TENANT_ID = undefined;
  * Stale data always shows warning banners but never hides the dashboard.
  */
 export default function DataHealthPage() {
-  const { data: syncHistory, isLoading, isError, refetch } = useSyncHistory(PLACEHOLDER_TENANT_ID);
+  const tenantId = useTenantId();
+  const { data: syncHistory, isLoading, isError, refetch } = useSyncHistory(tenantId);
   const { setExportData } = useExportContext();
   React.useEffect(() => {
     if (syncHistory && syncHistory.length > 0) {
@@ -41,9 +38,7 @@ export default function DataHealthPage() {
     try {
       const res = await fetch(`/api/integrations/${integrationId}/sync`, {
         method: 'POST',
-        headers: PLACEHOLDER_TENANT_ID
-          ? { 'X-Tenant-Id': PLACEHOLDER_TENANT_ID }
-          : {},
+        headers: { 'X-Tenant-Id': tenantId },
       });
       if (!res.ok) {
         console.error('Manual sync failed:', res.status);

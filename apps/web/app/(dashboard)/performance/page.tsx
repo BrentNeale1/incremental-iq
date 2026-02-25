@@ -7,11 +7,7 @@ import { useExportContext } from '@/lib/export/context';
 import { useCampaigns } from '@/lib/hooks/useCampaigns';
 import { PriorityQueue } from '@/components/performance/PriorityQueue';
 import { PlatformTabs } from '@/components/performance/PlatformTabs';
-
-/**
- * PLACEHOLDER tenant ID — Phase 6 (auth) will supply real tenant from session.
- */
-const PLACEHOLDER_TENANT_ID = undefined;
+import { useTenantId } from '@/lib/auth/tenant-context';
 
 /**
  * Marketing Performance page — action-oriented campaign management.
@@ -24,8 +20,9 @@ const PLACEHOLDER_TENANT_ID = undefined;
  * Mobile-responsive: full-width sections, tables horizontally scroll on mobile.
  */
 export default function MarketingPerformancePage() {
+  const tenantId = useTenantId();
   const dateRange = useDashboardStore((s) => s.dateRange);
-  const { data: campaignRows } = useCampaigns(undefined, dateRange);
+  const { data: campaignRows } = useCampaigns(tenantId, dateRange);
   const { setExportData } = useExportContext();
   React.useEffect(() => {
     if (campaignRows && campaignRows.length > 0) {
@@ -43,7 +40,7 @@ export default function MarketingPerformancePage() {
         <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Priority Actions
         </h2>
-        <PriorityQueue tenantId={PLACEHOLDER_TENANT_ID} />
+        <PriorityQueue tenantId={tenantId} />
       </section>
 
       {/* Section 2 — Platform tabs with overview + table */}
@@ -53,7 +50,7 @@ export default function MarketingPerformancePage() {
         </h2>
         {/* Horizontal scroll wrapper ensures table is usable on mobile */}
         <div className="overflow-x-auto">
-          <PlatformTabs tenantId={PLACEHOLDER_TENANT_ID} dateRange={dateRange} />
+          <PlatformTabs tenantId={tenantId} dateRange={dateRange} />
         </div>
       </section>
     </div>

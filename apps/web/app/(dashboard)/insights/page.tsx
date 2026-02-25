@@ -17,11 +17,7 @@ import {
 import { ChevronDownIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useExportContext } from '@/lib/export/context';
-
-/**
- * PLACEHOLDER tenant ID — Phase 6 (auth) will supply real tenant from session.
- */
-const PLACEHOLDER_TENANT_ID = undefined;
+import { useTenantId } from '@/lib/auth/tenant-context';
 
 /**
  * Statistical Insights page — analyst-focused deep-dive into model outputs.
@@ -39,13 +35,14 @@ const PLACEHOLDER_TENANT_ID = undefined;
  * RPRT-03: Drill-down hierarchy; RPRT-07: Analyst model transparency.
  */
 export default function StatisticalInsightsPage() {
+  const tenantId = useTenantId();
   const dateRange = useDashboardStore((s) => s.dateRange);
 
   const { setExportData } = useExportContext();
 
   // Incrementality scores for all campaigns
   const { data: scores, isLoading: scoresLoading } = useIncrementality(
-    PLACEHOLDER_TENANT_ID,
+    tenantId,
     undefined,
     'adjusted',
   );
@@ -61,7 +58,7 @@ export default function StatisticalInsightsPage() {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
   const { data: saturationData } = useSaturation(
-    PLACEHOLDER_TENANT_ID,
+    tenantId,
     selectedRow?.id,
   );
 
@@ -223,7 +220,7 @@ export default function StatisticalInsightsPage() {
             </div>
             <CollapsibleContent>
               <DrillDownTable
-                tenantId={PLACEHOLDER_TENANT_ID}
+                tenantId={tenantId}
                 dateRange={dateRange}
                 onSelectRow={(row) => {
                   setSelectedRow(row);

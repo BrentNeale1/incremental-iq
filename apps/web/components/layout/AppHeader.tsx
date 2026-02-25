@@ -22,11 +22,9 @@ const PAGE_TITLES: Record<string, string> = {
   '/health': 'Data Health',
 };
 
-/**
- * PLACEHOLDER tenant ID — Phase 6 (auth) will supply real tenant from session.
- * Until then, notification polling is disabled (enabled: !!tenantId guard).
- */
-const PLACEHOLDER_TENANT_ID = undefined;
+interface AppHeaderProps {
+  tenantId: string;
+}
 
 /**
  * AppHeader — sticky top bar shared by all dashboard pages.
@@ -41,7 +39,7 @@ const PLACEHOLDER_TENANT_ID = undefined;
  *
  * Notification panel: Sheet slide-over from right on all screen sizes.
  */
-export function AppHeader() {
+export function AppHeader({ tenantId }: AppHeaderProps) {
   const pathname = usePathname();
   const title = PAGE_TITLES[pathname] ?? 'Dashboard';
   const [notificationsOpen, setNotificationsOpen] = React.useState(false);
@@ -69,7 +67,7 @@ export function AppHeader() {
 
           {/* Notification bell — opens panel */}
           <NotificationBell
-            tenantId={PLACEHOLDER_TENANT_ID}
+            tenantId={tenantId}
             onOpen={() => setNotificationsOpen(true)}
           />
         </div>
@@ -77,7 +75,7 @@ export function AppHeader() {
 
       {/* Notification panel — Sheet slide-over from right */}
       <NotificationPanel
-        tenantId={PLACEHOLDER_TENANT_ID}
+        tenantId={tenantId}
         open={notificationsOpen}
         onClose={() => setNotificationsOpen(false)}
       />

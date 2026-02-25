@@ -9,11 +9,7 @@ import { TimelineSkeleton } from '@/components/dashboard/SkeletonLoaders';
 import { EmptySeasonality } from '@/components/dashboard/EmptyStates';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useExportContext } from '@/lib/export/context';
-
-/**
- * PLACEHOLDER tenant ID — Phase 6 (auth) will supply real tenant from session.
- */
-const PLACEHOLDER_TENANT_ID = undefined;
+import { useTenantId } from '@/lib/auth/tenant-context';
 
 /**
  * Seasonality Planning page — proactive seasonal budget preparation.
@@ -27,7 +23,8 @@ const PLACEHOLDER_TENANT_ID = undefined;
  * Mobile-responsive: 1 col on mobile, 2 on sm, 3 on lg.
  */
 export default function SeasonalityPlanningPage() {
-  const { data, isLoading, isError } = useSeasonality(PLACEHOLDER_TENANT_ID, 6);
+  const tenantId = useTenantId();
+  const { data, isLoading, isError } = useSeasonality(tenantId, 6);
   const { setExportData } = useExportContext();
   React.useEffect(() => {
     if (data?.upcoming && data.upcoming.length > 0) {

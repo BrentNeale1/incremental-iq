@@ -1,61 +1,43 @@
-'use client';
-
-import * as React from 'react';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { AppSidebar } from '@/components/layout/AppSidebar';
-import { AppHeader } from '@/components/layout/AppHeader';
-import { StaleDataBanner } from '@/components/dashboard/StaleDataBanner';
-import { ExportProvider } from '@/lib/export/context';
-import { useDashboardStore } from '@/lib/store/dashboard';
+// Server component — validates session and passes tenantId to client layout
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { auth } from '@/auth';
+import { DashboardLayoutClient } from '@/components/layout/DashboardLayoutClient';
 
 /**
- * PLACEHOLDER tenant ID — Phase 6 (auth) will supply real tenant from session.
- */
-const PLACEHOLDER_TENANT_ID = undefined;
-
-/**
- * Dashboard route group layout — shared by all 5 dashboard pages.
+ * DashboardLayout — server component wrapper for all dashboard pages.
  *
- * Structure:
- *   <SidebarProvider>
- *     <AppSidebar />  (collapsible navigation)
- *     <main>
- *       <AppHeader />  (date range, comparison, view toggle, notifications)
- *       <StaleDataBanner />  (amber warning when any integration is stale)
- *       {children}     (page content)
- *     </main>
- *   </SidebarProvider>
+ * Responsibilities:
+ *   1. Calls auth.api.getSession() with the current request headers for DB-level
+ *      session validation (not just cookie existence — that's middleware's job).
+ *   2. Redirects to /login if no valid session found.
+ *   3. Extracts session.user.tenantId and passes it to the client layout.
  *
- * CRITICAL (Pitfall 2): Zustand `skipHydration: true` is set on the dashboard
- * store, so we must call `persist.rehydrate()` here after mount. This prevents
- * the SSR hydration mismatch where the server-rendered HTML uses default state
- * but the client immediately loads persisted state.
+ * SECURITY: This is the definitive auth gate for all dashboard routes. The
+ * middleware (middleware.ts) provides fast optimistic protection via cookie
+ * check, but this server component performs the actual DB-backed validation.
+ *
+ * Pitfall 4 reminder: Always pass session.user.tenantId (not session.user.id)
+ * to withTenant() calls. user.id and tenantId are different UUIDs.
  */
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  React.useEffect(() => {
-    // Rehydrate persisted Zustand state (viewMode, kpiOrder) after mount
-    useDashboardStore.persist.rehydrate();
-  }, []);
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect('/login');
+  }
+
+  const tenantId = session.user.tenantId;
 
   return (
-    <ExportProvider>
-      <SidebarProvider defaultOpen={true}>
-        <AppSidebar />
-        <div className="flex min-h-screen flex-1 flex-col overflow-hidden">
-          <AppHeader />
-          <main className="flex-1 overflow-auto p-4 sm:p-6">
-            <div className="mx-auto max-w-7xl space-y-4">
-              {/* Stale data banner — shown when any integration >24h stale */}
-              <StaleDataBanner tenantId={PLACEHOLDER_TENANT_ID} />
-              {children}
-            </div>
-          </main>
-        </div>
-      </SidebarProvider>
-    </ExportProvider>
+    <DashboardLayoutClient tenantId={tenantId}>
+      {children}
+    </DashboardLayoutClient>
   );
 }

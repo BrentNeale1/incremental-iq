@@ -17,13 +17,8 @@ import { ChartSkeleton } from '@/components/dashboard/SkeletonLoaders';
 import { EmptyRecommendations } from '@/components/dashboard/EmptyStates';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useExportContext } from '@/lib/export/context';
+import { useTenantId } from '@/lib/auth/tenant-context';
 import type { Recommendation } from '@/lib/recommendations/types';
-
-/**
- * PLACEHOLDER tenant ID — Phase 6 (auth) will supply real tenant from session.
- * Until then, API calls with this placeholder will return empty data (no matching tenant).
- */
-const PLACEHOLDER_TENANT_ID = undefined;
 
 /**
  * Derives simple daily time series from campaign rows.
@@ -93,6 +88,7 @@ function buildPlatformData(campaigns: {
  * NOTE: Zustand rehydration is handled in the dashboard layout (layout.tsx).
  */
 export default function ExecutiveOverviewPage() {
+  const tenantId = useTenantId();
   const dateRange = useDashboardStore((s) => s.dateRange);
   const comparisonRange = useDashboardStore((s) => s.comparisonRange);
   const comparisonEnabled = useDashboardStore((s) => s.comparisonEnabled);
@@ -100,19 +96,19 @@ export default function ExecutiveOverviewPage() {
 
   // Fetch KPIs
   const { data: kpisData, isLoading: kpisLoading } = useKpis(
-    PLACEHOLDER_TENANT_ID,
+    tenantId,
     dateRange,
     comparisonEnabled ? comparisonRange : undefined,
   );
 
   // Fetch recommendations
   const { data: recommendations, isLoading: recsLoading } = useRecommendations(
-    PLACEHOLDER_TENANT_ID,
+    tenantId,
   );
 
   // Fetch campaigns for charts
   const { data: campaignRows, isLoading: campaignsLoading } = useCampaigns(
-    PLACEHOLDER_TENANT_ID,
+    tenantId,
     dateRange,
   );
 
