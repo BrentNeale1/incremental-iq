@@ -21,6 +21,9 @@ export const tenants = pgTable('tenants', {
   // Phase 5: Outcome mode gates UI language throughout the dashboard
   // 'ecommerce' = revenue/ROAS terminology; 'lead_gen' = leads/conversion terminology
   outcomeMode: text('outcome_mode').default('ecommerce').notNull(),
+  // Phase 7: Onboarding tracking — set to true once wizard is completed
+  onboardingCompleted: boolean('onboarding_completed').default(false).notNull(),
+  onboardingCompletedAt: timestamp('onboarding_completed_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });

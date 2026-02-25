@@ -2,6 +2,8 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
+import { db, tenants } from '@incremental-iq/db';
+import { eq } from 'drizzle-orm';
 import { DashboardLayoutClient } from '@/components/layout/DashboardLayoutClient';
 
 /**
@@ -34,6 +36,19 @@ export default async function DashboardLayout({
   }
 
   const tenantId = session.user.tenantId;
+
+  // Onboarding gate: redirect users who haven't completed onboarding.
+  // Do NOT use withTenant — tenants table has no RLS (root of isolation hierarchy).
+  const tenantRows = await db
+    .select({ onboardingCompleted: tenants.onboardingCompleted })
+    .from(tenants)
+    .where(eq(tenants.id, tenantId))
+    .limit(1);
+
+  if (!tenantRows[0]?.onboardingCompleted) {
+    redirect('/onboarding');
+  }
+
   const user = {
     name: session.user.name ?? '',
     email: session.user.email,
