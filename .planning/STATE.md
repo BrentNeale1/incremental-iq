@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** Campaign-level incremental lift analysis that tells brands exactly which campaigns to scale, by how much, and for how long — with transparent confidence levels so no recommendation is made without measurable expected impact.
-**Current focus:** Phase 5 - Expanded Connectors and Multi-Market (IN PROGRESS)
+**Current focus:** Phase 6 - Authentication (NEXT)
 
 ## Current Position
 
-Phase: 5 of 6 (Expanded Connectors and Multi-Market) - IN PROGRESS
-Plan: 2 of 4 in current phase - COMPLETE (Plans 01-02 done; Plans 03-04 remaining)
-Status: Phase 5 Plan 02 COMPLETE — GA4 connector (listProperties, listKeyEvents, fetchLeadCounts with YYYYMMDD normalization, refreshTokenIfNeeded), processGA4Sync normalizer (directConversions, ga4-leads synthetic campaign), GA4 OAuth routes, properties/events API endpoints.
-Last activity: 2026-02-25 — Completed Plan 02: GA4Connector with Admin API + Data API, processGA4Sync normalizer, OAuth flow (analytics.readonly), properties/events endpoints.
+Phase: 5 of 6 (Expanded Connectors and Multi-Market) - COMPLETE
+Plan: 4 of 4 in current phase - COMPLETE (all plans done, verified)
+Status: Phase 5 COMPLETE — All 4 success criteria verified. GA4 connector + OAuth, market auto-detection, market-isolated scoring, market-segmented UI + recommendations.
+Last activity: 2026-02-25 — Phase 5 verified and completed. Verification gaps fixed (GA4EventSelector POST body, recommendations marketId filter).
 
-Progress: [█████████░] 85%
+Progress: [██████████] 90%
 
 ## Performance Metrics
 
@@ -162,5 +162,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 05-01-PLAN.md — markets + campaign_markets schema with RLS, migration 0005, outcomeMode on tenants, detectMarketsForTenant orchestrator, detectGoogleAdsMarkets (GAQL two-query), detectMetaMarkets (ad set geo aggregation). Plans 02-04 remaining for phase completion.
+Stopped at: Phase 5 completed. Phase 6 (Authentication) is next — not yet planned.
 Resume file: None

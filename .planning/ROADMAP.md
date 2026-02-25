@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Core Data Ingestion** - Meta Ads, Google Ads, and Shopify data flowing through the pipeline with historical backfill
 - [x] **Phase 3: Statistical Engine** - Baseline forecasting, incrementality scoring, confidence intervals, and seasonality detection running (completed 2026-02-24)
 - [ ] **Phase 4: Recommendations and Dashboard** - Scaling-first recommendations and dual-audience dashboard surfacing model outputs to users
-- [ ] **Phase 5: Expanded Connectors and Multi-Market** - GA4 integration, market auto-detection, and market-aware attribution
+- [x] **Phase 5: Expanded Connectors and Multi-Market** - GA4 integration, market auto-detection, and market-aware attribution
 - [ ] **Phase 6: Authentication** - User sign-up, login with session persistence, and logout across the platform
 
 ## Phase Details
@@ -102,10 +102,10 @@ Plans:
   4. All reports and analysis views can be segmented by market
 **Plans**: 4 plans
 Plans:
-- [ ] 05-01-PLAN.md — DB schema (markets, campaign_markets, outcomeMode) + market detection from Google Ads and Meta geo targeting
-- [ ] 05-02-PLAN.md — GA4 connector, normalizer, OAuth routes, and event/property API endpoints
-- [ ] 05-03-PLAN.md — Market confirmation API + market-partitioned scoring isolation in worker
-- [ ] 05-04-PLAN.md — Market-segmented UI: MarketSelector, onboarding components, market-filtered API routes, outcome mode
+- [x] 05-01-PLAN.md — DB schema (markets, campaign_markets, outcomeMode) + market detection from Google Ads and Meta geo targeting
+- [x] 05-02-PLAN.md — GA4 connector, normalizer, OAuth routes, and event/property API endpoints
+- [x] 05-03-PLAN.md — Market confirmation API + market-partitioned scoring isolation in worker
+- [x] 05-04-PLAN.md — Market-segmented UI: MarketSelector, onboarding components, market-filtered API routes, outcome mode
 
 ### Phase 6: Authentication
 **Goal**: Users can create accounts, log in with persistent sessions, and log out securely from anywhere in the platform
@@ -128,5 +128,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Core Data Ingestion | 6/6 | Complete    | 2026-02-24 |
 | 3. Statistical Engine | 6/6 | Complete    | 2026-02-24 |
 | 4. Recommendations and Dashboard | 5/6 | In Progress|  |
-| 5. Expanded Connectors and Multi-Market | 2/4 | In Progress|  |
+| 5. Expanded Connectors and Multi-Market | 4/4 | Complete | 2026-02-25 |
 | 6. Authentication | 0/TBD | Not started | - |
