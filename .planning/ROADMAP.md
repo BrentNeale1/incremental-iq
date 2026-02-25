@@ -115,7 +115,11 @@ Plans:
   1. User can create an account with email and password and access the platform
   2. User can log in and remain logged in across browser refreshes without re-authenticating
   3. User can log out from any page and their session is immediately invalidated
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 06-01-PLAN.md — Auth foundation: Better Auth + Drizzle adapter, auth schema + migration, middleware, dashboard auth guard
+- [ ] 06-02-PLAN.md — Auth UI: login, signup, forgot-password, reset-password pages + sidebar logout dropdown
+- [ ] 06-03-PLAN.md — API retrofit: session-based tenantId on all API routes, remove PLACEHOLDER_TENANT_ID from dashboard
 
 ## Progress
 
@@ -129,4 +133,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 3. Statistical Engine | 6/6 | Complete    | 2026-02-24 |
 | 4. Recommendations and Dashboard | 5/6 | In Progress|  |
 | 5. Expanded Connectors and Multi-Market | 4/4 | Complete | 2026-02-25 |
-| 6. Authentication | 0/TBD | Not started | - |
+| 6. Authentication | 0/3 | Not started | - |
