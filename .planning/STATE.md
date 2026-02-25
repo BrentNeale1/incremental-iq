@@ -9,13 +9,13 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 
 ## Current Position
 
-Phase: 6 of 6 (Authentication) - IN PROGRESS
-Plan: 2 of 3 in current phase - COMPLETE
-Status: Phase 6 Plan 02 COMPLETE — Auth UI pages (login, signup, forgot-password, reset-password), AppSidebar logout with signOut + router.refresh(), all dashboard API routes retrofitted to session-based tenantId.
-Last activity: 2026-02-25 — Phase 6 Plan 02 executed. Auth UI and sidebar logout complete.
-Stopped at: Completed 06-02-PLAN.md
+Phase: 6 of 6 (Authentication) - COMPLETE
+Plan: 3 of 3 in current phase - COMPLETE
+Status: Phase 6 Plan 03 COMPLETE — Eliminated IDOR vulnerability: all 16 non-OAuth API routes use session-based tenantId (auth.api.getSession), all 8 hooks and 11 UI components stripped of tenantId prop. Full tenant isolation enforced by auth session, not client query params.
+Last activity: 2026-02-25 — Phase 6 Plan 03 executed. Session-based tenant isolation complete across all routes.
+Stopped at: Completed 06-03-PLAN.md
 
-Progress: [██████████] 93%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -56,6 +56,7 @@ Progress: [██████████] 93%
 | Phase 05-expanded-connectors-and-multi-market PP02 | 12 min | 2 tasks | 9 files |
 | Phase 06-authentication P01 | 7 | 2 tasks | 20 files |
 | Phase 06-authentication P02 | 4 min | 2 tasks | 17 files |
+| Phase 06-authentication P03 | ~90 min | 2 tasks | 41 files |
 
 ## Accumulated Context
 
@@ -151,6 +152,9 @@ Recent decisions affecting current work:
 - [Phase 06-authentication]: Sign-up server action creates tenant first then auth.api.signUpEmail with tenantId — rollback on user creation failure prevents orphan tenants
 - [Phase 06-authentication]: All dashboard API routes use session-based tenantId (auth.api.getSession) not query params — eliminates IDOR vulnerability
 - [Phase 06-authentication]: signOut uses fetchOptions.onSuccess callback with router.push('/login') + router.refresh() — clears Next.js router cache (Pitfall 2)
+- [Phase 06-authentication]: OAuth routes (/api/oauth/*) excluded from session retrofit — run during pre-auth OAuth flow, use own tenant resolution
+- [Phase 06-authentication]: DashboardLayoutClient passes tenantId to TenantProvider only — AppHeader, StaleDataBanner, SidebarNav use hooks directly; no tenantId prop chain
+- [Phase 06-authentication]: PUT body types for markets and tenant/preferences no longer accept tenantId field — eliminates all client-supplied tenantId vectors (not just query params)
 
 ### Pending Todos
 
@@ -170,5 +174,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 06-02-PLAN.md
+Stopped at: Completed 06-03-PLAN.md
 Resume file: None
