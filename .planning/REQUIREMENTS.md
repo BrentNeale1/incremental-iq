@@ -41,7 +41,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Multi-Market
 
-- [ ] **MRKT-01**: System auto-detects markets from campaign geo targeting metadata
+- [x] **MRKT-01**: System auto-detects markets from campaign geo targeting metadata
 - [ ] **MRKT-02**: User confirms or corrects detected markets during onboarding
 - [ ] **MRKT-03**: Attribution model isolates markets to prevent cross-market false signals
 - [ ] **MRKT-04**: All reports and analysis can be segmented by market
@@ -157,7 +157,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RPRT-06 | Phase 4 | Pending |
 | RPRT-07 | Phase 4 | Complete |
 | INTG-04 | Phase 5 | Pending |
-| MRKT-01 | Phase 5 | Pending |
+| MRKT-01 | Phase 5 | Complete |
 | MRKT-02 | Phase 5 | Pending |
 | MRKT-03 | Phase 5 | Pending |
 | MRKT-04 | Phase 5 | Pending |

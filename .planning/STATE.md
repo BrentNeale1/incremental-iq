@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** Campaign-level incremental lift analysis that tells brands exactly which campaigns to scale, by how much, and for how long — with transparent confidence levels so no recommendation is made without measurable expected impact.
-**Current focus:** Phase 4 - Recommendations and Dashboard (IN PROGRESS)
+**Current focus:** Phase 5 - Expanded Connectors and Multi-Market (IN PROGRESS)
 
 ## Current Position
 
-Phase: 4 of 6 (Recommendations and Dashboard) - IN PROGRESS
-Plan: 5 of 6 in current phase - COMPLETE (Plans 01-05 done; Plan 06 remaining)
-Status: Phase 4 Plans 01-05 COMPLETE — UI foundation + recommendation engine + 9 API routes + marketing performance page + seasonality page + statistical insights page + data health page. All 5 dashboard pages navigable.
-Last activity: 2026-02-25 — Completed Plan 05: Statistical Insights page (model health overview, CI charts, forecast vs actual, 12-month progression, methodology sidebar, drill-down table) + Data Health page (sync status with stale warnings, 90-day data gap timeline, integration settings) + 3 new hooks (useIncrementality, useSaturation, useSyncHistory).
+Phase: 5 of 6 (Expanded Connectors and Multi-Market) - IN PROGRESS
+Plan: 1 of 4 in current phase - COMPLETE (Plan 01 done; Plans 02-04 remaining)
+Status: Phase 5 Plan 01 COMPLETE — markets + campaign_markets schema with RLS, migration 0005, outcomeMode on tenants, market detection from Google Ads (GAQL two-query) and Meta (ad set geo aggregation).
+Last activity: 2026-02-25 — Completed Plan 01: markets and campaign_markets Drizzle tables with RLS, SQL migration 0005_markets_and_ga4, outcomeMode column on tenants, detectMarketsForTenant orchestrator, detectGoogleAdsMarkets (two-query GAQL), detectMetaMarkets (ad set targeting aggregation).
 
-Progress: [████████░░] 80%
+Progress: [█████████░] 85%
 
 ## Performance Metrics
 
@@ -51,6 +51,7 @@ Progress: [████████░░] 80%
 | Phase 04-recommendations-and-dashboard PP01 | 10 min | 2 tasks | 37 files |
 | Phase 04-recommendations-and-dashboard PP02 | 11 min | 2 tasks | 11 files |
 | Phase 04-recommendations-and-dashboard PP05 | 25 min | 2 tasks | 14 files |
+| Phase 05-expanded-connectors-and-multi-market P01 | 7 | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -135,6 +136,9 @@ Recent decisions affecting current work:
 - [Phase 04-recommendations-and-dashboard]: useSyncHistory wraps /api/integrations/status (Phase 2) — dedicated sync_runs history endpoint deferred to Phase 5
 - [Phase 04-recommendations-and-dashboard]: DataGapsTimeline infers coverage from staleSinceHours — per-day granularity requires sync_runs grouped by date (Phase 5 enhancement)
 - [Phase 04-recommendations-and-dashboard]: IntegrationSettings Disconnect button disabled placeholder — Phase 6 (auth) implements integration removal with credential cleanup
+- [Phase 05-expanded-connectors-and-multi-market]: markets.campaignCount uses integer (not numeric) — integer matches Drizzle type for a count field
+- [Phase 05-expanded-connectors-and-multi-market]: detectMarketsForTenant uses raw SQL upsert for campaign_markets ON CONFLICT (tenant_id, campaign_id) DO UPDATE — cleaner than select-then-insert for unique index
+- [Phase 05-expanded-connectors-and-multi-market]: NULL marketId in campaign_markets = Global/Unassigned bucket (not a sentinel UUID) — matches user decision from CONTEXT.md
 
 ### Pending Todos
 
@@ -154,5 +158,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 04-05-PLAN.md — Statistical Insights page (ModelHealthOverview, ConfidenceIntervalChart, ForecastActualChart, ProgressionView, MethodologySidebar, DrillDownTable) + Data Health page (SyncStatusList, DataGapsTimeline, IntegrationSettings) + 3 hooks (useIncrementality, useSaturation, useSyncHistory). All 5 dashboard pages now navigable. Plan 06 remaining for phase completion.
+Stopped at: Completed 05-01-PLAN.md — markets + campaign_markets schema with RLS, migration 0005, outcomeMode on tenants, detectMarketsForTenant orchestrator, detectGoogleAdsMarkets (GAQL two-query), detectMetaMarkets (ad set geo aggregation). Plans 02-04 remaining for phase completion.
 Resume file: None
