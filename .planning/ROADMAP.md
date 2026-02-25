@@ -100,7 +100,12 @@ Plans:
   2. System auto-detects markets from campaign geo targeting metadata and presents them to the user for confirmation or correction during onboarding
   3. Attribution model isolates market signals — a US spend spike does not produce a false lift signal against AU revenue
   4. All reports and analysis views can be segmented by market
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 05-01-PLAN.md — DB schema (markets, campaign_markets, outcomeMode) + market detection from Google Ads and Meta geo targeting
+- [ ] 05-02-PLAN.md — GA4 connector, normalizer, OAuth routes, and event/property API endpoints
+- [ ] 05-03-PLAN.md — Market confirmation API + market-partitioned scoring isolation in worker
+- [ ] 05-04-PLAN.md — Market-segmented UI: MarketSelector, onboarding components, market-filtered API routes, outcome mode
 
 ### Phase 6: Authentication
 **Goal**: Users can create accounts, log in with persistent sessions, and log out securely from anywhere in the platform
