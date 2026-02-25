@@ -43,6 +43,13 @@
       "when": 1771980761000,
       "tag": "0005_markets_and_ga4",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1771986013000,
+      "tag": "0006_auth",
+      "breakpoints": true
     }
   ]
 }

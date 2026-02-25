@@ -21,5 +21,8 @@ export * from './user-preferences';
 // Phase 5: Multi-market attribution schema
 export * from './markets';
 
+// Phase 6: Authentication schema
+export * from './auth';
+
 // Re-export the app role for use in policy definitions
 export { appRole } from './roles';
