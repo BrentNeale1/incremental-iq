@@ -17,6 +17,7 @@ import {
   campaigns,
   campaignMetrics,
   campaignMarkets,
+  markets,
 } from '@incremental-iq/db';
 import { eq, and, desc, sql, avg } from 'drizzle-orm';
 import { addDays, formatISO } from 'date-fns';
@@ -299,7 +300,7 @@ export async function generateRecommendations(
   // CRITICAL: INNER JOIN campaigns filters out rollup sentinel rows.
   // Rollup rows have pseudo-UUIDs that don't exist in the campaigns table — Pitfall 3.
   const latestScores: ScoreRow[] = await withTenant(tenantId, async (tx) => {
-    const query = tx
+    const baseQuery = tx
       .select({
         campaignId: incrementalityScores.campaignId,
         status: incrementalityScores.status,
@@ -317,18 +318,18 @@ export async function generateRecommendations(
         ),
       );
 
-    // Market filter: INNER JOIN campaign_markets when marketId specified
-    if (marketId) {
-      query.innerJoin(
-        campaignMarkets,
-        and(
-          eq(campaignMarkets.campaignId, incrementalityScores.campaignId),
-          eq(campaignMarkets.marketId, marketId),
-        ),
-      );
-    }
+    // Conditionally extend — always reassign (Drizzle immutable builder)
+    const filteredQuery = marketId
+      ? baseQuery.innerJoin(
+          campaignMarkets,
+          and(
+            eq(campaignMarkets.campaignId, incrementalityScores.campaignId),
+            eq(campaignMarkets.marketId, marketId),
+          ),
+        )
+      : baseQuery;
 
-    return query
+    return filteredQuery
       .where(
         and(
           eq(incrementalityScores.tenantId, tenantId),
@@ -411,6 +412,33 @@ export async function generateRecommendations(
     campaignRows.map((c: CampaignRow) => [c.id, c]),
   );
 
+  // Step 4b: Get market assignments for badge display
+  const marketRows: Array<{ campaignId: string; marketId: string | null; displayName: string | null; countryCode: string | null }> =
+    await withTenant(tenantId, async (tx) => {
+      return tx
+        .select({
+          campaignId: campaignMarkets.campaignId,
+          marketId: campaignMarkets.marketId,
+          displayName: markets.displayName,
+          countryCode: markets.countryCode,
+        })
+        .from(campaignMarkets)
+        .leftJoin(markets, eq(campaignMarkets.marketId, markets.id))
+        .where(
+          and(
+            eq(campaignMarkets.tenantId, tenantId),
+            sql`${campaignMarkets.campaignId} = ANY(ARRAY[${sql.join(
+              campaignIds.map((id: string) => sql`${id}::uuid`),
+              sql`, `,
+            )}])`,
+          ),
+        );
+    });
+
+  const marketByCampaign = new Map(
+    marketRows.map((r) => [r.campaignId, r]),
+  );
+
   // Step 5: Compute 30-day average daily spend from campaign_metrics
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -455,12 +483,16 @@ export async function generateRecommendations(
     const currentDailySpend = spendByCampaign.get(score.campaignId) ?? 0;
 
     const classification = classifyRecommendation(score, saturation, currentDailySpend);
+    const marketInfo = marketByCampaign.get(score.campaignId);
 
     recommendations.push({
       id: `rec-${score.campaignId}`,
       campaignId: score.campaignId,
       campaignName: campaign.name,
       platform: campaign.source,
+      marketId: marketInfo?.marketId ?? undefined,
+      marketName: marketInfo?.displayName ?? undefined,
+      marketCountryCode: marketInfo?.countryCode ?? undefined,
       ...classification,
     });
   }

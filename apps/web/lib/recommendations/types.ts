@@ -14,6 +14,12 @@ export interface Recommendation {
   campaignId: string;
   campaignName: string;
   platform: string;
+
+  // Market context — populated when campaign is assigned to a market
+  marketId?: string;              // UUID from campaign_markets.market_id (null = Global/Unassigned)
+  marketName?: string;            // Human-readable: "United States", "Australia"
+  marketCountryCode?: string;     // ISO 3166-1 alpha-2 for flag emoji: "US", "AU"
+
   action: RecommendationAction;
   confidenceLevel: RecommendationConfidenceLevel;
 
