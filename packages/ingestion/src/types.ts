@@ -13,7 +13,7 @@
 // ---------------------------------------------------------------------------
 
 /** Supported ad platforms. Matches the `platform` column in integrations/sync_runs. */
-export type Platform = 'meta' | 'google_ads' | 'shopify';
+export type Platform = 'meta' | 'google_ads' | 'shopify' | 'ga4';
 
 // ---------------------------------------------------------------------------
 // Sync job types
