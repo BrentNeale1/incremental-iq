@@ -16,6 +16,7 @@ import {
   saturationEstimates,
   campaigns,
   campaignMetrics,
+  campaignMarkets,
 } from '@incremental-iq/db';
 import { eq, and, desc, sql, avg } from 'drizzle-orm';
 import { addDays, formatISO } from 'date-fns';
@@ -290,12 +291,15 @@ export function classifyRecommendation(
  * 7. Merge seasonal alerts
  * 8. Sort by expectedImpact DESC (highest incremental revenue first per user decision)
  */
-export async function generateRecommendations(tenantId: string): Promise<Recommendation[]> {
+export async function generateRecommendations(
+  tenantId: string,
+  marketId?: string | null,
+): Promise<Recommendation[]> {
   // Step 1 & 2: Get latest adjusted score per campaign, excluding rollup sentinel rows.
   // CRITICAL: INNER JOIN campaigns filters out rollup sentinel rows.
   // Rollup rows have pseudo-UUIDs that don't exist in the campaigns table — Pitfall 3.
   const latestScores: ScoreRow[] = await withTenant(tenantId, async (tx) => {
-    return tx
+    const query = tx
       .select({
         campaignId: incrementalityScores.campaignId,
         status: incrementalityScores.status,
@@ -311,7 +315,20 @@ export async function generateRecommendations(tenantId: string): Promise<Recomme
           eq(incrementalityScores.campaignId, campaigns.id),
           eq(campaigns.tenantId, tenantId),
         ),
-      )
+      );
+
+    // Market filter: INNER JOIN campaign_markets when marketId specified
+    if (marketId) {
+      query.innerJoin(
+        campaignMarkets,
+        and(
+          eq(campaignMarkets.campaignId, incrementalityScores.campaignId),
+          eq(campaignMarkets.marketId, marketId),
+        ),
+      );
+    }
+
+    return query
       .where(
         and(
           eq(incrementalityScores.tenantId, tenantId),

@@ -51,10 +51,14 @@ export function GA4EventSelector({ integrationId, propertyId }: Props) {
 
   const handleSave = async () => {
     setSaving(true);
-    await fetch(`/api/ga4/events?integrationId=${integrationId}&propertyId=${propertyId}`, {
+    await fetch('/api/ga4/events', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ selectedEventNames: Array.from(selected) }),
+      body: JSON.stringify({
+        integrationId,
+        propertyId,
+        selectedEventNames: Array.from(selected),
+      }),
     });
     setSaving(false);
   };

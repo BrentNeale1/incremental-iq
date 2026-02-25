@@ -24,6 +24,7 @@ import { generateRecommendations } from '@/lib/recommendations/engine';
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const { searchParams } = new URL(request.url);
   const tenantId = searchParams.get('tenantId');
+  const marketId = searchParams.get('marketId');
 
   if (!tenantId) {
     return NextResponse.json(
@@ -32,7 +33,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     );
   }
 
-  const recommendations = await generateRecommendations(tenantId);
+  const recommendations = await generateRecommendations(tenantId, marketId);
 
   return NextResponse.json(recommendations);
 }
