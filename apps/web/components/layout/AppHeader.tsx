@@ -10,6 +10,7 @@ import { ViewToggle } from '@/components/dashboard/ViewToggle';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { NotificationPanel } from '@/components/notifications/NotificationPanel';
 import { ExportButton } from '@/components/dashboard/ExportButton';
+import { MarketSelector } from '@/components/layout/MarketSelector';
 import { useExportContext } from '@/lib/export/context';
 
 /** Maps pathnames to human-readable page titles. */
@@ -61,6 +62,7 @@ export function AppHeader() {
           <DateRangePicker />
           <ComparisonToggle />
           <ViewToggle />
+          <MarketSelector />
 
           {/* Export — data provided by active page via ExportProvider context */}
           <ExportButton data={exportData} filename={exportFilename} />
