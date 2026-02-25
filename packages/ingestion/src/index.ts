@@ -18,3 +18,6 @@ export {
 
 // Scoring pipeline: dispatch, worker, persist, rollup, funnel-stage, budget-detection
 export * from './scoring';
+
+// Phase 5: Market detection from campaign geo targeting metadata
+export * from './market-detection';
