@@ -18,6 +18,9 @@ export const tenants = pgTable('tenants', {
   // ARCH-03: Analysis gate — set to true once >= 1 year coverage is confirmed
   analysisUnlocked: boolean('analysis_unlocked').default(false).notNull(),
   analysisUnlockedAt: timestamp('analysis_unlocked_at', { withTimezone: true }),
+  // Phase 5: Outcome mode gates UI language throughout the dashboard
+  // 'ecommerce' = revenue/ROAS terminology; 'lead_gen' = leads/conversion terminology
+  outcomeMode: text('outcome_mode').default('ecommerce').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });

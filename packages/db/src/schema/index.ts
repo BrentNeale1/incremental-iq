@@ -18,5 +18,8 @@ export * from './saturation-estimates';
 export * from './notifications';
 export * from './user-preferences';
 
+// Phase 5: Multi-market attribution schema
+export * from './markets';
+
 // Re-export the app role for use in policy definitions
 export { appRole } from './roles';

@@ -36,6 +36,13 @@
       "when": 1771939198000,
       "tag": "0004_phase4_dashboard",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1771980761000,
+      "tag": "0005_markets_and_ga4",
+      "breakpoints": true
     }
   ]
 }
