@@ -2,6 +2,8 @@
 
 import * as React from 'react';
 import { format, eachDayOfInterval } from 'date-fns';
+import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 import { useDashboardStore } from '@/lib/store/dashboard';
 import { useKpis } from '@/lib/hooks/useKpis';
 import { useRecommendations } from '@/lib/hooks/useRecommendations';
@@ -72,6 +74,33 @@ function buildPlatformData(campaigns: {
 }
 
 /**
+ * CrossMarketSuggestions — shown when a market filter is active but returns no recommendations.
+ *
+ * Reads the full unfiltered recommendation set directly from TanStack Query cache
+ * (no extra network request — cache always holds ['recommendations'] from initial fetch).
+ * Shows top 3 cross-market picks with the selected viewMode card type.
+ */
+function CrossMarketSuggestions({ viewMode }: { viewMode: string }) {
+  const queryClient = useQueryClient();
+  const allRecs = queryClient.getQueryData<Recommendation[]>(['recommendations']) ?? [];
+  const topRecs = allRecs.slice(0, 3);
+
+  if (topRecs.length === 0) return <EmptyRecommendations />;
+
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {topRecs.map((rec: Recommendation) =>
+        viewMode === 'analyst' ? (
+          <RecommendationAnalystCard key={rec.id} recommendation={rec} />
+        ) : (
+          <RecommendationCard key={rec.id} recommendation={rec} />
+        ),
+      )}
+    </div>
+  );
+}
+
+/**
  * Executive Overview — primary landing page of the Incremental IQ dashboard.
  *
  * Layout (top to bottom, per design spec "clean analytical at top, denser toward bottom"):
@@ -79,7 +108,7 @@ function buildPlatformData(campaigns: {
  *   2. KPI grid — 4 draggable cards (KPIs first per loading priority)
  *   3. Hero chart — incremental revenue over time
  *   4. Supporting charts — platform comparison
- *   5. Recommendations — ranked by expected impact
+ *   5. Recommendations — ranked by expected impact, filtered by selected market
  *
  * Progressive loading: each section has independent skeleton placeholders.
  * Mobile-responsive: all grids use sm:/lg: breakpoints, charts scale to full width.
@@ -92,6 +121,12 @@ export default function ExecutiveOverviewPage() {
   const comparisonRange = useDashboardStore((s) => s.comparisonRange);
   const comparisonEnabled = useDashboardStore((s) => s.comparisonEnabled);
   const viewMode = useDashboardStore((s) => s.viewMode);
+  const selectedMarket = useDashboardStore((s) => s.selectedMarket);
+  const markets = useDashboardStore((s) => s.markets);
+  const setSelectedMarket = useDashboardStore((s) => s.setSelectedMarket);
+
+  // Derive selected market display info
+  const selectedMarketInfo = markets.find((m) => m.id === selectedMarket);
 
   // Fetch KPIs — tenantId from session cookie, not passed as param
   const { data: kpisData, isLoading: kpisLoading } = useKpis(
@@ -99,7 +134,7 @@ export default function ExecutiveOverviewPage() {
     comparisonEnabled ? comparisonRange : undefined,
   );
 
-  // Fetch recommendations — tenantId from session cookie
+  // Fetch recommendations — tenantId from session cookie; client-side filtered by selectedMarket via select
   const { data: recommendations, isLoading: recsLoading } = useRecommendations();
 
   // Fetch campaigns for charts — tenantId from session cookie
@@ -136,6 +171,17 @@ export default function ExecutiveOverviewPage() {
       );
     }
   }, [campaignRows, dateRange.from, setExportData]);
+
+  // Stale market fallback — if persisted selectedMarket no longer exists in markets list
+  React.useEffect(() => {
+    if (selectedMarket && markets.length > 0) {
+      const exists = markets.some((m) => m.id === selectedMarket);
+      if (!exists) {
+        setSelectedMarket(null);
+        toast('Selected market no longer exists — showing all markets.');
+      }
+    }
+  }, [markets, selectedMarket, setSelectedMarket]);
 
   const campaignRecs = recommendations ?? [];
   const lowConfidenceRecs = campaignRecs.filter(
@@ -219,6 +265,20 @@ export default function ExecutiveOverviewPage() {
 
       {/* Section 5 — Recommendations */}
       <section aria-label="Campaign recommendations">
+        {/* Market filter label */}
+        {selectedMarket && selectedMarketInfo && (
+          <p className="mb-2 text-xs text-muted-foreground">
+            Filtered: {selectedMarketInfo.displayName} ({campaignRecs.length} campaign{campaignRecs.length !== 1 ? 's' : ''})
+          </p>
+        )}
+
+        {/* Low-data warning for markets with fewer than 5 campaigns */}
+        {selectedMarket && selectedMarketInfo && selectedMarketInfo.campaignCount < 5 && (
+          <p className="mb-2 text-xs text-amber-600 dark:text-amber-400">
+            Limited data — recommendations may improve as more campaigns are added to this market
+          </p>
+        )}
+
         <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Recommendations
         </h2>
@@ -230,7 +290,17 @@ export default function ExecutiveOverviewPage() {
             ))}
           </div>
         ) : campaignRecs.length === 0 ? (
-          <EmptyRecommendations />
+          selectedMarket ? (
+            <div className="space-y-4">
+              <div className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
+                <p className="font-medium">No recommendations for this market</p>
+                <p className="mt-1">Here are top picks from other markets:</p>
+              </div>
+              <CrossMarketSuggestions viewMode={viewMode} />
+            </div>
+          ) : (
+            <EmptyRecommendations />
+          )
         ) : (
           <div className="space-y-6">
             {/* Actionable recommendations */}
