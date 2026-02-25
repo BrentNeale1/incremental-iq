@@ -117,9 +117,9 @@ Plans:
   3. User can log out from any page and their session is immediately invalidated
 **Plans**: 3 plans
 Plans:
-- [ ] 06-01-PLAN.md — Auth foundation: Better Auth + Drizzle adapter, auth schema + migration, middleware, dashboard auth guard
-- [ ] 06-02-PLAN.md — Auth UI: login, signup, forgot-password, reset-password pages + sidebar logout dropdown
-- [ ] 06-03-PLAN.md — API retrofit: session-based tenantId on all API routes, remove PLACEHOLDER_TENANT_ID from dashboard
+- [x] 06-01-PLAN.md — Auth foundation: Better Auth + Drizzle adapter, auth schema + migration, middleware, dashboard auth guard
+- [x] 06-02-PLAN.md — Auth UI: login, signup, forgot-password, reset-password pages + sidebar logout dropdown
+- [x] 06-03-PLAN.md — API retrofit: session-based tenantId on all API routes, remove PLACEHOLDER_TENANT_ID from dashboard
 
 ## Progress
 
