@@ -41,6 +41,7 @@ export default function LoginPage() {
       const { error: signInError } = await authClient.signIn.email({
         email,
         password,
+        callbackURL: '/',
       });
 
       if (signInError) {

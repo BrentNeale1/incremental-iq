@@ -14,6 +14,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
+import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { signUpAction } from './actions';
 import {
   Card,
@@ -84,7 +85,8 @@ export default function SignUpPage() {
         setError(result.error);
       }
       // On success, signUpAction calls redirect('/login') — no further handling needed
-    } catch {
+    } catch (e) {
+      if (isRedirectError(e)) throw e;
       setError('Something went wrong. Please try again.');
     } finally {
       setIsPending(false);
