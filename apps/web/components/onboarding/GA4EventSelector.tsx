@@ -25,9 +25,9 @@ export function GA4EventSelector({ integrationId, propertyId }: Props) {
   React.useEffect(() => {
     fetch(`/api/ga4/events?integrationId=${integrationId}&propertyId=${propertyId}`)
       .then((r) => r.json())
-      .then((data: KeyEvent[]) => {
-        setEvents(data);
-        setSelected(new Set(data.map((e) => e.eventName)));
+      .then((data: { events: KeyEvent[] }) => {
+        setEvents(data.events);
+        setSelected(new Set(data.events.map((e) => e.eventName)));
       })
       .finally(() => setLoading(false));
   }, [integrationId, propertyId]);

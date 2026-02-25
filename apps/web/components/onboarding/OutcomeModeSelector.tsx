@@ -5,12 +5,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 interface Props {
-  tenantId: string;
   onSelect: (mode: 'ecommerce' | 'lead_gen') => void;
   initialMode?: 'ecommerce' | 'lead_gen';
 }
 
-export function OutcomeModeSelector({ tenantId, onSelect, initialMode }: Props) {
+export function OutcomeModeSelector({ onSelect, initialMode }: Props) {
   const [selected, setSelected] = React.useState<'ecommerce' | 'lead_gen' | null>(initialMode ?? null);
 
   const handleSelect = async (mode: 'ecommerce' | 'lead_gen') => {
@@ -18,7 +17,7 @@ export function OutcomeModeSelector({ tenantId, onSelect, initialMode }: Props) 
     await fetch('/api/tenant/preferences', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tenantId, outcomeMode: mode }),
+      body: JSON.stringify({ outcomeMode: mode }),
     });
     onSelect(mode);
   };

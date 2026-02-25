@@ -16,27 +16,27 @@ interface MarketRow {
 }
 
 interface Props {
-  tenantId: string;
+  // No tenantId prop — session cookie handles auth on all /api/markets requests
 }
 
-export function MarketConfirmationStep({ tenantId }: Props) {
+export function MarketConfirmationStep(_props: Props) {
   const [markets, setMarkets] = React.useState<MarketRow[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [newCountry, setNewCountry] = React.useState('');
   const [newName, setNewName] = React.useState('');
 
   React.useEffect(() => {
-    fetch(`/api/markets?tenantId=${tenantId}`)
+    fetch('/api/markets')
       .then((r) => r.json())
       .then(setMarkets)
       .finally(() => setLoading(false));
-  }, [tenantId]);
+  }, []);
 
   const handleConfirm = async (id: string) => {
     await fetch('/api/markets', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tenantId, markets: [{ id, action: 'confirm' }] }),
+      body: JSON.stringify({ markets: [{ id, action: 'confirm' }] }),
     });
     setMarkets((prev) => prev.map((m) => (m.id === id ? { ...m, isConfirmed: true } : m)));
   };
@@ -45,7 +45,7 @@ export function MarketConfirmationStep({ tenantId }: Props) {
     await fetch('/api/markets', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tenantId, markets: [{ id, displayName, action: 'rename' }] }),
+      body: JSON.stringify({ markets: [{ id, displayName, action: 'rename' }] }),
     });
     setMarkets((prev) => prev.map((m) => (m.id === id ? { ...m, displayName } : m)));
   };
@@ -54,7 +54,7 @@ export function MarketConfirmationStep({ tenantId }: Props) {
     await fetch('/api/markets', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tenantId, markets: [{ id, action: 'delete' }] }),
+      body: JSON.stringify({ markets: [{ id, action: 'delete' }] }),
     });
     setMarkets((prev) => prev.filter((m) => m.id !== id));
   };
@@ -65,7 +65,6 @@ export function MarketConfirmationStep({ tenantId }: Props) {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        tenantId,
         markets: [{ countryCode: newCountry, displayName: newName, action: 'add' }],
       }),
     });

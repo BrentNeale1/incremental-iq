@@ -122,13 +122,34 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       },
     });
 
-    // Return integration ID so the client can proceed to property selection
-    // No backfill triggered here — requires property + event selection first
-    return NextResponse.json({
-      success: true,
-      integrationId: integration.id,
+    // Return HTML that closes the popup and notifies the opener via postMessage.
+    // Includes integrationId so the wizard can proceed to property selection.
+    // Error responses remain as JSON (acceptable in popup — user sees error message).
+    // No backfill triggered here — requires property + event selection first.
+    const successHtml = `<!DOCTYPE html>
+<html>
+<head><title>Connected</title></head>
+<body>
+<script>
+  (function() {
+    var data = ${JSON.stringify({
+      type: 'oauth_complete',
       platform: 'ga4',
-      nextStep: 'property_selection',
+      integrationId: integration.id,
+      success: true,
+    })};
+    if (window.opener && !window.opener.closed) {
+      window.opener.postMessage(data, window.location.origin);
+    }
+    window.close();
+  })();
+</script>
+<p>Connected successfully. You can close this window.</p>
+</body>
+</html>`;
+
+    return new NextResponse(successHtml, {
+      headers: { 'Content-Type': 'text/html; charset=utf-8' },
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';

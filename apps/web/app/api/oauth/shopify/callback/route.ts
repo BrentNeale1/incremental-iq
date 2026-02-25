@@ -152,12 +152,32 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       console.error(`[shopify-callback] Failed to register nightly sync for integration ${integration.id}: ${message}`);
     });
 
-    return NextResponse.json({
-      success: true,
-      integrationId: integration.id,
+    // Return HTML that closes the popup and notifies the opener via postMessage.
+    // Error responses remain as JSON (acceptable in popup — user sees error message).
+    const successHtml = `<!DOCTYPE html>
+<html>
+<head><title>Connected</title></head>
+<body>
+<script>
+  (function() {
+    var data = ${JSON.stringify({
+      type: 'oauth_complete',
       platform: 'shopify',
-      shop,
-      accountName: shopName,
+      integrationId: integration.id,
+      success: true,
+    })};
+    if (window.opener && !window.opener.closed) {
+      window.opener.postMessage(data, window.location.origin);
+    }
+    window.close();
+  })();
+</script>
+<p>Connected successfully. You can close this window.</p>
+</body>
+</html>`;
+
+    return new NextResponse(successHtml, {
+      headers: { 'Content-Type': 'text/html; charset=utf-8' },
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';
