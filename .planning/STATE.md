@@ -10,10 +10,10 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 6 of 6 (Authentication) - IN PROGRESS
-Plan: 1 of 3 in current phase - COMPLETE
-Status: Phase 6 Plan 01 COMPLETE — Better Auth installed, auth schema + migration (0006_auth.sql), server/client instances configured, middleware route protection, dashboard layout auth guard, tenantId wired from session.
-Last activity: 2026-02-25 — Phase 6 Plan 01 executed. Better Auth foundation laid.
-Stopped at: Completed 06-01-PLAN.md
+Plan: 2 of 3 in current phase - COMPLETE
+Status: Phase 6 Plan 02 COMPLETE — Auth UI pages (login, signup, forgot-password, reset-password), AppSidebar logout with signOut + router.refresh(), all dashboard API routes retrofitted to session-based tenantId.
+Last activity: 2026-02-25 — Phase 6 Plan 02 executed. Auth UI and sidebar logout complete.
+Stopped at: Completed 06-02-PLAN.md
 
 Progress: [██████████] 93%
 
@@ -55,6 +55,7 @@ Progress: [██████████] 93%
 | Phase 05-expanded-connectors-and-multi-market P01 | 7 | 2 tasks | 9 files |
 | Phase 05-expanded-connectors-and-multi-market PP02 | 12 min | 2 tasks | 9 files |
 | Phase 06-authentication P01 | 7 | 2 tasks | 20 files |
+| Phase 06-authentication P02 | 4 min | 2 tasks | 17 files |
 
 ## Accumulated Context
 
@@ -147,6 +148,9 @@ Recent decisions affecting current work:
 - [Phase 05-expanded-connectors-and-multi-market]: No GA4 backfill from OAuth callback — requires property + event selection first; POST /api/ga4/events triggers backfill eligibility (Plan 06 scheduler responsibility)
 - [Phase 06-authentication]: Better Auth v1.4.19 with drizzleAdapter — no RLS on auth tables, no cookieCache, 30-day sliding sessions, tenantId additionalField on user
 - [Phase 06-authentication]: TenantProvider React context distributes tenantId to dashboard client components — useTenantId() replaces PLACEHOLDER_TENANT_ID in all 5 dashboard pages
+- [Phase 06-authentication]: Sign-up server action creates tenant first then auth.api.signUpEmail with tenantId — rollback on user creation failure prevents orphan tenants
+- [Phase 06-authentication]: All dashboard API routes use session-based tenantId (auth.api.getSession) not query params — eliminates IDOR vulnerability
+- [Phase 06-authentication]: signOut uses fetchOptions.onSuccess callback with router.push('/login') + router.refresh() — clears Next.js router cache (Pitfall 2)
 
 ### Pending Todos
 
@@ -166,5 +170,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Phase 5 completed. Phase 6 (Authentication) is next — not yet planned.
+Stopped at: Completed 06-02-PLAN.md
 Resume file: None
