@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** Campaign-level incremental lift analysis that tells brands exactly which campaigns to scale, by how much, and for how long — with transparent confidence levels so no recommendation is made without measurable expected impact.
-**Current focus:** Phase 6 - Authentication (COMPLETE)
+**Current focus:** Phase 6 - Authentication (UAT retest failures — needs second gap closure)
 
 ## Current Position
 
-Phase: 6 of 6 (Authentication) - COMPLETE
-Plan: 4 of 4 in current phase - COMPLETE
-Status: Phase 6 Plan 04 COMPLETE — Closed all 4 UAT gaps: sign-up redirect propagates via isRedirectError re-throw, login works with callbackURL, forgot-password autofill-aware via onBlur, CSS stable on middleware redirects via removal of unreliable shadcn/tailwind.css import.
-Last activity: 2026-02-25 — Phase 6 Plan 04 executed. All UAT gaps closed, authentication flows fully functional.
-Stopped at: Completed 06-04-PLAN.md
+Phase: 6 of 6 (Authentication) - UAT GAPS REMAIN
+Plan: 4 of 4 executed, but retest shows 3 of 4 fixes insufficient
+Status: 06-04 gap closure executed. CSS fix confirmed working. Login, sign-up, and page routing still broken — fixes were insufficient, deeper investigation needed.
+Last activity: 2026-02-25 — Post-gap-closure retest. User confirmed CSS fixed but login not logging in, registration refreshes page, page paths not displaying correctly.
+Stopped at: Awaiting second gap closure cycle. Need /gsd:debug or deeper investigation before next plan.
 
-Progress: [██████████] 100%
+Progress: [████████░░] 80% (code complete, auth flows not functional)
 
 ## Performance Metrics
 
@@ -179,5 +179,7 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 06-04-PLAN.md
+Stopped at: Post-gap-closure UAT retest — 3 of 4 fixes insufficient
+Resume with: /gsd:debug to investigate why login, sign-up, and page routing still fail after 06-04 fixes
+Key context: CSS fix works. Login/sign-up/routing have a deeper systemic issue beyond the individual code fixes (env vars, callbackURL, isRedirectError). Likely middleware, Better Auth config, or Next.js routing problem.
 Resume file: None
