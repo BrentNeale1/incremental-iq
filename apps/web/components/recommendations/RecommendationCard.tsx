@@ -22,6 +22,13 @@ function platformLabel(platform: string): string {
   return labels[platform.toLowerCase()] ?? platform;
 }
 
+/** Converts a 2-letter country code to a flag emoji */
+function countryFlag(code: string): string {
+  return code.toUpperCase().split('')
+    .map((c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65))
+    .join('');
+}
+
 /** Returns a human-readable summary for a recommendation */
 function buildSummary(rec: Recommendation): string {
   switch (rec.action) {
@@ -63,7 +70,8 @@ export interface RecommendationCardProps {
  * RecommendationCard — executive (business owner) view.
  *
  * Shown when viewMode === 'executive'.
- * Displays: platform badge, campaign name, single-line summary with specific numbers.
+ * Displays: platform badge, market badge (when available), campaign name,
+ * single-line summary with specific numbers.
  * Left border color: green (scale_up), yellow (watch), red (investigate).
  */
 export function RecommendationCard({ recommendation: rec, className }: RecommendationCardProps) {
@@ -74,9 +82,16 @@ export function RecommendationCard({ recommendation: rec, className }: Recommend
       <CardHeader className="pb-2 pt-4">
         <div className="flex items-start justify-between gap-2">
           <p className="text-sm font-semibold leading-tight">{rec.campaignName}</p>
-          <Badge variant="secondary" className="shrink-0 text-xs">
-            {platformLabel(rec.platform)}
-          </Badge>
+          <div className="flex items-center gap-1.5">
+            <Badge variant="secondary" className="shrink-0 text-xs">
+              {platformLabel(rec.platform)}
+            </Badge>
+            {rec.marketName && (
+              <Badge variant="outline" className="shrink-0 text-xs text-muted-foreground">
+                {rec.marketCountryCode ? countryFlag(rec.marketCountryCode) : ''} {rec.marketName}
+              </Badge>
+            )}
+          </div>
         </div>
       </CardHeader>
 

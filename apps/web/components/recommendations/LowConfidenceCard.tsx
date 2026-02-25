@@ -13,6 +13,13 @@ import { format, parseISO, formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 import type { Recommendation } from '@/lib/recommendations/types';
 
+/** Converts a 2-letter country code to a flag emoji */
+function countryFlag(code: string): string {
+  return code.toUpperCase().split('')
+    .map((c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65))
+    .join('');
+}
+
 export interface LowConfidenceCardProps {
   recommendation: Recommendation;
   className?: string;
@@ -27,6 +34,8 @@ export interface LowConfidenceCardProps {
  *
  * Holdout test is NEVER the first option. It is presented only as a secondary
  * alternative below the primary "wait for data" path.
+ *
+ * Market info (platform · flag market · confidence) shown in subtitle when available.
  */
 export function LowConfidenceCard({ recommendation: rec, className }: LowConfidenceCardProps) {
   const nextDate = rec.nextAnalysisDate
@@ -51,7 +60,11 @@ export function LowConfidenceCard({ recommendation: rec, className }: LowConfide
           <div>
             <CardTitle className="text-sm font-semibold">{rec.campaignName}</CardTitle>
             <p className="text-xs text-muted-foreground capitalize">
-              {rec.platform} · {rec.confidenceLevel} confidence
+              {rec.platform}
+              {rec.marketName && (
+                <> · {rec.marketCountryCode ? countryFlag(rec.marketCountryCode) : ''} {rec.marketName}</>
+              )}
+              {' · '}{rec.confidenceLevel} confidence
             </p>
           </div>
         </div>

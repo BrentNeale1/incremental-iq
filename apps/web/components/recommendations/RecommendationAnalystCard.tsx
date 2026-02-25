@@ -27,6 +27,13 @@ function platformLabel(platform: string): string {
   return labels[platform.toLowerCase()] ?? platform;
 }
 
+/** Converts a 2-letter country code to a flag emoji */
+function countryFlag(code: string): string {
+  return code.toUpperCase().split('')
+    .map((c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65))
+    .join('');
+}
+
 function confidenceColor(level: string): string {
   switch (level) {
     case 'high': return 'text-brand-success';
@@ -50,6 +57,7 @@ export interface RecommendationAnalystCardProps {
  *   - Confidence % and level
  *   - Saturation %
  *   - Expandable methodology section (Hill curve params alpha/mu/gamma)
+ *   - Market badge (when available)
  */
 export function RecommendationAnalystCard({
   recommendation: rec,
@@ -85,9 +93,16 @@ export function RecommendationAnalystCard({
               {rec.confidenceLevel} confidence
             </p>
           </div>
-          <Badge variant="secondary" className="shrink-0 text-xs">
-            {platformLabel(rec.platform)}
-          </Badge>
+          <div className="flex items-center gap-1.5">
+            <Badge variant="secondary" className="shrink-0 text-xs">
+              {platformLabel(rec.platform)}
+            </Badge>
+            {rec.marketName && (
+              <Badge variant="outline" className="shrink-0 text-xs text-muted-foreground">
+                {rec.marketCountryCode ? countryFlag(rec.marketCountryCode) : ''} {rec.marketName}
+              </Badge>
+            )}
+          </div>
         </div>
       </CardHeader>
 
