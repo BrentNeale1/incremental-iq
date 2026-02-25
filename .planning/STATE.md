@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** Campaign-level incremental lift analysis that tells brands exactly which campaigns to scale, by how much, and for how long — with transparent confidence levels so no recommendation is made without measurable expected impact.
-**Current focus:** Phase 7 - Onboarding and Connect (In Progress — Plan 1 of 2 complete)
+**Current focus:** Phase 7 - Onboarding and Connect (Complete — Both plans done)
 
 ## Current Position
 
-Phase: 7 of 8 (Onboarding and Connect) - In Progress
-Plan: 1 of 2 executed
-Status: Plan 01 complete. DB migration, onboarding API routes, dashboard gate, GA4EventSelector fix, OAuth popup pattern, session auth cleanup all done.
-Last activity: 2026-02-25 — Plan 07-01 executed. Backend foundation for onboarding wizard.
-Stopped at: Completed 07-01-PLAN.md — DB schema, onboarding API routes, OAuth popup pattern, session auth fixes
+Phase: 7 of 8 (Onboarding and Connect) - Complete
+Plan: 2 of 2 executed
+Status: Phase 7 complete. Full onboarding wizard UI built — route group, 4-step wizard, OAuth popup cards, GA4 event selection, BatchMarketConfirmation batch-save, OnboardingTransition screen.
+Last activity: 2026-02-25 — Plan 07-02 executed. Full onboarding wizard UI complete.
+Stopped at: Completed 07-02-PLAN.md — onboarding route group, wizard, integration cards, batch market save, transition screen
 
-Progress: [███████░░░] ~75% (7 phases complete, phase 7 in progress)
+Progress: [████████░░] ~85% (7 phases complete, phase 8 pending)
 
 ## Performance Metrics
 
@@ -59,6 +59,7 @@ Progress: [███████░░░] ~75% (7 phases complete, phase 7 in p
 | Phase 06-authentication P03 | ~90 min | 2 tasks | 41 files |
 | Phase 06-authentication P04 | 8 min | 2 tasks | 4 files |
 | Phase 07-onboarding-and-connect P01 | 5 | 2 tasks | 15 files |
+| Phase 07-onboarding-and-connect P02 | 6 min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -164,6 +165,9 @@ Recent decisions affecting current work:
 - [Phase 07-onboarding-and-connect]: tenants table queried with db.select (no withTenant) in onboarding API routes — consistent with no-RLS rule for root isolation table
 - [Phase 07-onboarding-and-connect]: OAuth callbacks return HTML with window.opener.postMessage() on success — enables popup-close wizard flow for all 4 platforms
 - [Phase 07-onboarding-and-connect]: MarketConfirmationStep and OutcomeModeSelector no longer accept tenantId prop — session cookie handles auth per Phase 6 decision
+- [Phase 07-onboarding-and-connect]: BatchMarketConfirmation uses forwardRef + useImperativeHandle for save()/canProceed — wizard calls save() on Next click, true undo-before-commit (all edits local until flush)
+- [Phase 07-onboarding-and-connect]: GA4EventSelectorWithRef wrapper in OnboardingWizard exposes handleSave() via ref — wizard controls GA4 event save timing without modifying existing GA4EventSelector
+- [Phase 07-onboarding-and-connect]: Post-onboarding settings covered by existing dashboard pages for v1 — no new settings page needed (IntegrationSettings in Health, MarketSelector in AppHeader, outcomeMode in preferences)
 
 ### Pending Todos
 
@@ -183,7 +187,7 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: All 6 phases complete. UAT verification passed — 13/13 auth checks green.
-Resume with: /gsd:audit-milestone or /gsd:complete-milestone — all phases are done
-Key context: Root cause of auth failures was missing database. Docker Compose + TimescaleDB stood up, two Better Auth config bugs fixed (input:false on tenantId, nanoid vs UUID). All auth flows verified: sign-up, login, session, routing, sign-out.
+Stopped at: Completed 07-02-PLAN.md — full onboarding wizard UI. Phase 7 complete (both plans done).
+Resume with: /gsd:execute-phase phase 08 (final phase — deployment/infrastructure)
+Key context: Phase 7 complete. Onboarding wizard fully wired: (onboarding) route group, 4-step wizard, OAuth popup cards, GA4 event selection sub-flow, BatchMarketConfirmation batch-save wrapper, OutcomeModeSelector, OnboardingTransition screen. INTG-04 and MRKT-02 satisfied. New users routed through /onboarding before reaching dashboard. Returning onboarded users redirected from /onboarding to /.
 Resume file: .planning/phases/06-authentication/.continue-here.md (can be archived)
