@@ -8,7 +8,6 @@ import { IntegrationSettings } from '@/components/health/IntegrationSettings';
 import { EmptyHealth } from '@/components/dashboard/EmptyStates';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useExportContext } from '@/lib/export/context';
-import { useTenantId } from '@/lib/auth/tenant-context';
 
 /**
  * Data Health page — integration sync status, missing data gaps, and integration management.
@@ -23,14 +22,14 @@ import { useTenantId } from '@/lib/auth/tenant-context';
  * Mobile-responsive: full-width sections, flex-wrap for action rows.
  *
  * Stale data always shows warning banners but never hides the dashboard.
+ * tenantId comes from session cookie automatically — no PLACEHOLDER_TENANT_ID.
  */
 export default function DataHealthPage() {
-  const tenantId = useTenantId();
-  const { data: syncHistory, isLoading, isError, refetch } = useSyncHistory(tenantId);
+  const { data: syncHistory, isLoading, isError, refetch } = useSyncHistory();
   const { setExportData } = useExportContext();
   React.useEffect(() => {
-    if (syncHistory && syncHistory.length > 0) {
-      setExportData(syncHistory as unknown as Record<string, unknown>[], 'data-health');
+    if (syncHistory?.integrations && syncHistory.integrations.length > 0) {
+      setExportData(syncHistory.integrations as unknown as Record<string, unknown>[], 'data-health');
     }
   }, [syncHistory, setExportData]);
 
@@ -38,7 +37,6 @@ export default function DataHealthPage() {
     try {
       const res = await fetch(`/api/integrations/${integrationId}/sync`, {
         method: 'POST',
-        headers: { 'X-Tenant-Id': tenantId },
       });
       if (!res.ok) {
         console.error('Manual sync failed:', res.status);

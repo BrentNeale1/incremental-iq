@@ -31,11 +31,13 @@ export interface KpisResponse {
 /**
  * useKpis — fetches aggregated KPI data from /api/dashboard/kpis.
  *
+ * tenantId is no longer accepted — the API route reads it from the session cookie.
+ * Middleware ensures the user is authenticated before reaching dashboard pages.
+ *
  * queryKey includes all date params so refetch fires when ranges change.
  * staleTime: 5 minutes — KPI aggregates don't need real-time updates.
  */
 export function useKpis(
-  tenantId: string | undefined,
   dateRange: DateRange,
   comparisonRange?: DateRange | null,
 ) {
@@ -45,10 +47,9 @@ export function useKpis(
   const compareTo = comparisonRange ? format(comparisonRange.to, 'yyyy-MM-dd') : undefined;
 
   return useQuery<KpisResponse>({
-    queryKey: ['kpis', tenantId, from, to, compareFrom, compareTo],
+    queryKey: ['kpis', from, to, compareFrom, compareTo],
     queryFn: async () => {
       const params = new URLSearchParams({
-        tenantId: tenantId!,
         from,
         to,
         ...(compareFrom && compareTo ? { compareFrom, compareTo } : {}),
@@ -60,7 +61,6 @@ export function useKpis(
       }
       return res.json() as Promise<KpisResponse>;
     },
-    enabled: !!tenantId,
     staleTime: 5 * 60 * 1000,
   });
 }

@@ -17,7 +17,6 @@ import { ChartSkeleton } from '@/components/dashboard/SkeletonLoaders';
 import { EmptyRecommendations } from '@/components/dashboard/EmptyStates';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useExportContext } from '@/lib/export/context';
-import { useTenantId } from '@/lib/auth/tenant-context';
 import type { Recommendation } from '@/lib/recommendations/types';
 
 /**
@@ -86,31 +85,25 @@ function buildPlatformData(campaigns: {
  * Mobile-responsive: all grids use sm:/lg: breakpoints, charts scale to full width.
  *
  * NOTE: Zustand rehydration is handled in the dashboard layout (layout.tsx).
+ * tenantId comes from session cookie automatically — no PLACEHOLDER_TENANT_ID.
  */
 export default function ExecutiveOverviewPage() {
-  const tenantId = useTenantId();
   const dateRange = useDashboardStore((s) => s.dateRange);
   const comparisonRange = useDashboardStore((s) => s.comparisonRange);
   const comparisonEnabled = useDashboardStore((s) => s.comparisonEnabled);
   const viewMode = useDashboardStore((s) => s.viewMode);
 
-  // Fetch KPIs
+  // Fetch KPIs — tenantId from session cookie, not passed as param
   const { data: kpisData, isLoading: kpisLoading } = useKpis(
-    tenantId,
     dateRange,
     comparisonEnabled ? comparisonRange : undefined,
   );
 
-  // Fetch recommendations
-  const { data: recommendations, isLoading: recsLoading } = useRecommendations(
-    tenantId,
-  );
+  // Fetch recommendations — tenantId from session cookie
+  const { data: recommendations, isLoading: recsLoading } = useRecommendations();
 
-  // Fetch campaigns for charts
-  const { data: campaignRows, isLoading: campaignsLoading } = useCampaigns(
-    tenantId,
-    dateRange,
-  );
+  // Fetch campaigns for charts — tenantId from session cookie
+  const { data: campaignRows, isLoading: campaignsLoading } = useCampaigns(dateRange);
 
   // Derive time series from KPI data and campaign data
   const timeSeriesData: TimeSeriesDataPoint[] = React.useMemo(() => {

@@ -31,7 +31,6 @@ export interface NotificationItem {
 }
 
 export interface NotificationPanelProps {
-  tenantId?: string;
   open: boolean;
   onClose: () => void;
 }
@@ -53,10 +52,8 @@ function NotificationIcon({ type }: { type: string }) {
 }
 
 function NotificationList({
-  tenantId,
   onClose,
 }: {
-  tenantId?: string;
   onClose: () => void;
 }) {
   const router = useRouter();
@@ -65,23 +62,19 @@ function NotificationList({
   const [showSettings, setShowSettings] = React.useState(false);
 
   const { data: notifications = [], isLoading } = useQuery<NotificationItem[]>({
-    queryKey: ['notifications', 'all', tenantId],
+    queryKey: ['notifications', 'all'],
     queryFn: async () => {
-      if (!tenantId) return [];
-      const res = await fetch(
-        `/api/notifications?tenantId=${encodeURIComponent(tenantId)}`,
-      );
+      const res = await fetch('/api/notifications');
       if (!res.ok) throw new Error(`Failed to fetch notifications: ${res.status}`);
       return res.json() as Promise<NotificationItem[]>;
     },
-    enabled: !!tenantId,
     staleTime: 30_000,
   });
 
   const markReadMutation = useMutation({
     mutationFn: async (ids: string[]) => {
-      if (!tenantId || ids.length === 0) return;
-      await fetch(`/api/notifications?tenantId=${encodeURIComponent(tenantId)}`, {
+      if (ids.length === 0) return;
+      await fetch('/api/notifications', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ids, read: true }),
@@ -127,7 +120,7 @@ function NotificationList({
           </Button>
           <span className="text-sm font-medium">Notification Settings</span>
         </div>
-        <NotificationSettings tenantId={tenantId} />
+        <NotificationSettings />
       </div>
     );
   }
@@ -226,9 +219,10 @@ function NotificationList({
  * Each notification has a type icon, message, relative time, and unread indicator.
  * "Mark all as read" button at the top.
  * Notification settings accessible from the footer.
+ *
+ * tenantId is no longer accepted — the API route reads it from the session cookie.
  */
 export function NotificationPanel({
-  tenantId,
   open,
   onClose,
 }: NotificationPanelProps) {
@@ -238,7 +232,7 @@ export function NotificationPanel({
         <SheetHeader className="sr-only">
           <SheetTitle>Notifications</SheetTitle>
         </SheetHeader>
-        <NotificationList tenantId={tenantId} onClose={onClose} />
+        <NotificationList onClose={onClose} />
       </SheetContent>
     </Sheet>
   );

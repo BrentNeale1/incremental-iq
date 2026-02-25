@@ -15,7 +15,6 @@ const PLATFORM_TABS: { value: PlatformFilter; label: string }[] = [
 ];
 
 interface PlatformTabsProps {
-  tenantId: string | undefined;
   dateRange: DateRange;
 }
 
@@ -26,8 +25,9 @@ interface PlatformTabsProps {
  * below it. State is local to this component — no URL param needed.
  *
  * Per user decision: platform-specific views under each tab.
+ * tenantId is no longer needed — the API reads it from the session cookie.
  */
-export function PlatformTabs({ tenantId, dateRange }: PlatformTabsProps) {
+export function PlatformTabs({ dateRange }: PlatformTabsProps) {
   const [activePlatform, setActivePlatform] = React.useState<PlatformFilter>('all');
 
   return (
@@ -46,12 +46,10 @@ export function PlatformTabs({ tenantId, dateRange }: PlatformTabsProps) {
       {PLATFORM_TABS.map((tab) => (
         <TabsContent key={tab.value} value={tab.value} className="mt-4 space-y-4">
           <PlatformOverview
-            tenantId={tenantId}
             dateRange={dateRange}
             platform={tab.value === 'all' ? undefined : tab.value}
           />
           <CampaignTable
-            tenantId={tenantId}
             dateRange={dateRange}
             platform={tab.value === 'all' ? undefined : tab.value}
           />

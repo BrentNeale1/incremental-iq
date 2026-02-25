@@ -36,10 +36,6 @@ const NOTIFICATION_TYPE_LABELS: Record<keyof NotificationPreferences, string> = 
   data_health:          'Data health issues',
 };
 
-export interface NotificationSettingsProps {
-  tenantId?: string;
-}
-
 /**
  * NotificationSettings — per-type, per-channel notification preference toggles.
  *
@@ -47,19 +43,15 @@ export interface NotificationSettingsProps {
  * Rows: Anomaly detected | New recommendations | Seasonal deadlines | Data health issues
  *
  * Reads from /api/notifications/preferences, writes via PUT.
+ * tenantId is no longer accepted — the API route reads it from the session cookie.
  */
-export function NotificationSettings({ tenantId }: NotificationSettingsProps) {
+export function NotificationSettings() {
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery<UserPreferences>({
-    queryKey: ['notification-preferences', tenantId],
+    queryKey: ['notification-preferences'],
     queryFn: async () => {
-      if (!tenantId) {
-        return { notificationPreferences: DEFAULT_PREFERENCES };
-      }
-      const res = await fetch(
-        `/api/notifications/preferences?tenantId=${encodeURIComponent(tenantId)}`,
-      );
+      const res = await fetch('/api/notifications/preferences');
       if (!res.ok) throw new Error(`Failed to fetch preferences: ${res.status}`);
       return res.json() as Promise<UserPreferences>;
     },
@@ -70,18 +62,14 @@ export function NotificationSettings({ tenantId }: NotificationSettingsProps) {
 
   const updateMutation = useMutation({
     mutationFn: async (updates: Partial<NotificationPreferences>) => {
-      if (!tenantId) return;
-      await fetch(
-        `/api/notifications/preferences?tenantId=${encodeURIComponent(tenantId)}`,
-        {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updates),
-        },
-      );
+      await fetch('/api/notifications/preferences', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['notification-preferences', tenantId] });
+      void queryClient.invalidateQueries({ queryKey: ['notification-preferences'] });
     },
   });
 

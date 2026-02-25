@@ -31,22 +31,20 @@ export interface SyncHistoryData {
 /**
  * useSyncHistory — fetches integration status + sync run history.
  *
- * Uses /api/integrations/status (Phase 2 endpoint) for overall freshness
- * and integration-level status. Sync run details are derived from the
- * freshness response until a dedicated history endpoint is added.
+ * tenantId is no longer accepted — the API route reads it from the session cookie.
+ * Middleware ensures the user is authenticated before reaching dashboard pages.
+ *
+ * Uses /api/integrations/status for overall freshness and integration-level status.
+ * Sync run details are derived from the freshness response until a dedicated
+ * history endpoint is added.
  *
  * staleTime: 2 minutes — health data should be relatively fresh.
  */
-export function useSyncHistory(tenantId?: string) {
+export function useSyncHistory() {
   return useQuery<SyncHistoryData>({
-    queryKey: ['syncHistory', tenantId],
+    queryKey: ['syncHistory'],
     queryFn: async () => {
-      const headers: Record<string, string> = {};
-      if (tenantId) {
-        headers['X-Tenant-Id'] = tenantId;
-      }
-
-      const res = await fetch('/api/integrations/status', { headers });
+      const res = await fetch('/api/integrations/status');
       if (!res.ok) {
         throw new Error(`Failed to fetch sync history: ${res.status}`);
       }
@@ -97,7 +95,6 @@ export function useSyncHistory(tenantId?: string) {
         warnings: freshness.warnings,
       };
     },
-    enabled: !!tenantId,
     staleTime: 2 * 60 * 1000,
   });
 }

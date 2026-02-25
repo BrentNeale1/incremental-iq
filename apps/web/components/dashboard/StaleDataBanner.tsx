@@ -5,10 +5,6 @@ import { AlertTriangle, X } from 'lucide-react';
 import { useFreshness } from '@/lib/hooks/useFreshness';
 import { Button } from '@/components/ui/button';
 
-export interface StaleDataBannerProps {
-  tenantId?: string;
-}
-
 /**
  * StaleDataBanner — inline warning banner shown at the top of any page
  * when one or more integrations have not synced in >24 hours.
@@ -21,9 +17,10 @@ export interface StaleDataBannerProps {
  * - Dismissable per session (local React state — reappears on page reload)
  *
  * If all integrations are fresh, renders nothing.
+ * tenantId is no longer accepted — the API route reads it from the session cookie.
  */
-export function StaleDataBanner({ tenantId }: StaleDataBannerProps) {
-  const { data: freshnessData } = useFreshness(tenantId);
+export function StaleDataBanner() {
+  const { data: freshnessData } = useFreshness();
   const [dismissed, setDismissed] = React.useState(false);
 
   if (dismissed) return null;

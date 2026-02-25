@@ -62,7 +62,6 @@ const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
 };
 
 function useCampaignData(
-  tenantId: string | undefined,
   dateRange: DateRange,
   platform: string | undefined,
   level: DrillLevel,
@@ -71,10 +70,9 @@ function useCampaignData(
   const to = format(dateRange.to, 'yyyy-MM-dd');
 
   return useQuery<ApiCampaignRow[]>({
-    queryKey: ['campaigns-table', tenantId, from, to, platform, level],
+    queryKey: ['campaigns-table', from, to, platform, level],
     queryFn: async () => {
       const params = new URLSearchParams({
-        tenantId: tenantId!,
         from,
         to,
         ...(platform && platform !== 'all' ? { platform } : {}),
@@ -84,7 +82,6 @@ function useCampaignData(
       if (!res.ok) throw new Error(`Failed to fetch campaigns: ${res.status}`);
       return res.json() as Promise<ApiCampaignRow[]>;
     },
-    enabled: !!tenantId,
     staleTime: 5 * 60 * 1000,
   });
 }
@@ -141,7 +138,6 @@ function SortButton({ column, currentKey, currentDir, onSort, children }: SortBu
 }
 
 interface CampaignTableProps {
-  tenantId: string | undefined;
   dateRange: DateRange;
   platform?: string;
 }
@@ -153,14 +149,15 @@ interface CampaignTableProps {
  * Columns: Name, Platform, Funnel Stage, Spend, Revenue, ROAS, Lift, Confidence, Status
  * Client-side sort on any column.
  * Comfortable table spacing with hover highlights.
+ * tenantId is no longer needed — the API reads it from the session cookie.
  */
-export function CampaignTable({ tenantId, dateRange, platform }: CampaignTableProps) {
+export function CampaignTable({ dateRange, platform }: CampaignTableProps) {
   const [level, setLevel] = React.useState<DrillLevel>('campaign');
   const [sortKey, setSortKey] = React.useState<SortKey | null>('spend');
   const [sortDir, setSortDir] = React.useState<SortDir>('desc');
   const [expandedRows, setExpandedRows] = React.useState<Set<string>>(new Set());
 
-  const { data: rows, isLoading, isError } = useCampaignData(tenantId, dateRange, platform, level);
+  const { data: rows, isLoading, isError } = useCampaignData(dateRange, platform, level);
 
   const sorted = React.useMemo(() => {
     if (!rows) return [];

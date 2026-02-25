@@ -17,17 +17,19 @@ export interface SaturationCurve {
 /**
  * useSaturation — fetches Hill saturation curve parameters from /api/dashboard/saturation.
  *
+ * tenantId is no longer accepted — the API route reads it from the session cookie.
+ * Middleware ensures the user is authenticated before reaching dashboard pages.
+ *
  * Optional campaignId narrows to a single campaign's saturation curve.
  *
  * queryKey includes all params so refetch fires when campaign selection changes.
  * staleTime: 10 minutes (saturation curves change slowly)
  */
-export function useSaturation(tenantId: string | undefined, campaignId?: string) {
+export function useSaturation(campaignId?: string) {
   return useQuery<SaturationCurve[]>({
-    queryKey: ['saturation', tenantId, campaignId],
+    queryKey: ['saturation', campaignId],
     queryFn: async () => {
       const params = new URLSearchParams({
-        tenantId: tenantId!,
         ...(campaignId ? { campaignId } : {}),
       });
       const res = await fetch(`/api/dashboard/saturation?${params.toString()}`);
@@ -36,7 +38,6 @@ export function useSaturation(tenantId: string | undefined, campaignId?: string)
       }
       return res.json() as Promise<SaturationCurve[]>;
     },
-    enabled: !!tenantId,
     staleTime: 10 * 60 * 1000,
   });
 }

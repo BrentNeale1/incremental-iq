@@ -82,7 +82,6 @@ const PLATFORM_LABELS: Record<string, string> = {
 };
 
 function useDrillData(
-  tenantId: string | undefined,
   dateRange: DateRange,
   platform: string | undefined,
   level: DrillLevel,
@@ -91,10 +90,9 @@ function useDrillData(
   const to = format(dateRange.to, 'yyyy-MM-dd');
 
   return useQuery<DrillDownRow[]>({
-    queryKey: ['drill-down', tenantId, from, to, platform, level],
+    queryKey: ['drill-down', from, to, platform, level],
     queryFn: async () => {
       const params = new URLSearchParams({
-        tenantId: tenantId!,
         from,
         to,
         level,
@@ -105,7 +103,6 @@ function useDrillData(
       // Cast — the API returns ApiCampaignRow; we treat saturationPct + action as optional extras
       return (res.json() as Promise<DrillDownRow[]>);
     },
-    enabled: !!tenantId,
     staleTime: 5 * 60 * 1000,
   });
 }
@@ -162,7 +159,6 @@ function SortButton({ column, currentKey, currentDir, onSort, children }: SortBu
 }
 
 interface DrillDownTableProps {
-  tenantId: string | undefined;
   dateRange: DateRange;
   onSelectRow?: (row: DrillDownRow) => void;
 }
@@ -180,8 +176,9 @@ interface DrillDownTableProps {
  *   - Custom filters: text search, platform dropdown, confidence range
  *
  * Per design spec: RPRT-03 campaign -> cluster -> channel -> overall drill-down.
+ * tenantId is no longer needed — the API reads it from the session cookie.
  */
-export function DrillDownTable({ tenantId, dateRange, onSelectRow }: DrillDownTableProps) {
+export function DrillDownTable({ dateRange, onSelectRow }: DrillDownTableProps) {
   const [level, setLevel] = React.useState<DrillLevel>('campaign');
   const [sortKey, setSortKey] = React.useState<SortKey | null>('confidence');
   const [sortDir, setSortDir] = React.useState<SortDir>('desc');
@@ -192,7 +189,7 @@ export function DrillDownTable({ tenantId, dateRange, onSelectRow }: DrillDownTa
   const [platformFilter, setPlatformFilter] = React.useState<string>('all');
   const [minConfidence, setMinConfidence] = React.useState<number>(0);
 
-  const { data: rows, isLoading, isError } = useDrillData(tenantId, dateRange, platformFilter !== 'all' ? platformFilter : undefined, level);
+  const { data: rows, isLoading, isError } = useDrillData(dateRange, platformFilter !== 'all' ? platformFilter : undefined, level);
 
   const filtered = React.useMemo(() => {
     if (!rows) return [];

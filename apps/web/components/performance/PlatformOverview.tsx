@@ -16,7 +16,6 @@ interface PlatformStats {
 }
 
 function usePlatformStats(
-  tenantId: string | undefined,
   dateRange: DateRange,
   platform: string | undefined,
 ): { data: PlatformStats | undefined; isLoading: boolean } {
@@ -24,10 +23,9 @@ function usePlatformStats(
   const to = format(dateRange.to, 'yyyy-MM-dd');
 
   const { data: rows, isLoading } = useQuery<ApiCampaignRow[]>({
-    queryKey: ['campaigns-table', tenantId, from, to, platform, 'campaign'],
+    queryKey: ['campaigns-table', from, to, platform, 'campaign'],
     queryFn: async () => {
       const params = new URLSearchParams({
-        tenantId: tenantId!,
         from,
         to,
         ...(platform && platform !== 'all' ? { platform } : {}),
@@ -37,7 +35,6 @@ function usePlatformStats(
       if (!res.ok) throw new Error(`Failed: ${res.status}`);
       return res.json() as Promise<ApiCampaignRow[]>;
     },
-    enabled: !!tenantId,
     staleTime: 5 * 60 * 1000,
   });
 
@@ -79,7 +76,6 @@ function StatCard({ label, value, isLoading }: StatCardProps) {
 }
 
 interface PlatformOverviewProps {
-  tenantId: string | undefined;
   dateRange: DateRange;
   platform?: string;
 }
@@ -89,9 +85,10 @@ interface PlatformOverviewProps {
  *
  * Shows: Total Spend, Total Revenue, Avg ROAS, Campaign Count
  * Data reuses the same TanStack Query cache as CampaignTable (level=campaign).
+ * tenantId is no longer needed — the API reads it from the session cookie.
  */
-export function PlatformOverview({ tenantId, dateRange, platform }: PlatformOverviewProps) {
-  const { data: stats, isLoading } = usePlatformStats(tenantId, dateRange, platform);
+export function PlatformOverview({ dateRange, platform }: PlatformOverviewProps) {
+  const { data: stats, isLoading } = usePlatformStats(dateRange, platform);
 
   const fmtCurrency = (v: number) =>
     new Intl.NumberFormat('en-US', {

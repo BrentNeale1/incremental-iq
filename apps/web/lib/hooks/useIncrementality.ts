@@ -19,6 +19,9 @@ export interface IncrementalityScore {
 /**
  * useIncrementality — fetches incrementality scores from /api/dashboard/incrementality.
  *
+ * tenantId is no longer accepted — the API route reads it from the session cookie.
+ * Middleware ensures the user is authenticated before reaching dashboard pages.
+ *
  * Optional campaignId narrows to a single campaign's time series for overlay charts.
  * scoreType defaults to 'adjusted' (seasonally corrected).
  *
@@ -26,15 +29,13 @@ export interface IncrementalityScore {
  * staleTime: 5 minutes
  */
 export function useIncrementality(
-  tenantId: string | undefined,
   campaignId?: string,
   scoreType: 'adjusted' | 'raw' = 'adjusted',
 ) {
   return useQuery<IncrementalityScore[]>({
-    queryKey: ['incrementality', tenantId, campaignId, scoreType],
+    queryKey: ['incrementality', campaignId, scoreType],
     queryFn: async () => {
       const params = new URLSearchParams({
-        tenantId: tenantId!,
         scoreType,
         ...(campaignId ? { campaignId } : {}),
       });
@@ -44,7 +45,6 @@ export function useIncrementality(
       }
       return res.json() as Promise<IncrementalityScore[]>;
     },
-    enabled: !!tenantId,
     staleTime: 5 * 60 * 1000,
   });
 }

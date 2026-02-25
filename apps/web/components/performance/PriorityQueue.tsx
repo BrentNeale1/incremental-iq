@@ -16,10 +16,6 @@ const ACTION_PRIORITY: Record<Recommendation['action'], number> = {
   watch: 2,
 };
 
-interface PriorityQueueProps {
-  tenantId: string | undefined;
-}
-
 /**
  * PriorityQueue — ranked list of urgent campaign actions.
  *
@@ -30,10 +26,11 @@ interface PriorityQueueProps {
  * Caps at 10 visible items with a "Show all" expander.
  *
  * Per user decision: "Priority queue at top — urgent campaign actions ranked: scale, watch, investigate"
+ * tenantId is no longer needed — the API reads it from the session cookie.
  */
-export function PriorityQueue({ tenantId }: PriorityQueueProps) {
+export function PriorityQueue() {
   const [showAll, setShowAll] = React.useState(false);
-  const { data: recommendations, isLoading, isError } = useRecommendations(tenantId);
+  const { data: recommendations, isLoading, isError } = useRecommendations();
 
   const sorted = React.useMemo(() => {
     if (!recommendations) return [];

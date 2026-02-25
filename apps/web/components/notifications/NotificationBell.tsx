@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { useNotificationStore } from '@/lib/store/notifications';
 
 export interface NotificationBellProps {
-  tenantId?: string;
   onOpen: () => void;
 }
 
@@ -17,23 +16,21 @@ export interface NotificationBellProps {
  * Polls /api/notifications?unreadOnly=true every 60 seconds (Pitfall 8 — avoid
  * hammering the API). Updates the global Zustand store so other components
  * can read the count without making additional API calls.
+ *
+ * tenantId is no longer accepted — the API route reads it from the session cookie.
  */
-export function NotificationBell({ tenantId, onOpen }: NotificationBellProps) {
+export function NotificationBell({ onOpen }: NotificationBellProps) {
   const setUnreadCount = useNotificationStore((s) => s.setUnreadCount);
   const unreadCount = useNotificationStore((s) => s.unreadCount);
 
   // Poll for unread count — staleTime 60s prevents unnecessary refetches
   const { data } = useQuery<{ id: string }[]>({
-    queryKey: ['notifications', 'unread', tenantId],
+    queryKey: ['notifications', 'unread'],
     queryFn: async () => {
-      if (!tenantId) return [];
-      const res = await fetch(
-        `/api/notifications?unreadOnly=true&tenantId=${encodeURIComponent(tenantId)}`,
-      );
+      const res = await fetch('/api/notifications?unreadOnly=true');
       if (!res.ok) throw new Error(`Failed to fetch notifications: ${res.status}`);
       return res.json() as Promise<{ id: string }[]>;
     },
-    enabled: !!tenantId,
     staleTime: 60_000, // 60 seconds — Pitfall 8
     refetchInterval: 60_000,
   });

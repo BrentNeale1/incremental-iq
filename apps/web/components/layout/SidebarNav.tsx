@@ -75,10 +75,12 @@ function FreshnessDot({ status }: { status: 'healthy' | 'warning' | 'error' | 'u
  * Freshness dots reflect global integration health (green/yellow/red).
  * Per-route granularity is a future enhancement; current implementation
  * shows global status on all items for simplicity.
+ *
+ * tenantId is no longer accepted — the API route reads it from the session cookie.
  */
-export function SidebarNav({ tenantId }: { tenantId?: string }) {
+export function SidebarNav() {
   const pathname = usePathname();
-  const { data: freshnessData } = useFreshness(tenantId);
+  const { data: freshnessData } = useFreshness();
 
   const globalStatus = freshnessData?.globalStatus ?? 'unknown';
 

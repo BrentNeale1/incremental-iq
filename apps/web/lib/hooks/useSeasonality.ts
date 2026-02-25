@@ -32,18 +32,20 @@ export interface SeasonalityData {
 /**
  * useSeasonality — fetches seasonal events and historical performance.
  *
- * Endpoint: GET /api/dashboard/seasonality?tenantId=X&months=6
+ * tenantId is no longer accepted — the API route reads it from the session cookie.
+ * Middleware ensures the user is authenticated before reaching dashboard pages.
+ *
+ * Endpoint: GET /api/dashboard/seasonality?months=6
  * Returns: { upcoming: SeasonalEvent[], historical: HistoricalPerformance[] }
  *
- * queryKey: ['seasonality', tenantId, months]
+ * queryKey: ['seasonality', months]
  * staleTime: 30 minutes — seasonal data changes rarely
  */
-export function useSeasonality(tenantId: string | undefined, months = 6) {
+export function useSeasonality(months = 6) {
   return useQuery<SeasonalityData>({
-    queryKey: ['seasonality', tenantId, months],
+    queryKey: ['seasonality', months],
     queryFn: async () => {
       const params = new URLSearchParams({
-        tenantId: tenantId!,
         months: String(months),
       });
       const res = await fetch(`/api/dashboard/seasonality?${params.toString()}`);
@@ -52,7 +54,6 @@ export function useSeasonality(tenantId: string | undefined, months = 6) {
       }
       return res.json() as Promise<SeasonalityData>;
     },
-    enabled: !!tenantId,
     staleTime: 30 * 60 * 1000,
   });
 }

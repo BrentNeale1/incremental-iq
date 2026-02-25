@@ -56,11 +56,11 @@ export function DashboardLayoutClient({
         <SidebarProvider defaultOpen={true}>
           <AppSidebar user={user} />
           <div className="flex min-h-screen flex-1 flex-col overflow-hidden">
-            <AppHeader tenantId={tenantId} />
+            <AppHeader />
             <main className="flex-1 overflow-auto p-4 sm:p-6">
               <div className="mx-auto max-w-7xl space-y-4">
                 {/* Stale data banner — shown when any integration >24h stale */}
-                <StaleDataBanner tenantId={tenantId} />
+                <StaleDataBanner />
                 {children}
               </div>
             </main>

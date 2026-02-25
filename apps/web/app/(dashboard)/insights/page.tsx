@@ -17,7 +17,6 @@ import {
 import { ChevronDownIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useExportContext } from '@/lib/export/context';
-import { useTenantId } from '@/lib/auth/tenant-context';
 
 /**
  * Statistical Insights page — analyst-focused deep-dive into model outputs.
@@ -33,21 +32,20 @@ import { useTenantId } from '@/lib/auth/tenant-context';
  * MethodologySidebar shows full model details for the selected campaign row.
  *
  * RPRT-03: Drill-down hierarchy; RPRT-07: Analyst model transparency.
+ * tenantId comes from session cookie automatically — no PLACEHOLDER_TENANT_ID.
  */
 export default function StatisticalInsightsPage() {
-  const tenantId = useTenantId();
   const dateRange = useDashboardStore((s) => s.dateRange);
 
   const { setExportData } = useExportContext();
 
-  // Incrementality scores for all campaigns
+  // Incrementality scores for all campaigns — tenantId from session cookie
   const { data: scores, isLoading: scoresLoading } = useIncrementality(
-    tenantId,
     undefined,
     'adjusted',
   );
 
-  // Saturation for selected campaign
+  // Saturation for selected campaign — tenantId from session cookie
   React.useEffect(() => {
     if (scores && scores.length > 0) {
       setExportData(scores as unknown as Record<string, unknown>[], 'statistical-insights');
@@ -57,10 +55,7 @@ export default function StatisticalInsightsPage() {
   const [selectedRow, setSelectedRow] = React.useState<DrillDownRow | null>(null);
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
-  const { data: saturationData } = useSaturation(
-    tenantId,
-    selectedRow?.id,
-  );
+  const { data: saturationData } = useSaturation(selectedRow?.id);
 
   const selectedScore = React.useMemo(() => {
     if (!scores || !selectedRow) return null;
@@ -220,7 +215,6 @@ export default function StatisticalInsightsPage() {
             </div>
             <CollapsibleContent>
               <DrillDownTable
-                tenantId={tenantId}
                 dateRange={dateRange}
                 onSelectRow={(row) => {
                   setSelectedRow(row);

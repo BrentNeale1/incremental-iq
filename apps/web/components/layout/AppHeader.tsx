@@ -22,10 +22,6 @@ const PAGE_TITLES: Record<string, string> = {
   '/health': 'Data Health',
 };
 
-interface AppHeaderProps {
-  tenantId: string;
-}
-
 /**
  * AppHeader — sticky top bar shared by all dashboard pages.
  *
@@ -38,8 +34,9 @@ interface AppHeaderProps {
  *   - NotificationBell with unread count badge (wired in Plan 06)
  *
  * Notification panel: Sheet slide-over from right on all screen sizes.
+ * tenantId is no longer accepted — API routes read it from the session cookie.
  */
-export function AppHeader({ tenantId }: AppHeaderProps) {
+export function AppHeader() {
   const pathname = usePathname();
   const title = PAGE_TITLES[pathname] ?? 'Dashboard';
   const [notificationsOpen, setNotificationsOpen] = React.useState(false);
@@ -66,16 +63,12 @@ export function AppHeader({ tenantId }: AppHeaderProps) {
           <ExportButton data={exportData} filename={exportFilename} />
 
           {/* Notification bell — opens panel */}
-          <NotificationBell
-            tenantId={tenantId}
-            onOpen={() => setNotificationsOpen(true)}
-          />
+          <NotificationBell onOpen={() => setNotificationsOpen(true)} />
         </div>
       </header>
 
       {/* Notification panel — Sheet slide-over from right */}
       <NotificationPanel
-        tenantId={tenantId}
         open={notificationsOpen}
         onClose={() => setNotificationsOpen(false)}
       />
