@@ -21,3 +21,7 @@ export * from './scoring';
 
 // Phase 5: Market detection from campaign geo targeting metadata
 export * from './market-detection';
+
+// Phase 5-02: GA4 connector for lead-gen outcome source
+export { GA4Connector } from './connectors/ga4';
+export type { GA4Property, GA4KeyEvent } from './connectors/ga4';
