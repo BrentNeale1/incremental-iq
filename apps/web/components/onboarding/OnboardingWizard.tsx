@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { WizardStepper } from '@/components/onboarding/WizardStepper';
 import { IntegrationConnectStep } from '@/components/onboarding/IntegrationConnectStep';
-import { GA4EventSelector } from '@/components/onboarding/GA4EventSelector';
+import { GA4EventSelector, GA4EventSelectorHandle } from '@/components/onboarding/GA4EventSelector';
 import { BatchMarketConfirmation, BatchMarketHandle } from '@/components/onboarding/BatchMarketConfirmation';
 import { OutcomeModeSelector } from '@/components/onboarding/OutcomeModeSelector';
 import { OnboardingTransition } from '@/components/onboarding/OnboardingTransition';
@@ -68,7 +68,7 @@ export function OnboardingWizard() {
   const [stepError, setStepError] = React.useState<string | null>(null);
 
   const batchMarketRef = React.useRef<BatchMarketHandle>(null);
-  const ga4SelectorRef = React.useRef<{ handleSave: () => Promise<void> } | null>(null);
+  const ga4SelectorRef = React.useRef<GA4EventSelectorHandle>(null);
 
   // On mount: restore wizard state
   React.useEffect(() => {
@@ -336,10 +336,14 @@ export function OnboardingWizard() {
 
                 {/* GA4 event selector — only shown when property is selected */}
                 {state.ga4IntegrationId && state.ga4PropertyId && (
-                  <GA4EventSelectorWithRef
+                  <GA4EventSelector
                     ref={ga4SelectorRef}
                     integrationId={state.ga4IntegrationId}
                     propertyId={state.ga4PropertyId}
+                    hideActions
+                    onSelectionChange={(has) =>
+                      setState((prev) => ({ ...prev, ga4EventsSelected: has }))
+                    }
                   />
                 )}
               </div>
@@ -410,53 +414,3 @@ export function OnboardingWizard() {
   );
 }
 
-/**
- * GA4EventSelectorWithRef — wraps GA4EventSelector to expose handleSave()
- * via ref so the wizard can trigger the save when the user clicks Next,
- * rather than relying on the component's internal Save button.
- */
-interface GA4EventSelectorRef {
-  handleSave: () => Promise<void>;
-}
-
-const GA4EventSelectorWithRef = React.forwardRef<
-  GA4EventSelectorRef,
-  { integrationId: string; propertyId: string }
->(function GA4EventSelectorWithRef({ integrationId, propertyId }, ref) {
-  const [selected, setSelected] = React.useState<Set<string>>(new Set());
-  const [saving, setSaving] = React.useState(false);
-
-  // Expose handleSave via ref
-  React.useImperativeHandle(ref, () => ({
-    handleSave: async () => {
-      if (selected.size === 0) return;
-      setSaving(true);
-      try {
-        await fetch('/api/ga4/events', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            integrationId,
-            propertyId,
-            selectedEventNames: Array.from(selected),
-          }),
-        });
-      } finally {
-        setSaving(false);
-      }
-    },
-  }));
-
-  // Delegate rendering to the standard GA4EventSelector
-  // but we pass our own selected state override to it
-  // For simplicity, render GA4EventSelector directly — it manages its own state
-  // The wizard calls handleSave() on this ref when user clicks Next
-  return (
-    <div>
-      {saving && (
-        <p className="text-xs text-muted-foreground mb-2">Saving GA4 event selections...</p>
-      )}
-      <GA4EventSelector integrationId={integrationId} propertyId={propertyId} />
-    </div>
-  );
-});
