@@ -148,7 +148,10 @@ Plans:
   1. /api/recommendations accepts optional marketId query parameter
   2. When marketId is provided, only campaigns belonging to that market are included in recommendation generation
   3. MarketSelector in AppHeader filters recommendations the same way it filters other dashboard views
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 08-01-PLAN.md — Backend: fix Drizzle chain bug, add market fields to Recommendation type + engine, market summary in API response
+- [ ] 08-02-PLAN.md — Frontend: client-side market filtering in useRecommendations, market badges on cards, filter label + edge case UX
 
 ## Progress
 
@@ -164,4 +167,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 5. Expanded Connectors and Multi-Market | 4/4 | Complete | 2026-02-25 |
 | 6. Authentication | 4/4 | Complete   | 2026-02-25 |
 | 7. Onboarding & Integration Connect | 2/2 | Complete   | 2026-02-25 |
-| 8. Market-Aware Recommendations | 0/? | Pending | |
+| 8. Market-Aware Recommendations | 0/2 | Pending | |
