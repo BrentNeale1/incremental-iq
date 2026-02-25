@@ -123,6 +123,17 @@ None — no external service configuration required.
 - MarketSelector in AppHeader already wired to `selectedMarket` in Zustand store (Phase 5/7 work)
 - Users can now select a market and instantly see filtered recommendations with market badges
 
+## Self-Check: PASSED
+
+- FOUND: apps/web/lib/hooks/useRecommendations.ts
+- FOUND: apps/web/components/recommendations/RecommendationCard.tsx
+- FOUND: apps/web/components/recommendations/RecommendationAnalystCard.tsx
+- FOUND: apps/web/components/recommendations/LowConfidenceCard.tsx
+- FOUND: apps/web/app/(dashboard)/page.tsx
+- FOUND: .planning/phases/08-market-aware-recommendations/08-02-SUMMARY.md
+- COMMIT b31e756: verified in git log
+- COMMIT ca5039c: verified in git log
+
 ---
 *Phase: 08-market-aware-recommendations*
 *Completed: 2026-02-26*
