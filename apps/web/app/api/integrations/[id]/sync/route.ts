@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { headers } from 'next/headers';
+import { auth } from '@/auth';
 import { eq, and, gte, count } from 'drizzle-orm';
 import { db } from '@incremental-iq/db';
 import { integrations, syncRuns } from '@incremental-iq/db';
@@ -11,32 +13,31 @@ import type { Platform } from '@incremental-iq/ingestion';
  * Manual "Sync now" endpoint. Enqueues a manual sync job in BullMQ and
  * returns 202 Accepted immediately — the sync runs asynchronously.
  *
+ * tenantId is extracted from the authenticated session — not from a header.
+ * Returns 401 Unauthorized if no valid session exists.
+ *
  * Rate limiting (user decision: prevent API abuse):
  *   - Max 3 manual syncs per integration per day
  *   - If a manual sync was triggered in the last hour, return 429
  *   - Rate limit is checked against sync_runs table (no Redis required)
  *
- * Auth: Phase 2 uses X-Tenant-Id header — auth is Phase 6.
- *
  * Returns:
  *   202: { message: 'Sync queued', jobId: string }
- *   429: { error: 'Rate limit exceeded', retryAfter: number }
+ *   401: { error: 'Unauthorized' }
  *   404: { error: 'Integration not found' }
- *   400: { error: 'Missing X-Tenant-Id header' }
+ *   429: { error: 'Rate limit exceeded', retryAfter: number }
  */
 export async function POST(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ): Promise<NextResponse> {
-  const { id: integrationId } = await params;
-  const tenantId = request.headers.get('x-tenant-id');
-
-  if (!tenantId) {
-    return NextResponse.json(
-      { error: 'Missing X-Tenant-Id header' },
-      { status: 400 },
-    );
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+  const tenantId = session.user.tenantId;
+
+  const { id: integrationId } = await params;
 
   // Look up the integration to verify it exists and get platform
   const [integration] = await db

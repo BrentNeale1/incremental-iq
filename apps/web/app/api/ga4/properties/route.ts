@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { headers } from 'next/headers';
+import { auth } from '@/auth';
 import { eq, and } from 'drizzle-orm';
 import { withTenant, integrations } from '@incremental-iq/db';
 import { decryptToken } from '@incremental-iq/ingestion';
@@ -10,29 +12,28 @@ import { GA4Connector } from '@incremental-iq/ingestion';
  * Lists all GA4 properties the authorized user has access to.
  * Called after GA4 OAuth callback to let the user select which property to track.
  *
+ * tenantId is extracted from the authenticated session — not from a header.
+ * Returns 401 Unauthorized if no valid session exists.
+ *
  * RESEARCH.md Pitfall 5: if only one property exists, include autoSelected: true
  * so the client can skip the property selection step.
  *
  * Query params:
  *   integrationId  — UUID of the GA4 integration (returned from OAuth callback)
  *
- * Headers:
- *   X-Tenant-Id    — Tenant ID for RLS context
- *
  * Returns:
  *   200: { properties: Array<{ propertyId, displayName }>, autoSelected: boolean }
  *   400: Missing params
+ *   401: { error: 'Unauthorized' }
  *   404: Integration not found
  *   500: Server error
  */
 export async function GET(request: NextRequest): Promise<NextResponse> {
-  const tenantId = request.headers.get('x-tenant-id');
-  if (!tenantId) {
-    return NextResponse.json(
-      { error: 'Missing X-Tenant-Id header' },
-      { status: 400 }
-    );
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+  const tenantId = session.user.tenantId;
 
   const { searchParams } = request.nextUrl;
   const integrationId = searchParams.get('integrationId');

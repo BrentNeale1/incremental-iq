@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { headers } from 'next/headers';
+import { auth } from '@/auth';
 import { eq, inArray } from 'drizzle-orm';
 import { formatDistanceToNow } from 'date-fns';
 import { db } from '@incremental-iq/db';
@@ -11,6 +13,9 @@ import { integrations, syncRuns } from '@incremental-iq/db';
  * Used by the main dashboard to show the integration health indicator
  * (user decision: visible from main dashboard).
  *
+ * tenantId is extracted from the authenticated session — not from a header.
+ * Returns 401 Unauthorized if no valid session exists.
+ *
  * Global health levels:
  *   healthy — all integrations connected and synced within 24h
  *   warning — any integration synced > 24h ago, or any partial failure
@@ -19,21 +24,16 @@ import { integrations, syncRuns } from '@incremental-iq/db';
  * Response includes warnings array for any integrations needing attention
  * (triggers the in-app warning banner — user decision).
  *
- * Auth: Phase 2 uses X-Tenant-Id header — auth is Phase 6.
- *
  * Returns:
  *   200: GlobalFreshnessStatus JSON
- *   400: { error: 'Missing X-Tenant-Id header' }
+ *   401: { error: 'Unauthorized' }
  */
-export async function GET(request: NextRequest): Promise<NextResponse> {
-  const tenantId = request.headers.get('x-tenant-id');
-
-  if (!tenantId) {
-    return NextResponse.json(
-      { error: 'Missing X-Tenant-Id header' },
-      { status: 400 },
-    );
+export async function GET(_request: NextRequest): Promise<NextResponse> {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+  const tenantId = session.user.tenantId;
 
   // Query all integrations for this tenant
   const allIntegrations = await db

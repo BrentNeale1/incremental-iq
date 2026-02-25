@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { headers } from 'next/headers';
+import { auth } from '@/auth';
 import { detectMarketsForTenant } from '@incremental-iq/ingestion';
 
 /**
@@ -9,28 +11,24 @@ import { detectMarketsForTenant } from '@incremental-iq/ingestion';
  * upserts the results into the markets and campaign_markets tables,
  * and returns the detected/updated markets array.
  *
+ * tenantId is extracted from the authenticated session — not from query params.
+ * Returns 401 Unauthorized if no valid session exists.
+ *
  * Called:
  *   - During onboarding after ad accounts are connected
  *   - On-demand to re-detect when new campaigns are added
  *
- * Query params:
- *   tenantId (required) — UUID of the requesting tenant
- *
  * Returns:
  *   200: DetectedMarket[]
- *   400: { error: string }
+ *   401: { error: 'Unauthorized' }
  *   500: { error: string, details: string }
  */
-export async function POST(request: NextRequest): Promise<NextResponse> {
-  const { searchParams } = new URL(request.url);
-  const tenantId = searchParams.get('tenantId');
-
-  if (!tenantId) {
-    return NextResponse.json(
-      { error: 'Missing required query parameter: tenantId' },
-      { status: 400 },
-    );
+export async function POST(_request: NextRequest): Promise<NextResponse> {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+  const tenantId = session.user.tenantId;
 
   try {
     const detectedMarkets = await detectMarketsForTenant(tenantId);

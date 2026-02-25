@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { headers } from 'next/headers';
+import { auth } from '@/auth';
 import { eq, and } from 'drizzle-orm';
 import { withTenant, integrations } from '@incremental-iq/db';
 import { decryptToken } from '@incremental-iq/ingestion';
@@ -10,6 +12,9 @@ import { GA4Connector } from '@incremental-iq/ingestion';
  * Lists all key events (conversion events) for a selected GA4 property.
  * These are the events the user picks from as their "lead" signals.
  *
+ * tenantId is extracted from the authenticated session — not from a header.
+ * Returns 401 Unauthorized if no valid session exists.
+ *
  * The GA4 Admin API uses `listKeyEventsAsync` (NOT the deprecated
  * `conversionEvents` endpoint — RESEARCH.md State of the Art).
  *
@@ -17,23 +22,19 @@ import { GA4Connector } from '@incremental-iq/ingestion';
  *   integrationId  — UUID of the GA4 integration
  *   propertyId     — GA4 property ID (numeric string, e.g., '123456789')
  *
- * Headers:
- *   X-Tenant-Id    — Tenant ID for RLS context
- *
  * Returns:
  *   200: { events: Array<{ eventName, countingMethod }> }
  *   400: Missing params
+ *   401: { error: 'Unauthorized' }
  *   404: Integration not found
  *   500: Server error
  */
 export async function GET(request: NextRequest): Promise<NextResponse> {
-  const tenantId = request.headers.get('x-tenant-id');
-  if (!tenantId) {
-    return NextResponse.json(
-      { error: 'Missing X-Tenant-Id header' },
-      { status: 400 }
-    );
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+  const tenantId = session.user.tenantId;
 
   const { searchParams } = request.nextUrl;
   const integrationId = searchParams.get('integrationId');
@@ -112,6 +113,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
  * Saves the user's event selection and property ID to the integration metadata.
  * Called after the user has reviewed the key event checklist and confirmed their selections.
  *
+ * tenantId is extracted from the authenticated session — not from a header.
+ * Returns 401 Unauthorized if no valid session exists.
+ *
  * Once selectedEventNames is saved, the GA4 sync worker can start pulling lead counts.
  * If selections change after setup, the full GA4 backfill must be re-triggered
  * (RESEARCH.md Pitfall 7 — changing event selection changes ALL historical data meaning).
@@ -121,23 +125,19 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
  *   propertyId         — GA4 property ID to track (numeric string)
  *   selectedEventNames — Array of event names to count as leads
  *
- * Headers:
- *   X-Tenant-Id    — Tenant ID for RLS context
- *
  * Returns:
  *   200: { success: true, integrationId, selectedEventNames, propertyId }
  *   400: Missing params or validation error
+ *   401: { error: 'Unauthorized' }
  *   404: Integration not found
  *   500: Server error
  */
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  const tenantId = request.headers.get('x-tenant-id');
-  if (!tenantId) {
-    return NextResponse.json(
-      { error: 'Missing X-Tenant-Id header' },
-      { status: 400 }
-    );
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+  const tenantId = session.user.tenantId;
 
   let body: {
     integrationId?: string;

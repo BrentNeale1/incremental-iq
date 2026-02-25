@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { headers } from 'next/headers';
+import { auth } from '@/auth';
 import { eq, and, desc, sql } from 'drizzle-orm';
 import { withTenant, markets } from '@incremental-iq/db';
 
@@ -9,12 +11,12 @@ import { withTenant, markets } from '@incremental-iq/db';
  * Campaign counts serve as confidence indicators in the onboarding UI —
  * e.g., "AU — 87 campaigns", "US — 243 campaigns".
  *
- * Query params:
- *   tenantId (required) — UUID of the requesting tenant
+ * tenantId is extracted from the authenticated session — not from query params.
+ * Returns 401 Unauthorized if no valid session exists.
  *
  * Returns:
  *   200: MarketRow[]
- *   400: { error: string }
+ *   401: { error: 'Unauthorized' }
  */
 
 /**
@@ -23,7 +25,7 @@ import { withTenant, markets } from '@incremental-iq/db';
  * Batch update markets for a tenant.
  * Supports five actions: confirm, rename, merge, add, delete.
  *
- * Request body: { tenantId: string, markets: MarketAction[] }
+ * Request body: { markets: MarketAction[] }
  *
  * Actions:
  *   confirm — set isConfirmed=true on existing market
@@ -35,6 +37,7 @@ import { withTenant, markets } from '@incremental-iq/db';
  * Returns:
  *   200: { markets: MarketRow[] } — updated markets list
  *   400: { error: string }
+ *   401: { error: 'Unauthorized' }
  */
 
 /** Shape of a market row returned by the API. */
@@ -60,7 +63,6 @@ interface MarketAction {
 }
 
 interface PutBody {
-  tenantId: string;
   markets: MarketAction[];
 }
 
@@ -93,16 +95,12 @@ async function getMarketsForTenant(tenantId: string): Promise<MarketRow[]> {
   }));
 }
 
-export async function GET(request: NextRequest): Promise<NextResponse> {
-  const { searchParams } = new URL(request.url);
-  const tenantId = searchParams.get('tenantId');
-
-  if (!tenantId) {
-    return NextResponse.json(
-      { error: 'Missing required query parameter: tenantId' },
-      { status: 400 },
-    );
+export async function GET(_request: NextRequest): Promise<NextResponse> {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+  const tenantId = session.user.tenantId;
 
   try {
     const result = await getMarketsForTenant(tenantId);
@@ -117,6 +115,12 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 }
 
 export async function PUT(request: NextRequest): Promise<NextResponse> {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  const tenantId = session.user.tenantId;
+
   let body: PutBody;
 
   try {
@@ -128,11 +132,11 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
     );
   }
 
-  const { tenantId, markets: actions } = body;
+  const { markets: actions } = body;
 
-  if (!tenantId || !Array.isArray(actions) || actions.length === 0) {
+  if (!Array.isArray(actions) || actions.length === 0) {
     return NextResponse.json(
-      { error: 'Request body must include tenantId and non-empty markets array' },
+      { error: 'Request body must include non-empty markets array' },
       { status: 400 },
     );
   }

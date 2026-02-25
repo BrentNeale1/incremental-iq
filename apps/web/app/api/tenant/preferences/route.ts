@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { headers } from 'next/headers';
+import { auth } from '@/auth';
 import { eq } from 'drizzle-orm';
 import { withTenant, tenants } from '@incremental-iq/db';
 
@@ -7,23 +9,19 @@ import { withTenant, tenants } from '@incremental-iq/db';
  *
  * Returns tenant preferences including outcome mode.
  *
- * Query params:
- *   tenantId (required) — UUID of the requesting tenant
+ * tenantId is extracted from the authenticated session — not from query params.
+ * Returns 401 Unauthorized if no valid session exists.
  *
  * Returns:
  *   200: { outcomeMode: 'ecommerce' | 'lead_gen' }
- *   400: { error: string }
+ *   401: { error: 'Unauthorized' }
  */
-export async function GET(request: NextRequest): Promise<NextResponse> {
-  const { searchParams } = new URL(request.url);
-  const tenantId = searchParams.get('tenantId');
-
-  if (!tenantId) {
-    return NextResponse.json(
-      { error: 'Missing required query parameter: tenantId' },
-      { status: 400 },
-    );
+export async function GET(_request: NextRequest): Promise<NextResponse> {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+  const tenantId = session.user.tenantId;
 
   try {
     const rows = await withTenant(tenantId, (tx) =>
@@ -50,27 +48,37 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
  *
  * Update tenant preferences (outcomeMode).
  *
+ * tenantId is extracted from the authenticated session — not from query params.
+ * Returns 401 Unauthorized if no valid session exists.
+ *
  * Request body:
- *   { tenantId: string, outcomeMode: 'ecommerce' | 'lead_gen' }
+ *   { outcomeMode: 'ecommerce' | 'lead_gen' }
  *
  * Returns:
  *   200: { outcomeMode: string }
  *   400: { error: string }
+ *   401: { error: 'Unauthorized' }
  */
 export async function PUT(request: NextRequest): Promise<NextResponse> {
-  let body: { tenantId: string; outcomeMode: string };
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  const tenantId = session.user.tenantId;
+
+  let body: { outcomeMode: string };
 
   try {
-    body = (await request.json()) as { tenantId: string; outcomeMode: string };
+    body = (await request.json()) as { outcomeMode: string };
   } catch {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const { tenantId, outcomeMode } = body;
+  const { outcomeMode } = body;
 
-  if (!tenantId || !['ecommerce', 'lead_gen'].includes(outcomeMode)) {
+  if (!['ecommerce', 'lead_gen'].includes(outcomeMode)) {
     return NextResponse.json(
-      { error: 'tenantId required, outcomeMode must be ecommerce or lead_gen' },
+      { error: 'outcomeMode must be ecommerce or lead_gen' },
       { status: 400 },
     );
   }

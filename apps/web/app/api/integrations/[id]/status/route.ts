@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { headers } from 'next/headers';
+import { auth } from '@/auth';
 import { eq, and, desc } from 'drizzle-orm';
 import { formatDistanceToNow } from 'date-fns';
 import { db } from '@incremental-iq/db';
@@ -9,32 +11,31 @@ import { integrations, syncRuns } from '@incremental-iq/db';
  *
  * Returns per-integration status and sync history.
  *
+ * tenantId is extracted from the authenticated session — not from a header.
+ * Returns 401 Unauthorized if no valid session exists.
+ *
  * Response includes:
  *   - Integration status, lastSyncedAt, lastSyncStatus
  *   - Human-readable freshness string ("2h ago", "1d ago")
  *   - syncInProgress flag and current progress metadata if a job is running
  *   - Last 7 sync run records (user decision: 5-7 history entries)
  *
- * Auth: Phase 2 uses X-Tenant-Id header — auth is Phase 6.
- *
  * Returns:
  *   200: IntegrationStatus JSON
+ *   401: { error: 'Unauthorized' }
  *   404: { error: 'Integration not found' }
- *   400: { error: 'Missing X-Tenant-Id header' }
  */
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ): Promise<NextResponse> {
-  const { id: integrationId } = await params;
-  const tenantId = request.headers.get('x-tenant-id');
-
-  if (!tenantId) {
-    return NextResponse.json(
-      { error: 'Missing X-Tenant-Id header' },
-      { status: 400 },
-    );
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+  const tenantId = session.user.tenantId;
+
+  const { id: integrationId } = await params;
 
   // Query integration record
   const [integration] = await db
