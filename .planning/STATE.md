@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** Campaign-level incremental lift analysis that tells brands exactly which campaigns to scale, by how much, and for how long — with transparent confidence levels so no recommendation is made without measurable expected impact.
-**Current focus:** Phase 9 - Dashboard Data Wiring Fixes (Complete — Plan 1 of 1 done)
+**Current focus:** Phase 10 - Dashboard Polish and Integration Fixes (In Progress — Plan 1 of 2 done)
 
 ## Current Position
 
-Phase: 9 of 9 (Dashboard Data Wiring Fixes) - Complete
-Plan: 1 of 1 executed
-Status: Phase 9 Plan 1 complete. CampaignRow aligned to API response; buildPlatformData uses row.revenue; useOutcomeMode wired at layout level; KPI/chart labels dynamic based on outcomeMode.
-Last activity: 2026-02-26 — Plan 09-01 executed. Dashboard data wiring bugs fixed.
-Stopped at: Completed 09-01-PLAN.md — CampaignRow fix, buildPlatformData revenue fix, useOutcomeMode wiring, dynamic KPI/chart labels
+Phase: 10 of 11 (Dashboard Polish and Integration Fixes) - In Progress
+Plan: 1 of 2 executed
+Status: Phase 10 Plan 1 complete. dataPoints wired from DB through API to MethodologySidebar; market filter flows from AppHeader Zustand state to insights incrementality API; health and seasonality CSV exports produce flat primitive rows.
+Last activity: 2026-02-26 — Plan 10-01 executed. MRKT-04 and RPRT-05 gaps closed.
+Stopped at: Completed 10-01-PLAN.md — dataPoints API field, market filter wiring in insights page, flat CSV exports for health and seasonality
 
-Progress: [██████████] ~100% (9 phases complete)
+Progress: [██████████] ~100% (10 phases in progress)
 
 ## Performance Metrics
 
@@ -63,6 +63,7 @@ Progress: [██████████] ~100% (9 phases complete)
 | Phase 08-market-aware-recommendations P01 | 8 min | 2 tasks | 3 files |
 | Phase 08-market-aware-recommendations P02 | 4 | 2 tasks | 5 files |
 | Phase 09-dashboard-data-wiring-fixes PP01 | 3 min | 2 tasks | 6 files |
+| Phase 10-dashboard-polish-and-integration-fixes P01 | 3 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -177,6 +178,9 @@ Recent decisions affecting current work:
 - [Phase 08-market-aware-recommendations]: CrossMarketSuggestions reads from queryClient.getQueryData(['recommendations']) — no extra fetch for empty-market cross-market suggestions
 - [Phase 09-dashboard-data-wiring-fixes]: CampaignRow interface realigned to API: single revenue field replaces directRevenue + modeledRevenue (API never had those fields); incrementalRevenue derived as revenue * liftMean in buildPlatformData (v1 approximation)
 - [Phase 09-dashboard-data-wiring-fixes]: useOutcomeMode(tenantId) wired at layout level in DashboardLayoutClient (same pattern as useMarkets); leaf components read outcomeMode directly from Zustand — no prop drilling
+- [Phase 10-dashboard-polish-and-integration-fixes]: dataPoints uses parseInt(score.dataPoints, 10) ?? 0 — Drizzle numeric() returns string, same pattern as liftMean/confidence
+- [Phase 10-dashboard-polish-and-integration-fixes]: marketId in queryKey array prevents TanStack Query from serving stale cached data when market selection changes
+- [Phase 10-dashboard-polish-and-integration-fixes]: Flat export rows use em-dash (U+2014) for null/undefined values — consistent with CONTEXT.md locked decision
 
 ### Pending Todos
 
@@ -196,7 +200,7 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-26
-Stopped at: Completed 09-01-PLAN.md — CampaignRow fix, buildPlatformData revenue fix, useOutcomeMode wiring, dynamic KPI/chart labels.
-Resume with: All planned phases complete. Dashboard data wiring fixes complete.
-Key context: Phase 9 Plan 1 complete. CampaignRow interface aligned to API (revenue not directRevenue/modeledRevenue). buildPlatformData reads row.revenue and derives incrementalRevenue = revenue * liftMean. useOutcomeMode(tenantId) wired in DashboardLayoutClient. KpiCard, PlatformComparisonChart, IncrementalRevenueChart all read outcomeMode from Zustand for dynamic labels.
-Resume file: N/A — all phases complete
+Stopped at: Completed 10-01-PLAN.md — dataPoints API field, market filter wiring in insights page, flat CSV exports for health and seasonality.
+Resume with: Phase 10 Plan 2 if additional dashboard polish tasks exist.
+Key context: Phase 10 Plan 1 complete. dataPoints selected from DB in both incrementality query modes and returned as integer in API response. useIncrementality accepts optional marketId (third param) — included in queryKey and URLSearchParams. Insights page reads selectedMarket from Zustand, passes to useIncrementality, shows empty state when market selected with no data. Health and seasonality pages now pass flat primitive records to setExportData (no [object Object] in CSV exports).
+Resume file: N/A — Phase 10 Plan 1 complete
