@@ -201,17 +201,18 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       );
 
     // Market filter via campaign_markets JOIN
-    if (marketId) {
-      query.innerJoin(
-        campaignMarkets,
-        and(
-          eq(campaignMarkets.campaignId, saturationEstimates.campaignId),
-          eq(campaignMarkets.marketId, marketId),
-        ),
-      );
-    }
+    // Drizzle builder is immutable — must capture return value
+    const filteredQuery = marketId
+      ? query.innerJoin(
+          campaignMarkets,
+          and(
+            eq(campaignMarkets.campaignId, saturationEstimates.campaignId),
+            eq(campaignMarkets.marketId, marketId),
+          ),
+        )
+      : query;
 
-    return query
+    return filteredQuery
       .where(eq(saturationEstimates.tenantId, tenantId))
       .orderBy(desc(saturationEstimates.estimatedAt));
   });

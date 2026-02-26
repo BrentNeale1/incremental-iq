@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useDashboardStore } from '@/lib/store/dashboard';
 import type { MarketInfo } from '@/lib/store/dashboard';
@@ -15,7 +16,7 @@ import type { MarketInfo } from '@/lib/store/dashboard';
 export function useMarkets(tenantId: string | undefined) {
   const setMarkets = useDashboardStore((s) => s.setMarkets);
 
-  return useQuery<MarketInfo[]>({
+  const query = useQuery<MarketInfo[]>({
     queryKey: ['markets', tenantId],
     queryFn: async () => {
       const res = await fetch(`/api/markets?tenantId=${tenantId}`);
@@ -24,8 +25,14 @@ export function useMarkets(tenantId: string | undefined) {
     },
     enabled: !!tenantId,
     staleTime: 5 * 60 * 1000, // 5 minutes
-    onSuccess: (data: MarketInfo[]) => {
-      setMarkets(data);
-    },
   });
+
+  // Sync to Zustand store when data arrives (replaces TQ v5-removed onSuccess)
+  useEffect(() => {
+    if (query.data) {
+      setMarkets(query.data);
+    }
+  }, [query.data, setMarkets]);
+
+  return query;
 }

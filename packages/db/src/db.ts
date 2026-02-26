@@ -25,9 +25,15 @@ export async function withTenant<T>(
   tenantId: string,
   fn: (tx: Parameters<Parameters<typeof db.transaction>[0]>[0]) => Promise<T>
 ): Promise<T> {
+  // Validate UUID format to prevent SQL injection (SET LOCAL doesn't support $1 params)
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(tenantId)) {
+    throw new Error(`Invalid tenant ID format: ${tenantId}`);
+  }
   return db.transaction(async (tx) => {
     // SET LOCAL scopes the config to this transaction only
-    await tx.execute(sql`SET LOCAL app.current_tenant_id = ${tenantId}`);
+    // Must use sql.raw() because SET LOCAL doesn't accept parameterized values
+    await tx.execute(sql`SET LOCAL app.current_tenant_id = '${sql.raw(tenantId)}'`);
     return fn(tx);
   });
 }

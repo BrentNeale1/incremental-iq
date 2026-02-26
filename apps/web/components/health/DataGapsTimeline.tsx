@@ -83,6 +83,20 @@ export function DataGapsTimeline({ integrations, isLoading }: DataGapsTimelinePr
     });
   }, [integrations, days]);
 
+  // Month labels for the header — must be called before any early returns
+  const monthLabels = React.useMemo(() => {
+    const labels: { label: string; dayIndex: number }[] = [];
+    let lastMonth = '';
+    days.forEach((day, i) => {
+      const month = format(day, 'MMM');
+      if (month !== lastMonth) {
+        labels.push({ label: month, dayIndex: i });
+        lastMonth = month;
+      }
+    });
+    return labels;
+  }, [days]);
+
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -103,20 +117,6 @@ export function DataGapsTimeline({ integrations, isLoading }: DataGapsTimelinePr
       </div>
     );
   }
-
-  // Month labels for the header
-  const monthLabels = React.useMemo(() => {
-    const labels: { label: string; dayIndex: number }[] = [];
-    let lastMonth = '';
-    days.forEach((day, i) => {
-      const month = format(day, 'MMM');
-      if (month !== lastMonth) {
-        labels.push({ label: month, dayIndex: i });
-        lastMonth = month;
-      }
-    });
-    return labels;
-  }, [days]);
 
   const CELL_W = 6; // px width per day cell
   const CELL_GAP = 1; // px gap between cells

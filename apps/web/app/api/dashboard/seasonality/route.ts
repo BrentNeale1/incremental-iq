@@ -156,17 +156,18 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
             })
             .from(campaignMetrics);
 
-          if (marketId) {
-            query.innerJoin(
-              campaignMarkets,
-              and(
-                eq(campaignMarkets.campaignId, campaignMetrics.campaignId),
-                eq(campaignMarkets.marketId, marketId),
-              ),
-            );
-          }
+          // Drizzle builder is immutable — must capture return value
+          const filteredQuery = marketId
+            ? query.innerJoin(
+                campaignMarkets,
+                and(
+                  eq(campaignMarkets.campaignId, campaignMetrics.campaignId),
+                  eq(campaignMarkets.marketId, marketId),
+                ),
+              )
+            : query;
 
-          return query.where(
+          return filteredQuery.where(
             and(
               eq(campaignMetrics.tenantId, tenantId),
               sql`${campaignMetrics.date} >= ${periodFromStr}`,

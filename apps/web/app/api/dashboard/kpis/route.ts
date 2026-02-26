@@ -70,17 +70,18 @@ async function aggregateKpis(
       .from(campaignMetrics);
 
     // Market filter: INNER JOIN on campaign_markets when marketId specified
-    if (marketId) {
-      query.innerJoin(
-        campaignMarkets,
-        and(
-          eq(campaignMarkets.campaignId, campaignMetrics.campaignId),
-          eq(campaignMarkets.marketId, marketId),
-        ),
-      );
-    }
+    // Drizzle builder is immutable — must capture return value
+    const filteredQuery = marketId
+      ? query.innerJoin(
+          campaignMarkets,
+          and(
+            eq(campaignMarkets.campaignId, campaignMetrics.campaignId),
+            eq(campaignMarkets.marketId, marketId),
+          ),
+        )
+      : query;
 
-    return query.where(
+    return filteredQuery.where(
       and(
         eq(campaignMetrics.tenantId, tenantId),
         sql`${campaignMetrics.date} >= ${from}`,

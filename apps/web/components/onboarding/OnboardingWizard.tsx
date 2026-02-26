@@ -88,16 +88,24 @@ export function OnboardingWizard() {
           suggestedStep: number;
         };
 
-        const integrations = await integrationsRes.json() as Array<{
-          platform: string;
-          integrationId: string;
-        }>;
+        const integrationsBody = await integrationsRes.json() as {
+          globalStatus: string;
+          integrations: Array<{
+            id: string;
+            platform: string;
+            status: string;
+            accountName: string | null;
+          }>;
+          warnings: string[];
+        };
+
+        const integrations = integrationsBody.integrations ?? [];
 
         // Build connectedIntegrations map
         const connectedMap: Record<string, { integrationId: string }> = {};
         for (const intg of integrations) {
-          if (intg.platform && intg.integrationId) {
-            connectedMap[intg.platform] = { integrationId: intg.integrationId };
+          if (intg.platform && intg.id) {
+            connectedMap[intg.platform] = { integrationId: intg.id };
           }
         }
 
@@ -110,7 +118,7 @@ export function OnboardingWizard() {
           ...prev,
           currentStep: suggestedStep,
           connectedIntegrations: connectedMap,
-          ga4IntegrationId: ga4Intg?.integrationId ?? null,
+          ga4IntegrationId: ga4Intg?.id ?? null,
           ga4EventsSelected: status.ga4EventsSelected,
           marketsConfirmed: status.marketsConfirmed,
           outcomeMode: (status.outcomeMode as 'ecommerce' | 'lead_gen' | null) ?? null,
@@ -157,6 +165,13 @@ export function OnboardingWizard() {
       }
       return next;
     });
+
+    // Trigger market auto-detection after paid channel connects (MRKT-01)
+    if (['meta', 'google'].includes(platform)) {
+      fetch('/api/markets/detect', { method: 'POST' }).catch((err) =>
+        console.error('Market detection failed:', err),
+      );
+    }
   };
 
   // Compute completedSteps for stepper

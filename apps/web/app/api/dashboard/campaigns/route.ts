@@ -182,17 +182,18 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       .from(campaigns);
 
     // Market filter: only include campaigns assigned to the selected market
-    if (marketId) {
-      query.innerJoin(
-        campaignMarkets,
-        and(
-          eq(campaignMarkets.campaignId, campaigns.id),
-          eq(campaignMarkets.marketId, marketId),
-        ),
-      );
-    }
+    // Drizzle builder is immutable — must capture return value
+    const filteredQuery = marketId
+      ? query.innerJoin(
+          campaignMarkets,
+          and(
+            eq(campaignMarkets.campaignId, campaigns.id),
+            eq(campaignMarkets.marketId, marketId),
+          ),
+        )
+      : query;
 
-    return query.where(and(...campaignConditions));
+    return filteredQuery.where(and(...campaignConditions));
   });
 
   if (campaignList.length === 0) {
