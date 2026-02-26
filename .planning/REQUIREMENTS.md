@@ -172,4 +172,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-24*
-*Last updated: 2026-02-25 — Gap closure phases 7-8 created; INTG-04 reset to Pending (partial); RECC-05, RPRT-01, RPRT-05, RPRT-06, MRKT-03 updated to Complete per audit; INTG-04/MRKT-02 → Phase 7, MRKT-04 → Phase 8*
+*Last updated: 2026-02-26 — All 4 MRKT gaps from re-audit closed: market detection trigger (MRKT-01/02), Drizzle builder fix (MRKT-03), useMarkets wiring + TQ v5 fix (MRKT-04). 37/37 requirements satisfied.*

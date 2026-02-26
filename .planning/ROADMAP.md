@@ -168,3 +168,16 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 6. Authentication | 4/4 | Complete   | 2026-02-25 |
 | 7. Onboarding & Integration Connect | 2/2 | Complete   | 2026-02-25 |
 | 8. Market-Aware Recommendations | 2/2 | Complete   | 2026-02-25 |
+
+## Gap Closure (Re-Audit 2026-02-26)
+
+All 4 MRKT gaps identified by the v1.0 re-audit have been closed without new phases:
+
+| Gap | Root Cause | Fix |
+|-----|-----------|-----|
+| MRKT-01 | `/api/markets/detect` never called during onboarding | Trigger after paid channel connects in OnboardingWizard |
+| MRKT-02 | Depends on MRKT-01 markets being populated | Resolved by MRKT-01 fix |
+| MRKT-03 | Drizzle builder bug — `innerJoin()` return value discarded | Capture return value in kpis, campaigns, saturation, seasonality routes |
+| MRKT-04 | `useMarkets` never called + TQ v5 `onSuccess` removed | Call in DashboardLayoutClient + replace with `useEffect` |
+
+**Score:** 37/37 requirements satisfied (was 33/37)
