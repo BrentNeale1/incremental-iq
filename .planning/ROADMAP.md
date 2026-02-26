@@ -21,6 +21,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 7: Onboarding & Integration Connect** - Onboarding wizard mounting GA4EventSelector, MarketConfirmationStep, OutcomeModeSelector, and integration connect flow (Gap Closure) (completed 2026-02-25)
 - [x] **Phase 8: Market-Aware Recommendations** - Add marketId filtering to recommendations API and engine (Gap Closure) (completed 2026-02-25)
 - [ ] **Phase 9: Dashboard Data Wiring Fixes** - Fix CampaignRow type mismatch and wire useOutcomeMode into dashboard (Gap Closure)
+- [ ] **Phase 10: Dashboard Polish & Integration Fixes** - Close insights market filter gap, fix export flattening, fix dashboard data quality (Gap Closure)
+- [ ] **Phase 11: Backend Data Quality** - Fix ingestion duplicates, query bug, scoring approximations (Tech Debt)
 
 ## Phase Details
 
@@ -166,6 +168,28 @@ Plans:
 Plans:
 - [ ] 09-01-PLAN.md — Fix CampaignRow type/buildPlatformData revenue bug + wire useOutcomeMode and dynamic KPI/chart labels
 
+### Phase 10: Dashboard Polish & Integration Fixes
+**Goal**: Close the 2 remaining integration gaps (insights market filter + export flattening) and fix dashboard data display quality issues
+**Depends on**: Phase 9
+**Requirements**: MRKT-04, RPRT-05
+**Gap Closure**: Closes integration gaps from final audit — insights page ignores market filter, health/seasonality exports produce garbled output
+**Success Criteria** (what must be TRUE):
+  1. Insights page filters incrementality scores by selected market — when a market is selected, scores reflect only that market's data
+  2. Health page CSV/Excel export produces flat, readable data (no `[object Object]` cells)
+  3. Seasonality page CSV/Excel export produces flat, readable data (no `[object Object]` cells)
+  4. MethodologySidebar displays actual dataPoints count instead of 'undefined'
+  5. ForecastActualChart renders real Prophet forecast data instead of scaffold approximation
+
+### Phase 11: Backend Data Quality
+**Goal**: Fix backend data correctness issues — duplicate row prevention, query bug fix, scoring precision improvements
+**Depends on**: Phase 10
+**Gap Closure**: Closes tech debt from audit — ingestion duplicates, query bug, scoring approximations
+**Success Criteria** (what must be TRUE):
+  1. Repeated ingestion syncs do not insert duplicate rows into ingestion_coverage table
+  2. Global status route uses correct Drizzle `and()` operator instead of JavaScript `&&`
+  3. Pooled raw score is computed directly instead of reverse-approximated from adjusted result
+  4. Budget-change triggered ITS jobs use the actual budget change date as intervention point, not campaign start date
+
 ## Progress
 
 **Execution Order:**
@@ -182,6 +206,8 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 7. Onboarding & Integration Connect | 2/2 | Complete   | 2026-02-25 |
 | 8. Market-Aware Recommendations | 2/2 | Complete   | 2026-02-25 |
 | 9. Dashboard Data Wiring Fixes | 0/1 | Pending | |
+| 10. Dashboard Polish & Integration Fixes | 0/0 | Pending | |
+| 11. Backend Data Quality | 0/0 | Pending | |
 
 ## Gap Closure (Re-Audit 2026-02-26)
 
