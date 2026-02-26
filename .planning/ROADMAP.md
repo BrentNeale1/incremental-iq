@@ -179,6 +179,10 @@ Plans:
   3. Seasonality page CSV/Excel export produces flat, readable data (no `[object Object]` cells)
   4. MethodologySidebar displays actual dataPoints count instead of 'undefined'
   5. ForecastActualChart renders real Prophet forecast data instead of scaffold approximation
+**Plans**: 2 plans
+Plans:
+- [ ] 10-01-PLAN.md — Fix dataPoints API gap, wire market filter to insights page, flatten health/seasonality exports
+- [ ] 10-02-PLAN.md — Replace scaffold ForecastActualChart with real Prophet forecast data and confidence bands
 
 ### Phase 11: Backend Data Quality
 **Goal**: Fix backend data correctness issues — duplicate row prevention, query bug fix, scoring precision improvements
@@ -206,7 +210,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 7. Onboarding & Integration Connect | 2/2 | Complete   | 2026-02-25 |
 | 8. Market-Aware Recommendations | 2/2 | Complete   | 2026-02-25 |
 | 9. Dashboard Data Wiring Fixes | 0/1 | Pending | |
-| 10. Dashboard Polish & Integration Fixes | 0/0 | Pending | |
+| 10. Dashboard Polish & Integration Fixes | 0/2 | Pending | |
 | 11. Backend Data Quality | 0/0 | Pending | |
 
 ## Gap Closure (Re-Audit 2026-02-26)
