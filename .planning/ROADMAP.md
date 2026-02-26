@@ -21,7 +21,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 7: Onboarding & Integration Connect** - Onboarding wizard mounting GA4EventSelector, MarketConfirmationStep, OutcomeModeSelector, and integration connect flow (Gap Closure) (completed 2026-02-25)
 - [x] **Phase 8: Market-Aware Recommendations** - Add marketId filtering to recommendations API and engine (Gap Closure) (completed 2026-02-25)
 - [ ] **Phase 9: Dashboard Data Wiring Fixes** - Fix CampaignRow type mismatch and wire useOutcomeMode into dashboard (Gap Closure)
-- [ ] **Phase 10: Dashboard Polish & Integration Fixes** - Close insights market filter gap, fix export flattening, fix dashboard data quality (Gap Closure)
+- [x] **Phase 10: Dashboard Polish & Integration Fixes** - Close insights market filter gap, fix export flattening, fix dashboard data quality (Gap Closure) (completed 2026-02-26)
 - [ ] **Phase 11: Backend Data Quality** - Fix ingestion duplicates, query bug, scoring approximations (Tech Debt)
 
 ## Phase Details
@@ -210,7 +210,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 7. Onboarding & Integration Connect | 2/2 | Complete   | 2026-02-25 |
 | 8. Market-Aware Recommendations | 2/2 | Complete   | 2026-02-25 |
 | 9. Dashboard Data Wiring Fixes | 0/1 | Pending | |
-| 10. Dashboard Polish & Integration Fixes | 1/2 | In Progress|  |
+| 10. Dashboard Polish & Integration Fixes | 2/2 | Complete   | 2026-02-26 |
 | 11. Backend Data Quality | 0/0 | Pending | |
 
 ## Gap Closure (Re-Audit 2026-02-26)

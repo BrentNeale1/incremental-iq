@@ -64,6 +64,7 @@ Progress: [██████████] ~100% (10 phases in progress)
 | Phase 08-market-aware-recommendations P02 | 4 | 2 tasks | 5 files |
 | Phase 09-dashboard-data-wiring-fixes PP01 | 3 min | 2 tasks | 6 files |
 | Phase 10-dashboard-polish-and-integration-fixes P01 | 3 | 2 tasks | 5 files |
+| Phase 10-dashboard-polish-and-integration-fixes P02 | 12 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -181,6 +182,8 @@ Recent decisions affecting current work:
 - [Phase 10-dashboard-polish-and-integration-fixes]: dataPoints uses parseInt(score.dataPoints, 10) ?? 0 — Drizzle numeric() returns string, same pattern as liftMean/confidence
 - [Phase 10-dashboard-polish-and-integration-fixes]: marketId in queryKey array prevents TanStack Query from serving stale cached data when market selection changes
 - [Phase 10-dashboard-polish-and-integration-fixes]: Flat export rows use em-dash (U+2014) for null/undefined values — consistent with CONTEXT.md locked decision
+- [Phase 10-dashboard-polish-and-integration-fixes]: Forecast API graceful degradation: returns empty arrays on Python service failure, not 5xx — chart handles empty state display
+- [Phase 10-dashboard-polish-and-integration-fixes]: ForecastActualChart uses ComposedChart with ciBase+ciWidth stacked Area pattern — dark-mode safe, same pattern as ConfidenceIntervalChart
 
 ### Pending Todos
 
@@ -200,7 +203,7 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-26
-Stopped at: Completed 10-01-PLAN.md — dataPoints API field, market filter wiring in insights page, flat CSV exports for health and seasonality.
-Resume with: Phase 10 Plan 2 if additional dashboard polish tasks exist.
-Key context: Phase 10 Plan 1 complete. dataPoints selected from DB in both incrementality query modes and returned as integer in API response. useIncrementality accepts optional marketId (third param) — included in queryKey and URLSearchParams. Insights page reads selectedMarket from Zustand, passes to useIncrementality, shows empty state when market selected with no data. Health and seasonality pages now pass flat primitive records to setExportData (no [object Object] in CSV exports).
-Resume file: N/A — Phase 10 Plan 1 complete
+Stopped at: Completed 10-02-PLAN.md — forecast API route, useForecast hook, ForecastActualChart upgraded with real Prophet data and confidence bands.
+Resume with: Phase 10 complete (2 of 2 plans done). Dashboard polish and integration fixes complete.
+Key context: Phase 10 Plan 2 complete. GET /api/dashboard/forecast proxies to Python FastAPI. useForecast(campaignId) TanStack Query hook with 10-min staleTime. ForecastActualChart upgraded from LineChart scaffold to ComposedChart with stacked Area CI bands. insights/page.tsx wires real forecast data replacing liftMean * 1.08 approximation. Empty state messages context-aware (no-selection vs no-data).
+Resume file: N/A — all phases complete
