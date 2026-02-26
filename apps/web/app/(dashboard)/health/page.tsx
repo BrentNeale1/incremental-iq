@@ -29,7 +29,18 @@ export default function DataHealthPage() {
   const { setExportData } = useExportContext();
   React.useEffect(() => {
     if (syncHistory?.integrations && syncHistory.integrations.length > 0) {
-      setExportData(syncHistory.integrations as unknown as Record<string, unknown>[], 'data-health');
+      const flatRows = syncHistory.integrations.map((item) => ({
+        platform: item.integration.platform,
+        status: item.integration.status,
+        freshness: item.integration.freshness,
+        last_sync_status: item.integration.lastSyncStatus ?? '\u2014',
+        is_stale: item.isStale ? 'Yes' : 'No',
+        stale_since_hours: item.staleSinceHours != null ? item.staleSinceHours : '\u2014',
+        last_run_type: item.recentRuns[0]?.runType ?? '\u2014',
+        last_run_status: item.recentRuns[0]?.status ?? '\u2014',
+        records_ingested: item.recentRuns[0]?.recordsIngested != null ? item.recentRuns[0].recordsIngested : '\u2014',
+      }));
+      setExportData(flatRows as unknown as Record<string, unknown>[], 'data-health');
     }
   }, [syncHistory, setExportData]);
 

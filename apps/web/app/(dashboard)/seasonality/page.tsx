@@ -27,7 +27,16 @@ export default function SeasonalityPlanningPage() {
   const { setExportData } = useExportContext();
   React.useEffect(() => {
     if (data?.upcoming && data.upcoming.length > 0) {
-      setExportData(data.upcoming as unknown as Record<string, unknown>[], 'seasonality-planning');
+      const flatRows = data.upcoming.map((e) => ({
+        name: e.name,
+        event_date: e.eventDate,
+        weeks_until: e.weeksUntil,
+        days_until: e.daysUntil,
+        window_before_days: e.windowBefore ?? '\u2014',
+        window_after_days: e.windowAfter ?? '\u2014',
+        is_user_defined: e.isUserDefined ? 'Yes' : 'No',
+      }));
+      setExportData(flatRows as unknown as Record<string, unknown>[], 'seasonality-planning');
     }
   }, [data, setExportData]);
 
