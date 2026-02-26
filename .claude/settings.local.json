@@ -43,7 +43,10 @@
       "Bash(netstat:*)",
       "Bash(cd C:/Users/brent/incremental-iq/packages/db && npx tsx test-signup.ts 2>&1)",
       "Bash(cd C:/Users/brent/incremental-iq/packages/db && npx tsx test-internal-signup.ts 2>&1)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(git:*)",
+      "Bash(xxd:*)",
+      "Bash(sed:*)"
     ]
   }
 }
