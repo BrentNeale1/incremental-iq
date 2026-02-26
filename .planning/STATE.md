@@ -5,15 +5,15 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** Campaign-level incremental lift analysis that tells brands exactly which campaigns to scale, by how much, and for how long — with transparent confidence levels so no recommendation is made without measurable expected impact.
-**Current focus:** Phase 10 - Dashboard Polish and Integration Fixes (In Progress — Plan 1 of 2 done)
+**Current focus:** Phase 10 - Dashboard Polish and Integration Fixes (Complete — all 3 gap closure plans done)
 
 ## Current Position
 
-Phase: 10 of 11 (Dashboard Polish and Integration Fixes) - In Progress
-Plan: 1 of 2 executed
-Status: Phase 10 Plan 1 complete. dataPoints wired from DB through API to MethodologySidebar; market filter flows from AppHeader Zustand state to insights incrementality API; health and seasonality CSV exports produce flat primitive rows.
-Last activity: 2026-02-26 — Plan 10-01 executed. MRKT-04 and RPRT-05 gaps closed.
-Stopped at: Completed 10-01-PLAN.md — dataPoints API field, market filter wiring in insights page, flat CSV exports for health and seasonality
+Phase: 10 of 11 (Dashboard Polish and Integration Fixes) - Complete
+Plan: 3 of 3 executed
+Status: Phase 10 complete. Gap closure plans 10-01 through 10-03 all done. saturationData.find crash fixed; forecast chart unblocked; UAT tests 1, 6, 7 unblocked.
+Last activity: 2026-02-27 — Plan 10-03 executed. useSaturation hook normalized to fix saturationData.find TypeError.
+Stopped at: Completed 10-03-PLAN.md — useSaturation hook normalized to fix saturationData.find crash on Insights page
 
 Progress: [██████████] ~100% (10 phases in progress)
 
@@ -65,6 +65,7 @@ Progress: [██████████] ~100% (10 phases in progress)
 | Phase 09-dashboard-data-wiring-fixes PP01 | 3 min | 2 tasks | 6 files |
 | Phase 10-dashboard-polish-and-integration-fixes P01 | 3 | 2 tasks | 5 files |
 | Phase 10-dashboard-polish-and-integration-fixes P02 | 12 | 2 tasks | 4 files |
+| Phase 10-dashboard-polish-and-integration-fixes P03 | 2 | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -184,6 +185,8 @@ Recent decisions affecting current work:
 - [Phase 10-dashboard-polish-and-integration-fixes]: Flat export rows use em-dash (U+2014) for null/undefined values — consistent with CONTEXT.md locked decision
 - [Phase 10-dashboard-polish-and-integration-fixes]: Forecast API graceful degradation: returns empty arrays on Python service failure, not 5xx — chart handles empty state display
 - [Phase 10-dashboard-polish-and-integration-fixes]: ForecastActualChart uses ComposedChart with ciBase+ciWidth stacked Area pattern — dark-mode safe, same pattern as ConfidenceIntervalChart
+- [Phase 10-dashboard-polish-and-integration-fixes]: Normalize dual API response shapes in useSaturation hook queryFn — hook is the right boundary; all consumers always receive SaturationCurve[]
+- [Phase 10-dashboard-polish-and-integration-fixes]: Overview mode response also normalized via .map() — hook maps API field names (hillAlpha/hillMu/hillGamma/saturationPct/estimatedAt) to SaturationCurve interface names (alpha/mu/gamma/saturationPercent/scoredAt)
 
 ### Pending Todos
 
