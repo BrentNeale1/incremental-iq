@@ -21,7 +21,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 7: Onboarding & Integration Connect** - Onboarding wizard mounting GA4EventSelector, MarketConfirmationStep, OutcomeModeSelector, and integration connect flow (Gap Closure) (completed 2026-02-25)
 - [x] **Phase 8: Market-Aware Recommendations** - Add marketId filtering to recommendations API and engine (Gap Closure) (completed 2026-02-25)
 - [ ] **Phase 9: Dashboard Data Wiring Fixes** - Fix CampaignRow type mismatch and wire useOutcomeMode into dashboard (Gap Closure)
-- [x] **Phase 10: Dashboard Polish & Integration Fixes** - Close insights market filter gap, fix export flattening, fix dashboard data quality (Gap Closure) (completed 2026-02-26)
+- [ ] **Phase 10: Dashboard Polish & Integration Fixes** - Close insights market filter gap, fix export flattening, fix dashboard data quality (Gap Closure)
 - [ ] **Phase 11: Backend Data Quality** - Fix ingestion duplicates, query bug, scoring approximations (Tech Debt)
 
 ## Phase Details
@@ -180,11 +180,13 @@ Plans:
   4. MethodologySidebar displays actual dataPoints count instead of 'undefined'
   5. ForecastActualChart renders real Prophet forecast data instead of scaffold approximation
   6. Insights page does not crash when a campaign row is selected (no saturationData.find TypeError)
-**Plans**: 3 plans
+  7. Market filter applies to Campaign Drill-Down table — switching markets filters the campaign list
+**Plans**: 4 plans
 Plans:
 - [x] 10-01-PLAN.md — Fix dataPoints API gap, wire market filter to insights page, flatten health/seasonality exports
 - [x] 10-02-PLAN.md — Replace scaffold ForecastActualChart with real Prophet forecast data and confidence bands
-- [ ] 10-03-PLAN.md — Fix useSaturation hook dual response shape crash (UAT gap closure)
+- [x] 10-03-PLAN.md — Fix useSaturation hook dual response shape crash (UAT gap closure)
+- [ ] 10-04-PLAN.md — Wire marketId to DrillDownTable so campaign list filters by selected market (UAT gap closure)
 
 ### Phase 11: Backend Data Quality
 **Goal**: Fix backend data correctness issues — duplicate row prevention, query bug fix, scoring precision improvements
@@ -212,7 +214,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 7. Onboarding & Integration Connect | 2/2 | Complete   | 2026-02-25 |
 | 8. Market-Aware Recommendations | 2/2 | Complete   | 2026-02-25 |
 | 9. Dashboard Data Wiring Fixes | 0/1 | Pending | |
-| 10. Dashboard Polish & Integration Fixes | 3/3 | Complete    | 2026-02-26 |
+| 10. Dashboard Polish & Integration Fixes | 3/4 | In Progress | |
 | 11. Backend Data Quality | 0/0 | Pending | |
 
 ## Gap Closure (Re-Audit 2026-02-26)
