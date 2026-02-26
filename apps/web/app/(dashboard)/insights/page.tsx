@@ -4,12 +4,14 @@ import * as React from 'react';
 import { useDashboardStore } from '@/lib/store/dashboard';
 import { useIncrementality } from '@/lib/hooks/useIncrementality';
 import { useSaturation } from '@/lib/hooks/useSaturation';
+import { useForecast } from '@/lib/hooks/useForecast';
 import { ModelHealthOverview } from '@/components/insights/ModelHealthOverview';
 import { ConfidenceIntervalChart } from '@/components/insights/ConfidenceIntervalChart';
 import { ForecastActualChart, type ForecastActualPoint } from '@/components/insights/ForecastActualChart';
 import { ProgressionView } from '@/components/insights/ProgressionView';
 import { MethodologySidebar } from '@/components/insights/MethodologySidebar';
 import { DrillDownTable, type DrillDownRow } from '@/components/insights/DrillDownTable';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Collapsible,
   CollapsibleContent,
@@ -61,6 +63,9 @@ export default function StatisticalInsightsPage() {
 
   const { data: saturationData } = useSaturation(selectedRow?.id);
 
+  // Prophet forecast for selected campaign — real data from Python FastAPI service
+  const { data: forecastApiData, isLoading: forecastLoading } = useForecast(selectedRow?.id);
+
   const selectedScore = React.useMemo(() => {
     if (!scores || !selectedRow) return null;
     return scores.find((s) => s.campaignId === selectedRow.id && s.scoreType === 'adjusted') ?? null;
@@ -71,22 +76,43 @@ export default function StatisticalInsightsPage() {
     return saturationData.find((s) => s.campaignId === selectedRow.id) ?? null;
   }, [saturationData, selectedRow]);
 
-  // Forecast vs actual — derived from incrementality scores as a scaffold
-  // (Phase 5 will wire in actual Prophet forecast output)
-  const forecastData = React.useMemo<ForecastActualPoint[]>(() => {
-    if (!scores || scores.length === 0) return [];
-    // Use liftMean as "actual" and liftUpper-biased as "forecast" as a visual scaffold
-    return scores
-      .filter((s) => s.scoreType === 'adjusted')
-      .sort((a, b) => a.scoredAt.localeCompare(b.scoredAt))
-      .slice(0, 30)
-      .map((s) => ({
-        date: s.scoredAt,
-        forecast: s.liftMean * (1 + 0.08), // Prophet baseline slightly above observed
-        actual: s.liftMean,
-        divergence: Math.abs(s.liftMean * 0.08) / Math.max(s.liftMean, 0.001),
-      }));
-  }, [scores]);
+  // Merge Prophet forecast data into chart-ready format
+  // Combines historical fitted values + actual observed values + future predictions
+  const forecastChartData = React.useMemo<ForecastActualPoint[]>(() => {
+    if (!forecastApiData) return [];
+
+    const { historical, future, actuals } = forecastApiData;
+
+    // Build actuals map for fast lookup by date
+    const actualsMap = new Map<string, number>();
+    for (const a of actuals) {
+      actualsMap.set(a.date, a.value);
+    }
+
+    // Historical points: actual observed value + Prophet fitted yhat + CI band
+    const historicalPoints: ForecastActualPoint[] = historical.map((p) => ({
+      date: p.date,
+      actual: actualsMap.get(p.date),
+      forecast: p.yhat,
+      forecastLower: p.yhat_lower,
+      forecastUpper: p.yhat_upper,
+      ciBase: p.yhat_lower,
+      ciWidth: Math.max(0, p.yhat_upper - p.yhat_lower),
+    }));
+
+    // Future points: Prophet predicted yhat + CI band only (no actual value)
+    const futurePoints: ForecastActualPoint[] = future.map((p) => ({
+      date: p.date,
+      actual: undefined,
+      forecast: p.yhat,
+      forecastLower: p.yhat_lower,
+      forecastUpper: p.yhat_upper,
+      ciBase: p.yhat_lower,
+      ciWidth: Math.max(0, p.yhat_upper - p.yhat_lower),
+    }));
+
+    return [...historicalPoints, ...futurePoints].sort((a, b) => a.date.localeCompare(b.date));
+  }, [forecastApiData]);
 
   // Collapsible section state
   const [openSections, setOpenSections] = React.useState<Set<string>>(
@@ -195,7 +221,20 @@ export default function StatisticalInsightsPage() {
                 </div>
                 <div className="rounded-lg border bg-card p-4">
                   <h3 className="mb-3 text-sm font-medium">Forecast vs Actual</h3>
-                  <ForecastActualChart data={forecastData} isLoading={scoresLoading} height={240} />
+                  {forecastLoading ? (
+                    <Skeleton className="w-full rounded-md" style={{ height: 240 }} />
+                  ) : (
+                    <ForecastActualChart
+                      data={forecastChartData}
+                      isLoading={false}
+                      height={240}
+                      emptyMessage={
+                        !selectedRow
+                          ? 'Select a campaign in the table below to view its forecast'
+                          : 'Forecast data not available for this campaign'
+                      }
+                    />
+                  )}
                 </div>
               </div>
             </CollapsibleContent>

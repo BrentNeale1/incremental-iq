@@ -2,14 +2,14 @@
 
 import * as React from 'react';
 import {
-  LineChart,
+  ComposedChart,
   Line,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
   ResponsiveContainer,
   Tooltip,
-  ReferenceLine,
 } from 'recharts';
 import { format, parseISO } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -20,50 +20,62 @@ import {
 
 export interface ForecastActualPoint {
   date: string;
-  forecast: number;    // Prophet baseline / predicted value
-  actual: number;      // Observed metric value
-  divergence?: number; // abs(actual - forecast) / forecast, for highlighting
+  actual?: number;         // Observed historical value
+  forecast?: number;       // yhat (fitted for historical, predicted for future)
+  forecastLower?: number;  // yhat_lower (confidence band bottom)
+  forecastUpper?: number;  // yhat_upper (confidence band top)
+  ciBase?: number;         // = forecastLower (transparent area for stacking)
+  ciWidth?: number;        // = forecastUpper - forecastLower (colored area on top)
 }
 
 interface ForecastActualChartProps {
   data: ForecastActualPoint[];
   isLoading: boolean;
   height?: number;
+  emptyMessage?: string;
 }
 
 const chartConfig: ChartConfig = {
-  forecast: {
-    label: 'Prophet Forecast',
-    color: 'var(--color-muted-foreground)',
-  },
   actual: {
     label: 'Actual',
-    color: 'var(--color-brand-accent)',
+    color: 'hsl(var(--chart-1))',
+  },
+  forecast: {
+    label: 'Forecast',
+    color: 'hsl(var(--chart-2))',
   },
 };
 
-const DIVERGENCE_THRESHOLD = 0.15; // 15% divergence triggers highlight
-
 /**
- * ForecastActualChart — overlay chart showing Prophet forecast (dashed) vs actual (solid).
+ * ForecastActualChart — overlay chart showing real Prophet forecast with confidence bands.
  *
- * Divergence is highlighted where actual significantly deviates from forecast (>15%).
- * Uses Recharts LineChart with dual series and ReferenceLine for divergence zones.
+ * Uses ComposedChart (same approach as ConfidenceIntervalChart.tsx):
+ *   - Stacked Area for CI band (ciBase transparent + ciWidth shaded)
+ *   - Solid Line for actual observed historical values
+ *   - Dashed Line for Prophet forecast (fitted historical + future predictions)
  *
- * Per design spec: "Forecast vs actual overlays with divergence highlighting."
+ * Renders empty state message when no data is available.
+ * Hover tooltip shows date + actual/forecast values.
+ *
+ * RPRT-05: Forecast vs actual chart with Prophet confidence bands.
  */
-export function ForecastActualChart({ data, isLoading, height = 280 }: ForecastActualChartProps) {
+export function ForecastActualChart({
+  data,
+  isLoading,
+  height = 280,
+  emptyMessage = 'Forecast data not available for this campaign',
+}: ForecastActualChartProps) {
   if (isLoading) {
     return <Skeleton className="w-full" style={{ height }} />;
   }
 
-  if (data.length === 0) {
+  if (!data || data.length === 0) {
     return (
       <div
         className="flex items-center justify-center rounded-lg border border-dashed text-sm text-muted-foreground"
         style={{ height }}
       >
-        Forecast data not available — requires Prophet baseline model to be run
+        {emptyMessage}
       </div>
     );
   }
@@ -79,18 +91,13 @@ export function ForecastActualChart({ data, isLoading, height = 280 }: ForecastA
   const formatYAxis = (value: number) => {
     if (Math.abs(value) >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
     if (Math.abs(value) >= 1_000) return `$${(value / 1_000).toFixed(0)}K`;
-    return `$${value}`;
+    return `$${value.toFixed(0)}`;
   };
-
-  // Find points where divergence exceeds threshold for reference lines
-  const divergentDates = data
-    .filter((d) => d.divergence != null && d.divergence > DIVERGENCE_THRESHOLD)
-    .map((d) => d.date);
 
   return (
     <ChartContainer config={chartConfig} style={{ height }}>
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+        <ComposedChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" className="stroke-border/50" />
 
           <XAxis
@@ -114,32 +121,29 @@ export function ForecastActualChart({ data, isLoading, height = 280 }: ForecastA
               if (!active || !payload?.length) return null;
               const d = payload[0]?.payload as ForecastActualPoint | undefined;
               if (!d) return null;
-              const divergencePct = d.divergence != null ? `${(d.divergence * 100).toFixed(1)}%` : null;
               return (
                 <div className="rounded-lg border bg-background px-3 py-2 text-xs shadow-xl">
                   <p className="mb-1.5 font-medium">{formatXAxis(label as string)}</p>
                   <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="h-2 w-2 rounded-full bg-muted-foreground" />
-                      <span className="text-muted-foreground">Forecast:</span>
-                      <span className="font-mono font-medium">{formatYAxis(d.forecast)}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="h-2 w-2 rounded-full bg-brand-accent" />
-                      <span className="text-muted-foreground">Actual:</span>
-                      <span className="font-mono font-medium">{formatYAxis(d.actual)}</span>
-                    </div>
-                    {divergencePct && (
+                    {d.actual != null && (
                       <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground">Divergence:</span>
-                        <span
-                          className={
-                            d.divergence! > DIVERGENCE_THRESHOLD
-                              ? 'font-mono text-amber-600 dark:text-amber-400'
-                              : 'font-mono'
-                          }
-                        >
-                          {divergencePct}
+                        <span className="h-2 w-2 rounded-full bg-[hsl(var(--chart-1))]" />
+                        <span className="text-muted-foreground">Actual:</span>
+                        <span className="font-mono font-medium">{formatYAxis(d.actual)}</span>
+                      </div>
+                    )}
+                    {d.forecast != null && (
+                      <div className="flex items-center gap-2">
+                        <span className="h-2 w-2 rounded-full bg-[hsl(var(--chart-2))]" />
+                        <span className="text-muted-foreground">Forecast:</span>
+                        <span className="font-mono font-medium">{formatYAxis(d.forecast)}</span>
+                      </div>
+                    )}
+                    {d.forecastLower != null && d.forecastUpper != null && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground">CI:</span>
+                        <span className="font-mono">
+                          [{formatYAxis(d.forecastLower)}, {formatYAxis(d.forecastUpper)}]
                         </span>
                       </div>
                     )}
@@ -149,39 +153,48 @@ export function ForecastActualChart({ data, isLoading, height = 280 }: ForecastA
             }}
           />
 
-          {/* Divergence reference lines */}
-          {divergentDates.map((date) => (
-            <ReferenceLine
-              key={date}
-              x={date}
-              stroke="var(--color-amber-500, #f59e0b)"
-              strokeWidth={1}
-              strokeOpacity={0.4}
-              strokeDasharray="2 2"
-            />
-          ))}
-
-          {/* Forecast — dashed */}
-          <Line
+          {/* Confidence band — stacked: transparent base + shaded width (same as ConfidenceIntervalChart) */}
+          <Area
             type="monotone"
-            dataKey="forecast"
-            stroke="var(--color-muted-foreground)"
-            strokeWidth={1.5}
-            strokeDasharray="5 3"
-            dot={false}
-            name="Prophet Forecast"
+            dataKey="ciBase"
+            stackId="ci"
+            stroke="none"
+            fill="none"
+            legendType="none"
+          />
+          <Area
+            type="monotone"
+            dataKey="ciWidth"
+            stackId="ci"
+            stroke="none"
+            fill="hsl(var(--chart-2))"
+            fillOpacity={0.15}
+            legendType="none"
           />
 
-          {/* Actual — solid */}
+          {/* Actual historical — solid line */}
           <Line
             type="monotone"
             dataKey="actual"
-            stroke="var(--color-brand-accent)"
+            stroke="hsl(var(--chart-1))"
             strokeWidth={2}
             dot={false}
             name="Actual"
+            connectNulls={false}
           />
-        </LineChart>
+
+          {/* Forecast (fitted + predicted) — dashed line */}
+          <Line
+            type="monotone"
+            dataKey="forecast"
+            stroke="hsl(var(--chart-2))"
+            strokeDasharray="5 3"
+            strokeWidth={1.5}
+            dot={false}
+            name="Forecast"
+            connectNulls={false}
+          />
+        </ComposedChart>
       </ResponsiveContainer>
     </ChartContainer>
   );
