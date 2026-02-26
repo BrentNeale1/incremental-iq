@@ -18,8 +18,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 4: Recommendations and Dashboard** - Scaling-first recommendations and dual-audience dashboard surfacing model outputs to users
 - [x] **Phase 5: Expanded Connectors and Multi-Market** - GA4 integration, market auto-detection, and market-aware attribution
 - [x] **Phase 6: Authentication** - User sign-up, login with session persistence, and logout across the platform (completed 2026-02-25)
-- [x] **Phase 7: Onboarding & Integration Connect** - Onboarding wizard mounting GA4EventSelector, MarketConfirmationStep, OutcomeModeSelector, and integration connect flow (Gap Closure) (completed 2026-02-25)
-- [x] **Phase 8: Market-Aware Recommendations** - Add marketId filtering to recommendations API and engine (Gap Closure) (completed 2026-02-25)
+- [x] **Phase 7: Onboarding & Integration Connect** - Onboarding wizard mounting GA4EventSelector, MarketConfirmationStep, OutcomeModeSelector, and integration connect flow (Gap Closure) (completed 2026-02-25)
+- [x] **Phase 8: Market-Aware Recommendations** - Add marketId filtering to recommendations API and engine (Gap Closure) (completed 2026-02-25)
 - [ ] **Phase 9: Dashboard Data Wiring Fixes** - Fix CampaignRow type mismatch and wire useOutcomeMode into dashboard (Gap Closure)
 
 ## Phase Details
@@ -162,9 +162,9 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. Platform comparison chart in Executive Overview displays correct revenue values (not zeros)
   2. Lead_gen tenants see "Leads" terminology instead of "Revenue" in dashboard views
-**Plans**: 0 plans
+**Plans**: 1 plan
 Plans:
-- (to be planned)
+- [ ] 09-01-PLAN.md — Fix CampaignRow type/buildPlatformData revenue bug + wire useOutcomeMode and dynamic KPI/chart labels
 
 ## Progress
 
@@ -181,7 +181,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 6. Authentication | 4/4 | Complete   | 2026-02-25 |
 | 7. Onboarding & Integration Connect | 2/2 | Complete   | 2026-02-25 |
 | 8. Market-Aware Recommendations | 2/2 | Complete   | 2026-02-25 |
-| 9. Dashboard Data Wiring Fixes | 0/0 | Pending | |
+| 9. Dashboard Data Wiring Fixes | 0/1 | Pending | |
 
 ## Gap Closure (Re-Audit 2026-02-26)
 
