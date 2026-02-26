@@ -31,13 +31,15 @@ export interface IncrementalityScore {
 export function useIncrementality(
   campaignId?: string,
   scoreType: 'adjusted' | 'raw' = 'adjusted',
+  marketId?: string,
 ) {
   return useQuery<IncrementalityScore[]>({
-    queryKey: ['incrementality', campaignId, scoreType],
+    queryKey: ['incrementality', campaignId, scoreType, marketId],
     queryFn: async () => {
       const params = new URLSearchParams({
         scoreType,
         ...(campaignId ? { campaignId } : {}),
+        ...(marketId ? { marketId } : {}),
       });
       const res = await fetch(`/api/dashboard/incrementality?${params.toString()}`);
       if (!res.ok) {

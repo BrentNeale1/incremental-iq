@@ -38,6 +38,7 @@ interface IncrementalityDetail {
   liftLower: number | null;
   liftUpper: number | null;
   confidence: number | null;
+  dataPoints: number;
   status: string;
   // Saturation data (if available)
   saturationPct: number | null;
@@ -54,6 +55,7 @@ interface RawScoreRow {
   liftLower: string | null;
   liftUpper: string | null;
   confidence: string | null;
+  dataPoints: string | null;
   status: string;
 }
 
@@ -101,6 +103,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           liftLower: incrementalityScores.liftLower,
           liftUpper: incrementalityScores.liftUpper,
           confidence: incrementalityScores.confidence,
+          dataPoints: incrementalityScores.dataPoints,
           status: incrementalityScores.status,
         })
         .from(incrementalityScores)
@@ -168,6 +171,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       liftLower: score.liftLower ? parseFloat(score.liftLower) : null,
       liftUpper: score.liftUpper ? parseFloat(score.liftUpper) : null,
       confidence: score.confidence ? parseFloat(score.confidence) : null,
+      dataPoints: score.dataPoints ? parseInt(score.dataPoints, 10) : 0,
       status: score.status,
       saturationPct: sat?.saturationPct ? parseFloat(sat.saturationPct) : null,
       hillAlpha: sat?.hillAlpha ? parseFloat(sat.hillAlpha) : null,
@@ -199,6 +203,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         liftLower: incrementalityScores.liftLower,
         liftUpper: incrementalityScores.liftUpper,
         confidence: incrementalityScores.confidence,
+        dataPoints: incrementalityScores.dataPoints,
         status: incrementalityScores.status,
         campaignName: campaigns.name,
         campaignSource: campaigns.source,
@@ -275,6 +280,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       liftLower: score.liftLower ? parseFloat(score.liftLower) : null,
       liftUpper: score.liftUpper ? parseFloat(score.liftUpper) : null,
       confidence: score.confidence ? parseFloat(score.confidence) : null,
+      dataPoints: score.dataPoints ? parseInt(score.dataPoints, 10) : 0,
       status: score.status,
       saturationPct: sat?.saturationPct ? parseFloat(sat.saturationPct) : null,
       hillAlpha: sat?.hillAlpha ? parseFloat(sat.hillAlpha) : null,

@@ -36,13 +36,17 @@ import { useExportContext } from '@/lib/export/context';
  */
 export default function StatisticalInsightsPage() {
   const dateRange = useDashboardStore((s) => s.dateRange);
+  const selectedMarket = useDashboardStore((s) => s.selectedMarket);
+  const markets = useDashboardStore((s) => s.markets);
 
   const { setExportData } = useExportContext();
 
   // Incrementality scores for all campaigns — tenantId from session cookie
+  // Pass selectedMarket so API filters scores to the chosen market (MRKT-04)
   const { data: scores, isLoading: scoresLoading } = useIncrementality(
     undefined,
     'adjusted',
+    selectedMarket ?? undefined,
   );
 
   // Saturation for selected campaign — tenantId from session cookie
@@ -143,6 +147,19 @@ export default function StatisticalInsightsPage() {
             />
           </button>
         </div>
+
+        {/* Empty market state — show when a market is selected but no data exists for it */}
+        {selectedMarket && !scoresLoading && (!scores || scores.length === 0) && (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <p className="text-sm text-muted-foreground">
+              No incrementality data for{' '}
+              <span className="font-medium">
+                {markets.find((m) => m.id === selectedMarket)?.displayName ?? 'this market'}
+              </span>{' '}
+              yet.
+            </p>
+          </div>
+        )}
 
         {/* Section 1 — Model Health Overview */}
         <Collapsible open={openSections.has('model-health')}>
