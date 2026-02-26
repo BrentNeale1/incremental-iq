@@ -20,6 +20,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 6: Authentication** - User sign-up, login with session persistence, and logout across the platform (completed 2026-02-25)
 - [x] **Phase 7: Onboarding & Integration Connect** - Onboarding wizard mounting GA4EventSelector, MarketConfirmationStep, OutcomeModeSelector, and integration connect flow (Gap Closure) (completed 2026-02-25)
 - [x] **Phase 8: Market-Aware Recommendations** - Add marketId filtering to recommendations API and engine (Gap Closure) (completed 2026-02-25)
+- [ ] **Phase 9: Dashboard Data Wiring Fixes** - Fix CampaignRow type mismatch and wire useOutcomeMode into dashboard (Gap Closure)
 
 ## Phase Details
 
@@ -153,6 +154,18 @@ Plans:
 - [ ] 08-01-PLAN.md — Backend: fix Drizzle chain bug, add market fields to Recommendation type + engine, market summary in API response
 - [ ] 08-02-PLAN.md — Frontend: client-side market filtering in useRecommendations, market badges on cards, filter label + edge case UX
 
+### Phase 9: Dashboard Data Wiring Fixes
+**Goal**: Fix dashboard data display bugs — CampaignRow type mismatch causing zero-revenue platform chart, and orphaned useOutcomeMode hook preventing lead_gen terminology
+**Depends on**: Phase 8
+**Requirements**: RPRT-01, RPRT-07
+**Gap Closure**: Closes integration gaps from final audit — CampaignRow field names vs API response, useOutcomeMode not consumed
+**Success Criteria** (what must be TRUE):
+  1. Platform comparison chart in Executive Overview displays correct revenue values (not zeros)
+  2. Lead_gen tenants see "Leads" terminology instead of "Revenue" in dashboard views
+**Plans**: 0 plans
+Plans:
+- (to be planned)
+
 ## Progress
 
 **Execution Order:**
@@ -168,6 +181,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 6. Authentication | 4/4 | Complete   | 2026-02-25 |
 | 7. Onboarding & Integration Connect | 2/2 | Complete   | 2026-02-25 |
 | 8. Market-Aware Recommendations | 2/2 | Complete   | 2026-02-25 |
+| 9. Dashboard Data Wiring Fixes | 0/0 | Pending | |
 
 ## Gap Closure (Re-Audit 2026-02-26)
 
