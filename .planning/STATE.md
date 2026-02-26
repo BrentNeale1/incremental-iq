@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** Campaign-level incremental lift analysis that tells brands exactly which campaigns to scale, by how much, and for how long — with transparent confidence levels so no recommendation is made without measurable expected impact.
-**Current focus:** Phase 8 - Market-Aware Recommendations (In Progress — Plan 1 of 1+ done)
+**Current focus:** Phase 9 - Dashboard Data Wiring Fixes (Complete — Plan 1 of 1 done)
 
 ## Current Position
 
-Phase: 8 of 8 (Market-Aware Recommendations) - In Progress
+Phase: 9 of 9 (Dashboard Data Wiring Fixes) - Complete
 Plan: 1 of 1 executed
-Status: Phase 8 Plan 1 complete. Drizzle innerJoin bug fixed; market fields added to Recommendation type and engine; API route returns conditional marketSummary.
-Last activity: 2026-02-26 — Plan 08-01 executed. Server-side market filtering foundation complete.
-Stopped at: Completed 08-01-PLAN.md — Drizzle bug fix, market type fields, market enrichment query, API marketSummary response
+Status: Phase 9 Plan 1 complete. CampaignRow aligned to API response; buildPlatformData uses row.revenue; useOutcomeMode wired at layout level; KPI/chart labels dynamic based on outcomeMode.
+Last activity: 2026-02-26 — Plan 09-01 executed. Dashboard data wiring bugs fixed.
+Stopped at: Completed 09-01-PLAN.md — CampaignRow fix, buildPlatformData revenue fix, useOutcomeMode wiring, dynamic KPI/chart labels
 
-Progress: [█████████░] ~90% (7 phases complete, phase 8 in progress — plan 1 done)
+Progress: [██████████] ~100% (9 phases complete)
 
 ## Performance Metrics
 
@@ -62,6 +62,7 @@ Progress: [█████████░] ~90% (7 phases complete, phase 8 in p
 | Phase 07-onboarding-and-connect P02 | 6 min | 2 tasks | 8 files |
 | Phase 08-market-aware-recommendations P01 | 8 min | 2 tasks | 3 files |
 | Phase 08-market-aware-recommendations P02 | 4 | 2 tasks | 5 files |
+| Phase 09-dashboard-data-wiring-fixes PP01 | 3 min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -174,6 +175,8 @@ Recent decisions affecting current work:
 - [Phase 08-market-aware-recommendations]: API route returns plain Recommendation[] when no marketId (backwards compatible with useRecommendations hook); wrapped { recommendations, marketSummary } only when marketId present
 - [Phase 08-market-aware-recommendations]: queryKey stays ['recommendations'] (no market in key) — client-side filtering via TanStack Query select avoids per-market network requests
 - [Phase 08-market-aware-recommendations]: CrossMarketSuggestions reads from queryClient.getQueryData(['recommendations']) — no extra fetch for empty-market cross-market suggestions
+- [Phase 09-dashboard-data-wiring-fixes]: CampaignRow interface realigned to API: single revenue field replaces directRevenue + modeledRevenue (API never had those fields); incrementalRevenue derived as revenue * liftMean in buildPlatformData (v1 approximation)
+- [Phase 09-dashboard-data-wiring-fixes]: useOutcomeMode(tenantId) wired at layout level in DashboardLayoutClient (same pattern as useMarkets); leaf components read outcomeMode directly from Zustand — no prop drilling
 
 ### Pending Todos
 
@@ -193,7 +196,7 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-26
-Stopped at: Completed 08-01-PLAN.md — Drizzle bug fix, market type fields, market enrichment query, API marketSummary response.
-Resume with: Next plan in phase 08 (market-aware recommendations client UI)
-Key context: Phase 8 Plan 1 complete. Server-side foundation for MRKT-04 done: Drizzle innerJoin bug fixed (filteredQuery pattern), Recommendation type has marketId/marketName/marketCountryCode fields, engine enriches recommendations via Step-4b LEFT JOIN campaign_markets+markets, API route conditionally returns { recommendations, marketSummary } when marketId present.
-Resume file: .planning/phases/06-authentication/.continue-here.md (can be archived)
+Stopped at: Completed 09-01-PLAN.md — CampaignRow fix, buildPlatformData revenue fix, useOutcomeMode wiring, dynamic KPI/chart labels.
+Resume with: All planned phases complete. Dashboard data wiring fixes complete.
+Key context: Phase 9 Plan 1 complete. CampaignRow interface aligned to API (revenue not directRevenue/modeledRevenue). buildPlatformData reads row.revenue and derives incrementalRevenue = revenue * liftMean. useOutcomeMode(tenantId) wired in DashboardLayoutClient. KpiCard, PlatformComparisonChart, IncrementalRevenueChart all read outcomeMode from Zustand for dynamic labels.
+Resume file: N/A — all phases complete
