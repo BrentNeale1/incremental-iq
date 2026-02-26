@@ -16,6 +16,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from '@/components/ui/chart';
+import { useDashboardStore } from '@/lib/store/dashboard';
 
 export interface TimeSeriesDataPoint {
   date: string;    // ISO date string, e.g. "2025-01-15"
@@ -30,23 +31,14 @@ export interface IncrementalRevenueChartProps {
   height?: number;
 }
 
-const chartConfig: ChartConfig = {
-  value: {
-    label: 'Incremental Revenue',
-    color: 'var(--color-brand-accent)',
-  },
-  comparisonValue: {
-    label: 'Prior Period',
-    color: 'var(--color-muted-foreground)',
-  },
-};
-
 /**
  * IncrementalRevenueChart — hero area chart on the Executive Overview page.
  *
  * Uses shadcn ChartContainer + Recharts AreaChart.
  * Gradient fill: SVG linearGradient from brand accent at 80% opacity down to 10%.
  * When comparison is enabled, overlays a second area in a lighter shade.
+ *
+ * Chart label is dynamic based on tenant outcomeMode (ecommerce vs lead_gen).
  *
  * RESEARCH.md Pattern 5: gradient fill is defined inline as SVG defs inside the chart.
  */
@@ -56,6 +48,18 @@ export function IncrementalRevenueChart({
   isLoading = false,
   height = 280,
 }: IncrementalRevenueChartProps) {
+  const outcomeMode = useDashboardStore((s) => s.outcomeMode);
+
+  const chartConfig: ChartConfig = {
+    value: {
+      label: outcomeMode === 'lead_gen' ? 'Incremental Leads' : 'Incremental Revenue',
+      color: 'var(--color-brand-accent)',
+    },
+    comparisonValue: {
+      label: 'Prior Period',
+      color: 'var(--color-muted-foreground)',
+    },
+  };
   if (isLoading) {
     return <Skeleton className="w-full" style={{ height }} />;
   }

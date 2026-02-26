@@ -3,6 +3,7 @@
 import { TrendingDown, TrendingUp, GripVertical } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { useDashboardStore } from '@/lib/store/dashboard';
 
 export type KpiMetricKey =
   | 'spend'
@@ -11,15 +12,6 @@ export type KpiMetricKey =
   | 'incremental_revenue'
   | 'lift_pct'
   | 'avg_confidence';
-
-const METRIC_LABELS: Record<KpiMetricKey, string> = {
-  spend: 'Total Spend',
-  revenue: 'Revenue',
-  roas: 'ROAS',
-  incremental_revenue: 'Incremental Revenue',
-  lift_pct: 'Avg Lift %',
-  avg_confidence: 'Avg Confidence',
-};
 
 /**
  * Formats a raw numeric value with currency/multiplier abbreviations.
@@ -60,6 +52,8 @@ export interface KpiCardProps {
  *
  * Equal-sized cards — layout is controlled by KpiGrid.
  * Delta: green arrow up for positive, red arrow down for negative.
+ *
+ * Labels are dynamic based on tenant outcomeMode (ecommerce vs lead_gen).
  */
 export function KpiCard({
   metricKey,
@@ -69,6 +63,17 @@ export function KpiCard({
   isDragging = false,
   className,
 }: KpiCardProps) {
+  const outcomeMode = useDashboardStore((s) => s.outcomeMode);
+
+  const METRIC_LABELS: Record<KpiMetricKey, string> = {
+    spend: 'Total Spend',
+    revenue: outcomeMode === 'lead_gen' ? 'Leads' : 'Revenue',
+    roas: outcomeMode === 'lead_gen' ? 'Cost per Lead' : 'ROAS',
+    incremental_revenue: outcomeMode === 'lead_gen' ? 'Incremental Leads' : 'Incremental Revenue',
+    lift_pct: 'Avg Lift %',
+    avg_confidence: 'Avg Confidence',
+  };
+
   const label = METRIC_LABELS[metricKey];
   const formattedValue = formatKpiValue(metricKey, value);
 

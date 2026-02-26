@@ -9,6 +9,7 @@ import { ExportProvider } from '@/lib/export/context';
 import { useDashboardStore } from '@/lib/store/dashboard';
 import { TenantProvider } from '@/lib/auth/tenant-context';
 import { useMarkets } from '@/hooks/useMarkets';
+import { useOutcomeMode } from '@/hooks/useOutcomeMode';
 
 interface DashboardLayoutClientProps {
   tenantId: string;
@@ -53,6 +54,8 @@ export function DashboardLayoutClient({
 
   // Populate Zustand markets store so MarketSelector renders
   useMarkets(tenantId);
+  // Populate Zustand outcomeMode from tenant preferences so KPI/chart labels are correct
+  useOutcomeMode(tenantId);
 
   return (
     <TenantProvider tenantId={tenantId}>

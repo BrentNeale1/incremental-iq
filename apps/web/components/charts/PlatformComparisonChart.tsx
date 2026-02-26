@@ -16,6 +16,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from '@/components/ui/chart';
+import { useDashboardStore } from '@/lib/store/dashboard';
 
 export interface PlatformDataPoint {
   platform: string;  // 'Meta' | 'Google' | 'Shopify'
@@ -29,21 +30,6 @@ export interface PlatformComparisonChartProps {
   isLoading?: boolean;
   height?: number;
 }
-
-const chartConfig: ChartConfig = {
-  spend: {
-    label: 'Spend',
-    color: 'var(--color-chart-1)',
-  },
-  revenue: {
-    label: 'Revenue',
-    color: 'var(--color-chart-2)',
-  },
-  incrementalRevenue: {
-    label: 'Incremental Revenue',
-    color: 'var(--color-brand-accent)',
-  },
-};
 
 const PLATFORM_COLORS: Record<string, string> = {
   meta: '#1877F2',
@@ -61,12 +47,31 @@ const PLATFORM_COLORS: Record<string, string> = {
  * Uses shadcn ChartContainer + Recharts BarChart.
  * Rounded bars (radius prop) per design spec.
  * Color-coded per platform.
+ *
+ * Chart labels are dynamic based on tenant outcomeMode (ecommerce vs lead_gen).
  */
 export function PlatformComparisonChart({
   data,
   isLoading = false,
   height = 240,
 }: PlatformComparisonChartProps) {
+  const outcomeMode = useDashboardStore((s) => s.outcomeMode);
+
+  const chartConfig: ChartConfig = {
+    spend: {
+      label: 'Spend',
+      color: 'var(--color-chart-1)',
+    },
+    revenue: {
+      label: outcomeMode === 'lead_gen' ? 'Leads' : 'Revenue',
+      color: 'var(--color-chart-2)',
+    },
+    incrementalRevenue: {
+      label: outcomeMode === 'lead_gen' ? 'Incremental Leads' : 'Incremental Revenue',
+      color: 'var(--color-brand-accent)',
+    },
+  };
+
   if (isLoading) {
     return <Skeleton className="w-full" style={{ height }} />;
   }
@@ -120,13 +125,13 @@ export function PlatformComparisonChart({
           />
           <Bar
             dataKey="revenue"
-            name="Revenue"
+            name={outcomeMode === 'lead_gen' ? 'Leads' : 'Revenue'}
             fill="var(--color-chart-2)"
             radius={[4, 4, 0, 0]}
           />
           <Bar
             dataKey="incrementalRevenue"
-            name="Incremental Revenue"
+            name={outcomeMode === 'lead_gen' ? 'Incremental Leads' : 'Incremental Revenue'}
             fill="var(--color-brand-accent)"
             radius={[4, 4, 0, 0]}
           />
