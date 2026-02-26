@@ -132,13 +132,14 @@ export default function ExecutiveOverviewPage() {
   const { data: kpisData, isLoading: kpisLoading } = useKpis(
     dateRange,
     comparisonEnabled ? comparisonRange : undefined,
+    selectedMarket,
   );
 
   // Fetch recommendations — tenantId from session cookie; client-side filtered by selectedMarket via select
   const { data: recommendations, isLoading: recsLoading } = useRecommendations();
 
   // Fetch campaigns for charts — tenantId from session cookie
-  const { data: campaignRows, isLoading: campaignsLoading } = useCampaigns(dateRange);
+  const { data: campaignRows, isLoading: campaignsLoading } = useCampaigns(dateRange, undefined, undefined, selectedMarket);
 
   // Derive time series from KPI data and campaign data
   const timeSeriesData: TimeSeriesDataPoint[] = React.useMemo(() => {

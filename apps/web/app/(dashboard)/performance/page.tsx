@@ -21,7 +21,8 @@ import { PlatformTabs } from '@/components/performance/PlatformTabs';
  */
 export default function MarketingPerformancePage() {
   const dateRange = useDashboardStore((s) => s.dateRange);
-  const { data: campaignRows } = useCampaigns(dateRange);
+  const selectedMarket = useDashboardStore((s) => s.selectedMarket);
+  const { data: campaignRows } = useCampaigns(dateRange, undefined, undefined, selectedMarket);
   const { setExportData } = useExportContext();
   React.useEffect(() => {
     if (campaignRows && campaignRows.length > 0) {

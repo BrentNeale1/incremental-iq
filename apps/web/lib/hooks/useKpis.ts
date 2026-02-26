@@ -40,6 +40,7 @@ export interface KpisResponse {
 export function useKpis(
   dateRange: DateRange,
   comparisonRange?: DateRange | null,
+  marketId?: string | null,
 ) {
   const from = format(dateRange.from, 'yyyy-MM-dd');
   const to = format(dateRange.to, 'yyyy-MM-dd');
@@ -47,12 +48,13 @@ export function useKpis(
   const compareTo = comparisonRange ? format(comparisonRange.to, 'yyyy-MM-dd') : undefined;
 
   return useQuery<KpisResponse>({
-    queryKey: ['kpis', from, to, compareFrom, compareTo],
+    queryKey: ['kpis', from, to, compareFrom, compareTo, marketId],
     queryFn: async () => {
       const params = new URLSearchParams({
         from,
         to,
         ...(compareFrom && compareTo ? { compareFrom, compareTo } : {}),
+        ...(marketId ? { marketId } : {}),
       });
 
       const res = await fetch(`/api/dashboard/kpis?${params.toString()}`);

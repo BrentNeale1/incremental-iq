@@ -33,18 +33,20 @@ export function useCampaigns(
   dateRange: DateRange,
   platform?: string,
   level?: string,
+  marketId?: string | null,
 ) {
   const from = format(dateRange.from, 'yyyy-MM-dd');
   const to = format(dateRange.to, 'yyyy-MM-dd');
 
   return useQuery<CampaignRow[]>({
-    queryKey: ['campaigns', from, to, platform, level],
+    queryKey: ['campaigns', from, to, platform, level, marketId],
     queryFn: async () => {
       const params = new URLSearchParams({
         from,
         to,
         ...(platform ? { platform } : {}),
         ...(level ? { level } : {}),
+        ...(marketId ? { marketId } : {}),
       });
 
       const res = await fetch(`/api/dashboard/campaigns?${params.toString()}`);
