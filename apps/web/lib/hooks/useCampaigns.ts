@@ -5,15 +5,19 @@ import { format } from 'date-fns';
 import type { DateRange } from '@/lib/store/dashboard';
 
 export interface CampaignRow {
-  campaignId: string;
-  campaignName: string;
+  id: string;
+  name: string;
   platform: string;
+  funnelStage: string | null;
   spend: number;
-  directRevenue: number;
-  modeledRevenue: number;
+  revenue: number;
   roas: number;
-  incrementalRevenue: number;
-  liftPct: number | null;
+  liftMean: number | null;
+  liftLower: number | null;
+  liftUpper: number | null;
+  confidence: number | null;
+  status: string | null;
+  isRollup: boolean;
 }
 
 /**

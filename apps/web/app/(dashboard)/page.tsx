@@ -49,13 +49,15 @@ function buildTimeSeriesFromTotal(
 function buildPlatformData(campaigns: {
   platform: string;
   spend: number;
-  directRevenue: number;
-  incrementalRevenue: number;
+  revenue: number;
+  liftMean: number | null;
 }[]): PlatformDataPoint[] {
   const byPlatform = new Map<string, PlatformDataPoint>();
 
   for (const row of campaigns) {
     const key = row.platform.charAt(0).toUpperCase() + row.platform.slice(1);
+    // Approximate: incremental revenue = revenue * lift fraction (v1 approximation)
+    const rowIncrementalRevenue = row.revenue * (row.liftMean ?? 0);
     const existing = byPlatform.get(key) ?? {
       platform: key,
       spend: 0,
@@ -65,8 +67,8 @@ function buildPlatformData(campaigns: {
     byPlatform.set(key, {
       platform: key,
       spend: existing.spend + row.spend,
-      revenue: existing.revenue + row.directRevenue,
-      incrementalRevenue: existing.incrementalRevenue + row.incrementalRevenue,
+      revenue: existing.revenue + row.revenue,
+      incrementalRevenue: existing.incrementalRevenue + rowIncrementalRevenue,
     });
   }
 
