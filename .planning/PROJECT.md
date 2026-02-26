@@ -12,37 +12,34 @@ Campaign-level incremental lift analysis that tells brands exactly which campaig
 
 ### Validated
 
-(None yet — ship to validate)
+- ✓ Multi-tenant schema with RLS, dual attribution, creative metadata — v1.0
+- ✓ Meta Ads, Google Ads, Shopify integrations via OAuth — v1.0
+- ✓ GA4 integration for lead gen (user-selectable conversion events) — v1.0
+- ✓ Historical backfill (1yr min, 3yr ideal) with analysis gate — v1.0
+- ✓ Prophet baseline forecasting per campaign — v1.0
+- ✓ CausalPy incrementality scoring with confidence intervals — v1.0
+- ✓ Hill saturation curve modeling — v1.0
+- ✓ Budget change detection with pre/post analysis — v1.0
+- ✓ Seasonality detection with retail calendar + anomaly detection — v1.0
+- ✓ Campaign-level scores rolling up to cluster/channel/overall — v1.0
+- ✓ Scaling-first recommendations (holdout as last resort) — v1.0
+- ✓ Dual-audience views (executive summary + analyst detail) — v1.0
+- ✓ Dashboard with KPIs, date range, drill-down, CSV/Excel export — v1.0
+- ✓ Multi-market attribution with auto-detection and onboarding confirmation — v1.0
+- ✓ Email/password auth with session persistence and logout — v1.0
+- ✓ Onboarding wizard (connect integrations, GA4 events, markets, outcome mode) — v1.0
 
 ### Active
 
-- [ ] Statistical forecasting engine for campaign-level incrementality (primary methodology)
-- [ ] Time-series analysis for pre/post budget change measurement (secondary methodology)
-- [ ] Geo-based testing framework for market-level control groups (tertiary methodology)
-- [ ] Individual campaign incrementality scores that roll up to clusters, channels, and overall
-- [ ] Scaling-first recommendations ("increase budget by X% for Y weeks") as default approach
-- [ ] Holdout test suggestions only when other methods lack sufficient data
-- [ ] Confidence thresholds — transparent uncertainty with specific test suggestions to resolve gaps
-- [ ] Dual-audience reporting: simple summaries for business owners, detailed ranges/confidence intervals for analysts
-- [ ] Shopify API integration for ecommerce revenue data (direct + modeled attribution layers)
-- [ ] Google Ads API integration
-- [ ] Meta Ads API integration
 - [ ] TikTok Ads API integration
 - [ ] Snapchat Ads API integration
 - [ ] Google Search Console API integration
-- [ ] CRM integrations for lead gen: HubSpot, Salesforce, GoHighLevel, Zoho CRM (primary lead source)
-- [ ] GA4 integration as fallback for lead volume (user-selectable conversion events)
-- [ ] Multi-market analysis with auto-detection from campaign geo targets, confirmed by user on source connection
-- [ ] Market-aware attribution — prevent cross-market false signals (e.g., US spend spike ≠ AU sales spike)
-- [ ] Seasonality detection using known retail events (BFCM, etc.) + data-driven anomaly detection
-- [ ] Post-first-analysis seasonality questionnaire — ask user to confirm/identify sales periods and recurring patterns
-- [ ] Proactive budget adjustment suggestions based on historical seasonality patterns
-- [ ] Multi-tenant access: agency accounts managing multiple client accounts + standalone brand accounts
+- [ ] CRM integrations for lead gen: HubSpot, Salesforce, GoHighLevel, Zoho CRM
+- [ ] Multi-tenant access: agency accounts managing multiple client accounts
 - [ ] Client login — clients see only their own account data
 - [ ] Specialist login — media specialists access multiple client accounts
-- [ ] Creative analysis data architecture (schema/models ready, no UI or analysis features in v1)
-- [ ] Minimum 1 year historical data requirement, 3 years ideal, model improves over time
-- [ ] Prediction outputs: expected outcome ranges with confidence levels (detailed) and simple single-line summaries (simplified)
+- [ ] Post-first-analysis seasonality questionnaire — ask user to confirm/identify sales periods
+- [ ] Creative analysis UI and recommendations (schema ready from v1.0)
 
 ### Out of Scope
 
@@ -54,6 +51,10 @@ Campaign-level incremental lift analysis that tells brands exactly which campaig
 - Mobile app — web platform only for v1
 
 ## Context
+
+**Current state:** v1.0 shipped 2026-02-26. 43,280 LOC across TypeScript (Next.js + packages), Python (FastAPI sidecar), CSS, SQL. 37/37 requirements satisfied. 12 tech debt items tracked for v1.1.
+
+**Tech stack:** Next.js 15 (App Router), Drizzle ORM, PostgreSQL + TimescaleDB, Better Auth, BullMQ + Redis, Python FastAPI (Prophet, CausalPy, PyMC), TanStack Query, Zustand, Tailwind v4 + shadcn/ui, Recharts.
 
 **Market gap**: Most incremental measurement tools (e.g., Measured, Rockerbox) operate at the channel level — "Meta drove X% incremental revenue." Incremental IQ goes deeper to the campaign level, which is where media specialists actually make optimization decisions.
 
@@ -79,12 +80,14 @@ Campaign-level incremental lift analysis that tells brands exactly which campaig
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Statistical modeling as primary methodology | Most scalable, doesn't require pausing spend, works with historical data | — Pending |
-| Scaling-first over holdout-first | Rewards growth, doesn't hurt brands during testing, aligns with scaling mission | — Pending |
-| CRM-first for lead gen (not GA4) | CRM has actual lead data, GA4 is a proxy; accuracy matters for conviction | — Pending |
-| Creative analysis architecture-only in v1 | Reduce scope, focus on core campaign analysis, future-proof the data model | — Pending |
-| Dual attribution layers (direct + modeled) | Transparency — show what's trackable alongside what's estimated | — Pending |
-| 4 CRMs in v1 (HubSpot, Salesforce, GHL, Zoho) | Cover the mid-tier brand market broadly from day one | — Pending |
+| Statistical modeling as primary methodology | Most scalable, doesn't require pausing spend, works with historical data | ✓ Good — Prophet + CausalPy ITS working |
+| Scaling-first over holdout-first | Rewards growth, doesn't hurt brands during testing, aligns with scaling mission | ✓ Good — holdout only on low-confidence path |
+| CRM-first for lead gen (not GA4) | CRM has actual lead data, GA4 is a proxy; accuracy matters for conviction | ⚠️ Revisit — CRMs deferred to v1.1, GA4 serves as lead source in v1.0 |
+| Creative analysis architecture-only in v1 | Reduce scope, focus on core campaign analysis, future-proof the data model | ✓ Good — schema ready, no wasted effort |
+| Dual attribution layers (direct + modeled) | Transparency — show what's trackable alongside what's estimated | ✓ Good — both columns populated end-to-end |
+| 4 CRMs deferred to v1.1 | Scope reduction — GA4 covers lead gen adequately for launch | ✓ Good — shipped faster without CRM complexity |
+| Better Auth for authentication | Lightweight, Drizzle adapter, session-based (no JWT complexity) | ✓ Good — clean integration with existing DB |
+| Python FastAPI sidecar for stats | Prophet/CausalPy/PyMC ecosystem requires Python; TypeScript orchestration layer bridges the gap | ✓ Good — clean separation of concerns |
 
 ---
-*Last updated: 2026-02-24 after initialization*
+*Last updated: 2026-02-26 after v1.0 milestone*
