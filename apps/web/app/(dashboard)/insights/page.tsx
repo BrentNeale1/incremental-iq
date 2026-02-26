@@ -73,6 +73,8 @@ export default function StatisticalInsightsPage() {
 
   const selectedSaturation = React.useMemo(() => {
     if (!saturationData || !selectedRow) return null;
+    // Defense-in-depth: guard against unexpected non-array response shapes
+    if (!Array.isArray(saturationData)) return null;
     return saturationData.find((s) => s.campaignId === selectedRow.id) ?? null;
   }, [saturationData, selectedRow]);
 
