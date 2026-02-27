@@ -5,15 +5,15 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** Campaign-level incremental lift analysis that tells brands exactly which campaigns to scale, by how much, and for how long — with transparent confidence levels so no recommendation is made without measurable expected impact.
-**Current focus:** Phase 10 - Dashboard Polish and Integration Fixes (Complete — all 3 gap closure plans done)
+**Current focus:** Phase 10 - Dashboard Polish and Integration Fixes (Complete — all 4 gap closure plans done)
 
 ## Current Position
 
 Phase: 10 of 11 (Dashboard Polish and Integration Fixes) - Complete
-Plan: 3 of 3 executed
-Status: Phase 10 complete. Gap closure plans 10-01 through 10-03 all done. saturationData.find crash fixed; forecast chart unblocked; UAT tests 1, 6, 7 unblocked.
-Last activity: 2026-02-27 — Plan 10-03 executed. useSaturation hook normalized to fix saturationData.find TypeError.
-Stopped at: Completed 10-03-PLAN.md — useSaturation hook normalized to fix saturationData.find crash on Insights page
+Plan: 4 of 4 executed
+Status: Phase 10 complete. Gap closure plans 10-01 through 10-04 all done. UAT Test 2 gap closed: DrillDownTable now filters by selectedMarket matching stats cards behavior.
+Last activity: 2026-02-27 — Plan 10-04 executed. marketId wired from Zustand selectedMarket through DrillDownTable to /api/dashboard/campaigns.
+Stopped at: Completed 10-04-PLAN.md — DrillDownTable market filter wiring complete
 
 Progress: [██████████] ~100% (10 phases in progress)
 
@@ -66,6 +66,7 @@ Progress: [██████████] ~100% (10 phases in progress)
 | Phase 10-dashboard-polish-and-integration-fixes P01 | 3 | 2 tasks | 5 files |
 | Phase 10-dashboard-polish-and-integration-fixes P02 | 12 | 2 tasks | 4 files |
 | Phase 10-dashboard-polish-and-integration-fixes P03 | 2 | 1 tasks | 2 files |
+| Phase 10-dashboard-polish-and-integration-fixes P04 | 2 | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -187,6 +188,7 @@ Recent decisions affecting current work:
 - [Phase 10-dashboard-polish-and-integration-fixes]: ForecastActualChart uses ComposedChart with ciBase+ciWidth stacked Area pattern — dark-mode safe, same pattern as ConfidenceIntervalChart
 - [Phase 10-dashboard-polish-and-integration-fixes]: Normalize dual API response shapes in useSaturation hook queryFn — hook is the right boundary; all consumers always receive SaturationCurve[]
 - [Phase 10-dashboard-polish-and-integration-fixes]: Overview mode response also normalized via .map() — hook maps API field names (hillAlpha/hillMu/hillGamma/saturationPct/estimatedAt) to SaturationCurve interface names (alpha/mu/gamma/saturationPercent/scoredAt)
+- [Phase 10-dashboard-polish-and-integration-fixes]: marketId in TanStack Query queryKey causes automatic cache-bust when market changes in DrillDownTable — same pattern as useIncrementality Plan 10-01
 
 ### Pending Todos
 
