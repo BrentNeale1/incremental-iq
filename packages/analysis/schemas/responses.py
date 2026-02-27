@@ -2,16 +2,17 @@
 Pydantic v2 response models for the Incremental IQ Analysis Engine.
 
 Defines output contracts for all four statistical endpoints:
-- /forecast       → ForecastResponse
-- /incrementality → IncrementalityResponse
-- /saturation     → SaturationResponse
-- /anomalies      → AnomalyResponse
+- /forecast            → ForecastResponse
+- /incrementality      → IncrementalityResponse
+- /incrementality/pooled → PooledIncrementalityResponse
+- /saturation          → SaturationResponse
+- /anomalies           → AnomalyResponse
 """
 
 from datetime import date
-from typing import Optional
+from typing import Any, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ForecastPoint(BaseModel):
@@ -169,4 +170,43 @@ class AnomalyResponse(BaseModel):
     trend_direction: str = Field(
         ...,
         description="Overall trend: 'increasing' | 'decreasing' | 'stable'",
+    )
+
+
+class PooledCampaignResult(BaseModel):
+    """A single campaign's result from the hierarchical pooled endpoint.
+
+    Accommodates additional fields (e.g., data_points, method) returned by
+    different estimation methods via extra="allow".
+    """
+
+    model_config = ConfigDict(extra="allow")
+
+    campaign_id: str
+    lift_mean: float
+    lift_lower: float
+    lift_upper: float
+    confidence: float
+    status: str
+
+
+class PooledIncrementalityResponse(BaseModel):
+    """Structured response from POST /incrementality/pooled.
+
+    Returns both the hierarchically-adjusted (pooled) score and a direct raw
+    score for the target campaign, eliminating the arithmetic approximation.
+
+    - adjusted: hierarchical pooled estimate (borrows strength from cluster)
+    - raw: direct compute_raw_incrementality on the target campaign's own metrics
+    - all_results: full list of results for all campaigns in the cluster
+    """
+
+    adjusted: PooledCampaignResult = Field(
+        ..., description="Hierarchical pooled estimate for the target campaign"
+    )
+    raw: PooledCampaignResult = Field(
+        ..., description="Direct raw score for the target campaign (no pooling bias)"
+    )
+    all_results: list[dict[str, Any]] = Field(
+        ..., description="Full result list for all campaigns in the cluster"
     )

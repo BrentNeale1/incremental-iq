@@ -273,3 +273,103 @@ def test_raw_incrementality_no_seasonal_adjustment(client):
     assert adj_lift != raw_lift, (
         f"Expected adjusted lift ({adj_lift}) to differ from raw lift ({raw_lift})"
     )
+
+
+def test_pooled_returns_dual_scores(client):
+    """
+    POST /incrementality/pooled should return {adjusted, raw, all_results} shape.
+
+    The raw score must be computed via compute_raw_incrementality directly on
+    the target campaign's metrics — NOT an arithmetic approximation of the
+    adjusted score.
+
+    Setup: 2 data-rich campaigns + 1 sparse campaign as the target.
+    """
+    # Data-rich peer 1: 90 pre + 30 post days
+    rich_metrics_1, intervention_1 = make_intervention_data(
+        pre_days=90, post_days=30, lift_pct=0.15, seed=10
+    )
+    # Data-rich peer 2: 90 pre + 30 post days
+    rich_metrics_2, intervention_2 = make_intervention_data(
+        pre_days=90, post_days=30, lift_pct=0.18, seed=20
+    )
+    # Sparse target: only 20 data points total (below 30 threshold)
+    sparse_metrics, intervention_sparse = make_intervention_data(
+        pre_days=12, post_days=8, lift_pct=0.20, seed=30
+    )
+
+    target_campaign_id = "sparse-campaign-001"
+    intervention_date = intervention_1.isoformat()  # shared intervention for peers
+
+    payload = {
+        "tenant_id": "t-test",
+        "cluster_key": "meta-conversion",
+        "target_campaign_id": target_campaign_id,
+        "campaigns": [
+            {
+                "campaign_id": "rich-campaign-001",
+                "metrics": rich_metrics_1,
+                "intervention_date": intervention_1.isoformat(),
+                "data_points_count": len(rich_metrics_1),
+                "is_target": False,
+            },
+            {
+                "campaign_id": "rich-campaign-002",
+                "metrics": rich_metrics_2,
+                "intervention_date": intervention_2.isoformat(),
+                "data_points_count": len(rich_metrics_2),
+                "is_target": False,
+            },
+            {
+                "campaign_id": target_campaign_id,
+                "metrics": sparse_metrics,
+                "intervention_date": intervention_sparse.isoformat(),
+                "data_points_count": len(sparse_metrics),
+                "is_target": True,
+            },
+        ],
+    }
+
+    response = client.post("/incrementality/pooled", json=payload)
+    assert response.status_code == 200, (
+        f"Expected 200, got {response.status_code}: {response.text}"
+    )
+
+    body = response.json()
+
+    # 1. Response must have the three required keys
+    assert "adjusted" in body, f"Response missing 'adjusted' key: {body.keys()}"
+    assert "raw" in body, f"Response missing 'raw' key: {body.keys()}"
+    assert "all_results" in body, f"Response missing 'all_results' key: {body.keys()}"
+
+    # 2. adjusted.campaign_id must match the target
+    assert body["adjusted"]["campaign_id"] == target_campaign_id, (
+        f"adjusted.campaign_id expected '{target_campaign_id}', got '{body['adjusted']['campaign_id']}'"
+    )
+
+    # 3. raw.campaign_id must match the target
+    assert body["raw"]["campaign_id"] == target_campaign_id, (
+        f"raw.campaign_id expected '{target_campaign_id}', got '{body['raw']['campaign_id']}'"
+    )
+
+    # 4. raw.lift_mean must be a number
+    assert isinstance(body["raw"]["lift_mean"], (int, float)), (
+        f"raw.lift_mean must be numeric, got {type(body['raw']['lift_mean'])}: {body['raw']['lift_mean']}"
+    )
+
+    # 5. all_results must be a list
+    assert isinstance(body["all_results"], list), (
+        f"all_results must be a list, got {type(body['all_results'])}"
+    )
+
+    # 6. Verify raw is not an arithmetic approximation of adjusted
+    #    The raw score comes from compute_raw_incrementality which uses
+    #    a different algorithm — it should not be exactly adjusted * 0.95
+    adjusted_mean = body["adjusted"]["lift_mean"]
+    raw_mean = body["raw"]["lift_mean"]
+    arithmetic_approx = adjusted_mean * 0.95
+    assert abs(raw_mean - arithmetic_approx) > 1e-6, (
+        f"raw.lift_mean ({raw_mean}) looks like arithmetic approximation "
+        f"of adjusted ({adjusted_mean}) * 0.95 = {arithmetic_approx}. "
+        "Expected direct compute_raw_incrementality result."
+    )

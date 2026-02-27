@@ -90,6 +90,7 @@ interface IncrementalityRequest {
 interface PooledRequest {
   tenant_id: string;
   cluster_key: string;
+  target_campaign_id: string;
   campaigns: Array<{
     campaign_id: string;
     metrics: MetricRow[];
@@ -153,7 +154,7 @@ async function callSidecar<T>(endpoint: string, body: unknown): Promise<T> {
  * @param job - BullMQ job with ScoringJobData payload.
  */
 export async function processScoringJob(job: Job<ScoringJobData>): Promise<void> {
-  const { tenantId, campaignId, triggerType } = job.data;
+  const { tenantId, campaignId, triggerType, budgetChangeDate } = job.data;
 
   console.info(
     `[scoring-worker] Starting score: tenant=${tenantId} campaign=${campaignId} trigger=${triggerType}`,
@@ -315,7 +316,7 @@ export async function processScoringJob(job: Job<ScoringJobData>): Promise<void>
   // Use campaign start date or the most recent budget change date.
   // For simplicity, use the date of first non-zero spend as campaign start.
   // -------------------------------------------------------------------------
-  const interventionDate = _getInterventionDate(rawMetrics, triggerType);
+  const interventionDate = _getInterventionDate(rawMetrics, triggerType, budgetChangeDate);
 
   // -------------------------------------------------------------------------
   // Step 5: Call POST /incrementality (CausalPy ITS dual scores)
@@ -355,18 +356,18 @@ export async function processScoringJob(job: Job<ScoringJobData>): Promise<void>
 
     incrementalityResult = {
       adjusted: {
-        lift_mean: pooledResult.lift_mean,
-        lift_lower: pooledResult.lift_lower,
-        lift_upper: pooledResult.lift_upper,
-        confidence: pooledResult.confidence,
+        lift_mean: pooledResult.adjusted.lift_mean,
+        lift_lower: pooledResult.adjusted.lift_lower,
+        lift_upper: pooledResult.adjusted.lift_upper,
+        confidence: pooledResult.adjusted.confidence,
         data_points: dataPoints,
         status: 'pooled_estimate',
       },
       raw: {
-        lift_mean: pooledResult.lift_mean * 0.95, // Raw is slightly narrower than pooled
-        lift_lower: pooledResult.lift_lower * 1.05,
-        lift_upper: pooledResult.lift_upper * 0.95,
-        confidence: pooledResult.confidence * 0.9,
+        lift_mean: pooledResult.raw.lift_mean,
+        lift_lower: pooledResult.raw.lift_lower,
+        lift_upper: pooledResult.raw.lift_upper,
+        confidence: pooledResult.raw.confidence,
         data_points: dataPoints,
         status: 'pooled_estimate',
       },
@@ -542,10 +543,18 @@ async function _runHierarchicalPooling(
   userEvents: HolidayEvent[],
   peers: Array<{ campaign_id: string; lift_mean: number }>,
 ): Promise<{
-  lift_mean: number;
-  lift_lower: number;
-  lift_upper: number;
-  confidence: number;
+  adjusted: {
+    lift_mean: number;
+    lift_lower: number;
+    lift_upper: number;
+    confidence: number;
+  };
+  raw: {
+    lift_mean: number;
+    lift_lower: number;
+    lift_upper: number;
+    confidence: number;
+  };
 }> {
   // Fetch peer metrics
   const peerCampaigns = await Promise.all(
@@ -581,6 +590,7 @@ async function _runHierarchicalPooling(
   const pooledRequest: PooledRequest = {
     tenant_id: tenantId,
     cluster_key: `pooled_${campaignId}`,
+    target_campaign_id: campaignId,
     campaigns: [
       ...peerCampaigns,
       {
@@ -593,33 +603,63 @@ async function _runHierarchicalPooling(
   };
 
   const pooledResponse = await callSidecar<{
-    target_campaign_id: string;
-    lift_mean: number;
-    lift_lower: number;
-    lift_upper: number;
-    confidence: number;
+    adjusted: {
+      campaign_id: string;
+      lift_mean: number;
+      lift_lower: number;
+      lift_upper: number;
+      confidence: number;
+      status: string;
+      [key: string]: unknown;
+    };
+    raw: {
+      campaign_id: string;
+      lift_mean: number;
+      lift_lower: number;
+      lift_upper: number;
+      confidence: number;
+      status: string;
+      [key: string]: unknown;
+    };
+    all_results: unknown[];
   }>('/incrementality/pooled', pooledRequest);
 
   return {
-    lift_mean: pooledResponse.lift_mean,
-    lift_lower: pooledResponse.lift_lower,
-    lift_upper: pooledResponse.lift_upper,
-    confidence: pooledResponse.confidence,
+    adjusted: {
+      lift_mean: pooledResponse.adjusted.lift_mean,
+      lift_lower: pooledResponse.adjusted.lift_lower,
+      lift_upper: pooledResponse.adjusted.lift_upper,
+      confidence: pooledResponse.adjusted.confidence,
+    },
+    raw: {
+      lift_mean: pooledResponse.raw.lift_mean,
+      lift_lower: pooledResponse.raw.lift_lower,
+      lift_upper: pooledResponse.raw.lift_upper,
+      confidence: pooledResponse.raw.confidence,
+    },
   };
 }
 
 /**
  * Determine the ITS intervention date for a campaign.
  *
- * Uses the date of first non-zero spend as the campaign start date.
- * For budget_change triggered jobs, ideally the budget change date
- * would be passed in job data — for now we use the first-spend heuristic.
+ * For budget_change triggered jobs, uses the actual budget change date (midpoint
+ * of the transition window computed by detectBudgetChanges). This ensures the
+ * counterfactual baseline is computed from the correct intervention point.
+ *
+ * For other trigger types, falls back to the date of first non-zero spend.
  */
 function _getInterventionDate(
   metrics: MetricRow[],
-  _triggerType: string,
+  triggerType: string,
+  budgetChangeDate?: string,
 ): string {
-  // Find first date with non-zero spend
+  // For budget-change triggered scoring, use the actual change date
+  if (triggerType === 'budget_change' && budgetChangeDate) {
+    return budgetChangeDate; // Midpoint already computed by detectBudgetChanges
+  }
+
+  // Find first date with non-zero spend (campaign start date)
   const firstSpend = metrics.find((m) => m.spend_usd > 0);
   if (firstSpend) {
     return firstSpend.date;
