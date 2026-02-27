@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { auth } from '@/auth';
-import { eq, inArray } from 'drizzle-orm';
+import { eq, inArray, and } from 'drizzle-orm';
 import { formatDistanceToNow } from 'date-fns';
 import { db } from '@incremental-iq/db';
 import { integrations, syncRuns } from '@incremental-iq/db';
@@ -51,16 +51,21 @@ export async function GET(_request: NextRequest): Promise<NextResponse> {
 
   // Check which integrations have a sync currently in progress
   const integrationIds = allIntegrations.map((i) => i.id);
-  const runningSyncs = await db
-    .select({ integrationId: syncRuns.integrationId })
-    .from(syncRuns)
-    .where(
-      // @ts-ignore — drizzle inArray works at runtime, type inference edge case
-      inArray(syncRuns.integrationId, integrationIds) &&
-      eq(syncRuns.status, 'running'),
-    );
-
-  const runningIntegrationIds = new Set(runningSyncs.map((r) => r.integrationId));
+  const runningIntegrationIds = new Set<string>();
+  if (integrationIds.length > 0) {
+    const runningSyncs = await db
+      .select({ integrationId: syncRuns.integrationId })
+      .from(syncRuns)
+      .where(
+        and(
+          inArray(syncRuns.integrationId, integrationIds),
+          eq(syncRuns.status, 'running'),
+        ),
+      );
+    for (const r of runningSyncs) {
+      runningIntegrationIds.add(r.integrationId);
+    }
+  }
 
   // Build integration status array and collect warnings
   const now = Date.now();
