@@ -197,6 +197,10 @@ Plans:
   2. Global status route uses correct Drizzle `and()` operator instead of JavaScript `&&`
   3. Pooled raw score is computed directly instead of reverse-approximated from adjusted result
   4. Budget-change triggered ITS jobs use the actual budget change date as intervention point, not campaign start date
+**Plans**: 2 plans
+Plans:
+- [ ] 11-01-PLAN.md — Fix ingestion_coverage duplicates (unique constraint + upsert) and Drizzle and() query bug
+- [ ] 11-02-PLAN.md — Fix pooled raw score approximation (direct computation) and budget-change ITS intervention date
 
 ## Progress
 
@@ -215,7 +219,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 8. Market-Aware Recommendations | 2/2 | Complete   | 2026-02-25 |
 | 9. Dashboard Data Wiring Fixes | 0/1 | Pending | |
 | 10. Dashboard Polish & Integration Fixes | 4/4 | Complete    | 2026-02-27 |
-| 11. Backend Data Quality | 0/0 | Pending | |
+| 11. Backend Data Quality | 0/2 | Pending | |
 
 ## Gap Closure (Re-Audit 2026-02-26)
 
