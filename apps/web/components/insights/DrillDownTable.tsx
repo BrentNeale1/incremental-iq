@@ -85,18 +85,20 @@ function useDrillData(
   dateRange: DateRange,
   platform: string | undefined,
   level: DrillLevel,
+  marketId: string | undefined,
 ) {
   const from = format(dateRange.from, 'yyyy-MM-dd');
   const to = format(dateRange.to, 'yyyy-MM-dd');
 
   return useQuery<DrillDownRow[]>({
-    queryKey: ['drill-down', from, to, platform, level],
+    queryKey: ['drill-down', from, to, platform, level, marketId],
     queryFn: async () => {
       const params = new URLSearchParams({
         from,
         to,
         level,
         ...(platform && platform !== 'all' ? { platform } : {}),
+        ...(marketId ? { marketId } : {}),
       });
       const res = await fetch(`/api/dashboard/campaigns?${params.toString()}`);
       if (!res.ok) throw new Error(`Failed to fetch campaigns: ${res.status}`);
@@ -161,6 +163,7 @@ function SortButton({ column, currentKey, currentDir, onSort, children }: SortBu
 interface DrillDownTableProps {
   dateRange: DateRange;
   onSelectRow?: (row: DrillDownRow) => void;
+  marketId?: string;
 }
 
 /**
@@ -178,7 +181,7 @@ interface DrillDownTableProps {
  * Per design spec: RPRT-03 campaign -> cluster -> channel -> overall drill-down.
  * tenantId is no longer needed — the API reads it from the session cookie.
  */
-export function DrillDownTable({ dateRange, onSelectRow }: DrillDownTableProps) {
+export function DrillDownTable({ dateRange, onSelectRow, marketId }: DrillDownTableProps) {
   const [level, setLevel] = React.useState<DrillLevel>('campaign');
   const [sortKey, setSortKey] = React.useState<SortKey | null>('confidence');
   const [sortDir, setSortDir] = React.useState<SortDir>('desc');
@@ -189,7 +192,7 @@ export function DrillDownTable({ dateRange, onSelectRow }: DrillDownTableProps) 
   const [platformFilter, setPlatformFilter] = React.useState<string>('all');
   const [minConfidence, setMinConfidence] = React.useState<number>(0);
 
-  const { data: rows, isLoading, isError } = useDrillData(dateRange, platformFilter !== 'all' ? platformFilter : undefined, level);
+  const { data: rows, isLoading, isError } = useDrillData(dateRange, platformFilter !== 'all' ? platformFilter : undefined, level, marketId);
 
   const filtered = React.useMemo(() => {
     if (!rows) return [];

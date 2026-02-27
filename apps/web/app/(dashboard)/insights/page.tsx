@@ -274,6 +274,7 @@ export default function StatisticalInsightsPage() {
             <CollapsibleContent>
               <DrillDownTable
                 dateRange={dateRange}
+                marketId={selectedMarket ?? undefined}
                 onSelectRow={(row) => {
                   setSelectedRow(row);
                   setSidebarOpen(true);
