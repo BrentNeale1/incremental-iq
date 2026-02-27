@@ -19,6 +19,23 @@ import { budgetChanges } from '@incremental-iq/db';
 import { db, withTenant } from '@incremental-iq/db';
 
 // ---------------------------------------------------------------------------
+// Configuration
+// ---------------------------------------------------------------------------
+
+/**
+ * Default budget change detection threshold.
+ *
+ * Per user decision: only significant budget changes (>20%) should trigger
+ * ITS analysis. Configurable via BUDGET_CHANGE_THRESHOLD env var so operators
+ * can tune without a code deploy.
+ *
+ * Previous value: 0.25 (25%) — changed to 0.20 (20%) per user decision.
+ */
+const BUDGET_CHANGE_THRESHOLD = parseFloat(
+  process.env.BUDGET_CHANGE_THRESHOLD ?? '0.20',
+);
+
+// ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
@@ -60,18 +77,19 @@ export interface BudgetChangeEvent {
  * 3. Compare 14-day rolling averages:
  *    - pre  = average of smoothed spend from days 28–15 ago
  *    - post = average of smoothed spend from days 14–1 ago
- * 4. If |post - pre| / pre > thresholdPct, return a BudgetChangeEvent.
+ * 4. If |post - pre| / pre > thresholdPct (default 0.20), return a BudgetChangeEvent.
  * 5. Otherwise return null (no significant change detected).
  *
  * @param tenantId    - Tenant UUID for RLS context.
  * @param campaignId  - Campaign UUID to check.
- * @param thresholdPct - Fractional threshold for change detection (default 0.25 = 25%).
+ * @param thresholdPct - Fractional threshold for change detection (default 0.20 = 20%).
+ *                       Override via BUDGET_CHANGE_THRESHOLD env var or pass explicitly.
  * @returns BudgetChangeEvent if a significant change is detected, null otherwise.
  */
 export async function detectBudgetChanges(
   tenantId: string,
   campaignId: string,
-  thresholdPct: number = 0.25,
+  thresholdPct: number = BUDGET_CHANGE_THRESHOLD,
 ): Promise<BudgetChangeEvent | null> {
   // Use withTenant for RLS context — all queries must run inside the tenant session
   return withTenant(tenantId, async () => {

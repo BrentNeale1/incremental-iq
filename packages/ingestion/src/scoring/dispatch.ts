@@ -41,6 +41,8 @@ export interface ScoringJobData {
   tenantId: string;
   campaignId: string;
   triggerType: 'nightly' | 'budget_change' | 'manual';
+  /** ISO date string of the budget change — only set for budget_change triggers. */
+  budgetChangeDate?: string;
 }
 
 /** Data payload for a full tenant scoring job (enqueues individual campaign jobs). */
@@ -59,18 +61,21 @@ export interface TenantScoringJobData {
  * Adds a 'score-campaign' job with 3 retry attempts and exponential backoff
  * starting at 30 seconds (Python model fitting may take time to warm up).
  *
- * @param tenantId    - Tenant UUID for RLS context and isolation.
- * @param campaignId  - Campaign UUID to score.
- * @param triggerType - What triggered this scoring run (for audit/logging).
+ * @param tenantId         - Tenant UUID for RLS context and isolation.
+ * @param campaignId       - Campaign UUID to score.
+ * @param triggerType      - What triggered this scoring run (for audit/logging).
+ * @param budgetChangeDate - ISO date of the budget change (only for budget_change triggers).
+ *                          Used by the scoring worker as the ITS intervention date.
  */
 export async function enqueueScoringJob(
   tenantId: string,
   campaignId: string,
   triggerType: 'nightly' | 'budget_change' | 'manual',
+  budgetChangeDate?: string,
 ): Promise<void> {
   await scoringQueue.add(
     'score-campaign',
-    { tenantId, campaignId, triggerType } satisfies ScoringJobData,
+    { tenantId, campaignId, triggerType, budgetChangeDate } satisfies ScoringJobData,
     {
       attempts: 3,
       backoff: { type: 'exponential', delay: 30_000 },

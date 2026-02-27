@@ -87,7 +87,7 @@ const scoringWorker = new Worker<ScoringJobData | TenantScoringJobData>(
       try {
         const budgetChanges = await scanAllCampaignsForBudgetChanges(tenantId);
         for (const change of budgetChanges) {
-          await enqueueScoringJob(tenantId, change.campaignId, 'budget_change');
+          await enqueueScoringJob(tenantId, change.campaignId, 'budget_change', change.changeDate);
         }
         if (budgetChanges.length > 0) {
           console.info(
