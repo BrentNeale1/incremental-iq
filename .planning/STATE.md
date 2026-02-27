@@ -5,15 +5,15 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** Campaign-level incremental lift analysis that tells brands exactly which campaigns to scale, by how much, and for how long — with transparent confidence levels so no recommendation is made without measurable expected impact.
-**Current focus:** Phase 11 - Backend Data Quality (In Progress — plan 11-01 complete)
+**Current focus:** Phase 11 - Backend Data Quality (Complete — plans 11-01 and 11-02 done)
 
 ## Current Position
 
-Phase: 11 of 11 (Backend Data Quality) - In Progress
-Plan: 1 of 2 executed
-Status: Plan 11-01 complete. uniqueIndex on ingestion_coverage, all 4 normalizer upserts converted, status route and() bug fixed.
-Last activity: 2026-02-27 — Plan 11-01 executed. ingestion_coverage unique constraint + migration 0008 + upsert normalizers + Drizzle and() fix.
-Stopped at: Completed 11-01-PLAN.md — data integrity fixes complete
+Phase: 11 of 11 (Backend Data Quality) - Complete
+Plan: 2 of 2 executed
+Status: Phase 11 complete. Plans 11-01 and 11-02 done. Scoring precision bugs fixed: pooled raw scores now via compute_raw_incrementality, budget-change ITS uses actual change date, threshold at 20%.
+Last activity: 2026-02-27 — Plan 11-02 executed. Dual adjusted+raw pooled response, budgetChangeDate wiring, 20% threshold.
+Stopped at: Completed 11-02-PLAN.md — pooled raw scores and budget change date wiring complete
 
 Progress: [██████████] ~100% (10 phases in progress)
 
@@ -68,6 +68,7 @@ Progress: [██████████] ~100% (10 phases in progress)
 | Phase 10-dashboard-polish-and-integration-fixes P03 | 2 | 1 tasks | 2 files |
 | Phase 10-dashboard-polish-and-integration-fixes P04 | 2 | 1 tasks | 2 files |
 | Phase 11-backend-data-quality PP01 | 3 min | 2 tasks | 7 files |
+| Phase 11-backend-data-quality P02 | 15 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -191,6 +192,9 @@ Recent decisions affecting current work:
 - [Phase 10-dashboard-polish-and-integration-fixes]: Overview mode response also normalized via .map() — hook maps API field names (hillAlpha/hillMu/hillGamma/saturationPct/estimatedAt) to SaturationCurve interface names (alpha/mu/gamma/saturationPercent/scoredAt)
 - [Phase 10-dashboard-polish-and-integration-fixes]: marketId in TanStack Query queryKey causes automatic cache-bust when market changes in DrillDownTable — same pattern as useIncrementality Plan 10-01
 - [Phase 11-backend-data-quality]: Migration path is packages/db/migrations/ (not drizzle/) — drizzle.config.ts out: './migrations' is canonical; ingestionCoverage onConflictDoUpdate uses (tenantId, source, coverageDate) target; Drizzle WHERE must use and(cond1, cond2) not && (JavaScript boolean evaluation); empty inArray guard before inArray(col, []) prevents Postgres error
+- [Phase 11-backend-data-quality]: Pooled endpoint returns {adjusted, raw, all_results} — raw computed via compute_raw_incrementality, not arithmetic approximation of adjusted
+- [Phase 11-backend-data-quality]: budgetChangeDate threaded from dispatch.ts through workers.ts to _getInterventionDate — budget_change triggers use actual change date, not campaign start
+- [Phase 11-backend-data-quality]: Budget change detection threshold changed from 0.25 to 0.20 per user decision; configurable via BUDGET_CHANGE_THRESHOLD env var
 
 ### Pending Todos
 
@@ -210,7 +214,7 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 11-01-PLAN.md — data integrity fixes (uniqueIndex on ingestion_coverage, upsert normalizers, Drizzle and() fix in status route)
-Resume with: Phase 11 in progress (1 of 2 plans done). Plan 11-02 next.
-Key context: Phase 11 Plan 1 complete. Migration 0008 deduplicates existing ingestion_coverage rows then adds unique index. All 4 normalizers (meta, google-ads, shopify, ga4) now upsert coverage rows. Status route uses and(inArray(), eq()) instead of buggy && operator, with empty-array guard.
-Resume file: .planning/phases/11-backend-data-quality/11-02-PLAN.md
+Stopped at: Completed 11-02-PLAN.md — pooled raw scores and budget change date wiring complete
+Resume with: Phase 11 complete (2 of 2 plans done). All scoring precision bugs fixed.
+Key context: Phase 11 Plan 2 complete. Pooled endpoint now returns {adjusted, raw, all_results} with raw computed via compute_raw_incrementality (no more arithmetic approximation). budgetChangeDate threaded from dispatch through workers.ts to _getInterventionDate — budget_change triggers use actual change date as ITS intervention point. Budget detection threshold changed from 25% to 20% (configurable via BUDGET_CHANGE_THRESHOLD env var).
+Resume file: N/A — Phase 11 complete

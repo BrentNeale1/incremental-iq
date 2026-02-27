@@ -22,7 +22,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 8: Market-Aware Recommendations** - Add marketId filtering to recommendations API and engine (Gap Closure) (completed 2026-02-25)
 - [ ] **Phase 9: Dashboard Data Wiring Fixes** - Fix CampaignRow type mismatch and wire useOutcomeMode into dashboard (Gap Closure)
 - [x] **Phase 10: Dashboard Polish & Integration Fixes** - Close insights market filter gap, fix export flattening, fix dashboard data quality (Gap Closure) (completed 2026-02-27)
-- [ ] **Phase 11: Backend Data Quality** - Fix ingestion duplicates, query bug, scoring approximations (Tech Debt)
+- [x] **Phase 11: Backend Data Quality** - Fix ingestion duplicates, query bug, scoring approximations (Tech Debt) (completed 2026-02-27)
 
 ## Phase Details
 
@@ -219,7 +219,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 8. Market-Aware Recommendations | 2/2 | Complete   | 2026-02-25 |
 | 9. Dashboard Data Wiring Fixes | 0/1 | Pending | |
 | 10. Dashboard Polish & Integration Fixes | 4/4 | Complete    | 2026-02-27 |
-| 11. Backend Data Quality | 1/2 | In Progress|  |
+| 11. Backend Data Quality | 2/2 | Complete   | 2026-02-27 |
 
 ## Gap Closure (Re-Audit 2026-02-26)
 
