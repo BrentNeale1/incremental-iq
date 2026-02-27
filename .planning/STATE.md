@@ -5,15 +5,15 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** Campaign-level incremental lift analysis that tells brands exactly which campaigns to scale, by how much, and for how long — with transparent confidence levels so no recommendation is made without measurable expected impact.
-**Current focus:** Phase 10 - Dashboard Polish and Integration Fixes (Complete — all 4 gap closure plans done)
+**Current focus:** Phase 11 - Backend Data Quality (In Progress — plan 11-01 complete)
 
 ## Current Position
 
-Phase: 10 of 11 (Dashboard Polish and Integration Fixes) - Complete
-Plan: 4 of 4 executed
-Status: Phase 10 complete. Gap closure plans 10-01 through 10-04 all done. UAT Test 2 gap closed: DrillDownTable now filters by selectedMarket matching stats cards behavior.
-Last activity: 2026-02-27 — Plan 10-04 executed. marketId wired from Zustand selectedMarket through DrillDownTable to /api/dashboard/campaigns.
-Stopped at: Completed 10-04-PLAN.md — DrillDownTable market filter wiring complete
+Phase: 11 of 11 (Backend Data Quality) - In Progress
+Plan: 1 of 2 executed
+Status: Plan 11-01 complete. uniqueIndex on ingestion_coverage, all 4 normalizer upserts converted, status route and() bug fixed.
+Last activity: 2026-02-27 — Plan 11-01 executed. ingestion_coverage unique constraint + migration 0008 + upsert normalizers + Drizzle and() fix.
+Stopped at: Completed 11-01-PLAN.md — data integrity fixes complete
 
 Progress: [██████████] ~100% (10 phases in progress)
 
@@ -67,6 +67,7 @@ Progress: [██████████] ~100% (10 phases in progress)
 | Phase 10-dashboard-polish-and-integration-fixes P02 | 12 | 2 tasks | 4 files |
 | Phase 10-dashboard-polish-and-integration-fixes P03 | 2 | 1 tasks | 2 files |
 | Phase 10-dashboard-polish-and-integration-fixes P04 | 2 | 1 tasks | 2 files |
+| Phase 11-backend-data-quality PP01 | 3 min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -189,6 +190,7 @@ Recent decisions affecting current work:
 - [Phase 10-dashboard-polish-and-integration-fixes]: Normalize dual API response shapes in useSaturation hook queryFn — hook is the right boundary; all consumers always receive SaturationCurve[]
 - [Phase 10-dashboard-polish-and-integration-fixes]: Overview mode response also normalized via .map() — hook maps API field names (hillAlpha/hillMu/hillGamma/saturationPct/estimatedAt) to SaturationCurve interface names (alpha/mu/gamma/saturationPercent/scoredAt)
 - [Phase 10-dashboard-polish-and-integration-fixes]: marketId in TanStack Query queryKey causes automatic cache-bust when market changes in DrillDownTable — same pattern as useIncrementality Plan 10-01
+- [Phase 11-backend-data-quality]: Migration path is packages/db/migrations/ (not drizzle/) — drizzle.config.ts out: './migrations' is canonical; ingestionCoverage onConflictDoUpdate uses (tenantId, source, coverageDate) target; Drizzle WHERE must use and(cond1, cond2) not && (JavaScript boolean evaluation); empty inArray guard before inArray(col, []) prevents Postgres error
 
 ### Pending Todos
 
@@ -207,8 +209,8 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-02-26
-Stopped at: Completed 10-02-PLAN.md — forecast API route, useForecast hook, ForecastActualChart upgraded with real Prophet data and confidence bands.
-Resume with: Phase 10 complete (2 of 2 plans done). Dashboard polish and integration fixes complete.
-Key context: Phase 10 Plan 2 complete. GET /api/dashboard/forecast proxies to Python FastAPI. useForecast(campaignId) TanStack Query hook with 10-min staleTime. ForecastActualChart upgraded from LineChart scaffold to ComposedChart with stacked Area CI bands. insights/page.tsx wires real forecast data replacing liftMean * 1.08 approximation. Empty state messages context-aware (no-selection vs no-data).
-Resume file: N/A — all phases complete
+Last session: 2026-02-27
+Stopped at: Completed 11-01-PLAN.md — data integrity fixes (uniqueIndex on ingestion_coverage, upsert normalizers, Drizzle and() fix in status route)
+Resume with: Phase 11 in progress (1 of 2 plans done). Plan 11-02 next.
+Key context: Phase 11 Plan 1 complete. Migration 0008 deduplicates existing ingestion_coverage rows then adds unique index. All 4 normalizers (meta, google-ads, shopify, ga4) now upsert coverage rows. Status route uses and(inArray(), eq()) instead of buggy && operator, with empty-array guard.
+Resume file: .planning/phases/11-backend-data-quality/11-02-PLAN.md
