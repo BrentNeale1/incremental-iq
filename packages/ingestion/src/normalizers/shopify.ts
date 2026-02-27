@@ -425,6 +425,13 @@ export async function processShopifySync(
         coverageDate,
         status: recordsIngested > 0 ? 'complete' : 'partial',
         recordCount: String(recordsIngested),
+      }).onConflictDoUpdate({
+        target: [ingestionCoverage.tenantId, ingestionCoverage.source, ingestionCoverage.coverageDate],
+        set: {
+          status: sql`excluded.status`,
+          recordCount: sql`excluded.record_count`,
+          ingestedAt: sql`NOW()`,
+        },
       });
     }
   });

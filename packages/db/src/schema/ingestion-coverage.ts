@@ -1,4 +1,4 @@
-import { pgPolicy, pgTable, uuid, text, date, timestamp, numeric } from 'drizzle-orm/pg-core';
+import { pgPolicy, pgTable, uuid, text, date, timestamp, numeric, uniqueIndex } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { appRole } from './roles';
 
@@ -31,6 +31,7 @@ export const ingestionCoverage = pgTable('ingestion_coverage', {
   ingestedAt: timestamp('ingested_at', { withTimezone: true }).defaultNow().notNull(),
   notes: text('notes'),                           // error messages, partial reasons
 }, (t) => [
+  uniqueIndex('ingestion_coverage_tenant_source_date_idx').on(t.tenantId, t.source, t.coverageDate),
   pgPolicy('tenant_isolation', {
     as: 'restrictive',
     for: 'all',
